@@ -7,30 +7,33 @@ import {
   MagnifyingGlassIcon,
   UserIcon,
 } from '@heroicons/vue/24/outline'
+import BasicInput from '@/components/atoms/BasicInput.vue'
+import BasicButton from '@/components/atoms/BasicButton.vue'
+import BasicLink from '@/components/atoms/BasicLink.vue'
 
 const chartCanvas = ref(null) // canvas 요소를 위한 ref
 const chartInstance = ref(null) // 차트 인스턴스를 저장할 ref
 const chartData = ref([]) // 데이터를 저장할 ref
 
 // API에서 데이터를 가져오는 함수
-const fetchData = async () => {
-  try {
-    const response = await fetch('your-api-endpoint')
-    const data = await response.json()
-    chartData.value = data
-    updateChart()
-  } catch (error) {
-    console.error('데이터 가져오기 실패:', error)
-  }
-}
+// const fetchData = async () => {
+//   try {
+//     const response = await fetch('your-api-endpoint')
+//     const data = await response.json()
+//     chartData.value = data
+//     updateChart()
+//   } catch (error) {
+//     console.error('데이터 가져오기 실패:', error)
+//   }
+// }
 
 // 차트 업데이트 함수
-const updateChart = () => {
-  if (chartInstance.value) {
-    chartInstance.value.data.datasets[0].data = chartData.value
-    chartInstance.value.update()
-  }
-}
+// const updateChart = () => {
+//   if (chartInstance.value) {
+//     chartInstance.value.data.datasets[0].data = chartData.value
+//     chartInstance.value.update()
+//   }
+// }
 
 onMounted(() => {
   // ref로 canvas 요소 접근
@@ -67,7 +70,7 @@ onMounted(() => {
   })
 
   // 초기 데이터 가져오기
-  fetchData()
+  // fetchData()
 })
 </script>
 
@@ -77,12 +80,6 @@ onMounted(() => {
     <p>Home 페이지입니다.</p>
     <div class="w-full max-w-3xl">
       <canvas ref="chartCanvas"></canvas>
-    </div>
-    <div class="flex gap-2">
-      <Bars3Icon class="h-8 w-8 text-red-400" />
-      <MagnifyingGlassIcon class="h-8 w-8" />
-      <UserIcon class="h-8 w-8" />
-      <AcademicCapIcon class="h-8 w-8" />
     </div>
   </main>
 </template>
