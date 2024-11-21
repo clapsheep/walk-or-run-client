@@ -1,4 +1,4 @@
-import { createRouter, createMemoryHistory, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(),

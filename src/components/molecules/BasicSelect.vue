@@ -1,50 +1,30 @@
-<script setup>
-defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  label: {
-    type: String,
-    required: true,
-  },
-  modelValue: {
-    type: [String, Number],
-    default: '',
-  },
-  options: {
-    type: Array,
-    required: true,
-  },
-  valueKey: {
-    type: String,
-    required: true,
-  },
-  labelKey: {
-    type: String,
-    required: true,
-  },
-  placeholder: {
-    type: String,
-    default: '선택해주세요',
-  },
-  error: {
-    type: String,
-    default: '',
-  },
-  direction: {
-    type: String,
-    validator: (value) => ['row', 'col'].includes(value),
-    default: 'col',
-  },
-  size: {
-    type: String,
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
-    default: 'md',
-  },
-})
+<script setup lang="ts">
+interface BasicSelectProps {
+  id: string
+  label: string
+  modelValue: string | number
+  options: Record<string, string>[]
+  valueKey: string
+  labelKey: string
+  placeholder?: string
+  error?: string
+  direction?: 'row' | 'col'
+  size?: 'sm' | 'md' | 'lg'
+}
 
-defineEmits(['update:modelValue'])
+const {
+  id,
+  label,
+  modelValue,
+  options,
+  valueKey,
+  labelKey,
+  placeholder,
+  error = '',
+  direction = 'row',
+  size = 'md',
+} = defineProps<BasicSelectProps>()
+const value = defineModel()
 
 const SIZE_CLASSES = {
   sm: 'px-3 py-1.5 text-sm',
@@ -62,8 +42,7 @@ const SIZE_CLASSES = {
       <select
         :name="id"
         :id="id"
-        :value="modelValue"
-        @change="$emit('update:modelValue', $event.target.value)"
+        v-model="value"
         :class="[
           'w-full rounded-lg border bg-white transition-all duration-200',
           SIZE_CLASSES[size],

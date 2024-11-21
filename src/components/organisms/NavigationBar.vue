@@ -1,5 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
+
 import {
   FlagIcon,
   ChartBarSquareIcon,
@@ -12,6 +13,7 @@ import {
   ChevronDoubleRightIcon,
 } from '@heroicons/vue/24/outline'
 import { RouterLink } from 'vue-router'
+
 import NavButton from '@/components/atoms/NavButton.vue'
 import LogoutButton from '@/components/atoms/LogoutButton.vue'
 

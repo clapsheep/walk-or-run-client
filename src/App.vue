@@ -1,5 +1,5 @@
-<script setup>
-import NavigationBar from '@/components/molecules/NavigationBar.vue'
+<script setup lang="ts">
+import NavigationBar from '@/components/organisms/NavigationBar.vue'
 </script>
 
 <template>
