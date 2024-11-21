@@ -39,7 +39,7 @@ const onSubmit = () => {
 
         <!-- 아이디/비밀번호 찾기 -->
         <div class="flex justify-end">
-          <RouterLink to="/find-account" class="text-sm text-gray-600 hover:text-primary-500">
+          <RouterLink to="/find-email" class="text-sm text-gray-600 hover:text-primary-500">
             아이디/비밀번호 찾기
           </RouterLink>
         </div>

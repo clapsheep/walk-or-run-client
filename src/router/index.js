@@ -35,9 +35,14 @@ const router = createRouter({
       component: () => import('@/views/SignupView.vue'),
     },
     {
-      path: '/find-account',
-      name: 'find-account',
-      component: () => import('@/views/FindAccountView.vue'),
+      path: '/find-email',
+      name: 'find-email',
+      component: () => import('@/views/FindEmailView.vue'),
+    },
+    {
+      path: '/find-password',
+      name: 'find-password',
+      component: () => import('@/views/FindPasswordView.vue'),
     },
   ],
 })
