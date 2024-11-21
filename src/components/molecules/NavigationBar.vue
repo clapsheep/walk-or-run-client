@@ -42,12 +42,12 @@ const menus = [
 const authMenus = [
   {
     name: '로그인',
-    path: '/login',
+    path: '/signin',
     icon: ArrowLeftEndOnRectangleIcon,
   },
   {
     name: '회원가입',
-    path: '/register',
+    path: '/signup',
     icon: UserGroupIcon,
   },
 ]
@@ -57,9 +57,9 @@ const authMenus = [
     class="relative shrink-0 rounded-[20px] transition-all duration-300"
     :class="{ 'w-[100px]': isNavCollapsed, 'w-64': !isNavCollapsed }"
   >
-    <div class="bg-background-primary flex h-full flex-col rounded-[20px] shadow-sm">
+    <div class="flex h-full flex-col rounded-[20px] bg-gray-100 shadow-sm">
       <!-- 로고 영역 -->
-      <div class="flex h-20 items-center justify-center border-b border-neutral-200 px-4">
+      <div class="flex h-20 items-center justify-center border-b border-gray-300 px-4">
         <RouterLink to="/" class="flex h-14 items-center justify-center">
           <img
             class="h-full w-full object-contain"
@@ -71,7 +71,7 @@ const authMenus = [
 
       <!-- 메뉴 영역 -->
       <div class="flex-1 overflow-y-auto">
-        <ul class="space-y-2 border-b border-neutral-200 p-4">
+        <ul class="space-y-2 border-b border-gray-300 p-4">
           <li v-for="(menu, index) in menus" :key="index">
             <NavButton
               :to="menu.path"
@@ -110,7 +110,7 @@ const authMenus = [
       <!-- Nav바 접기/펼치기 버튼 -->
       <button
         @click="isNavCollapsed = !isNavCollapsed"
-        class="text-brand-dark hover:bg-brand-yellowDark absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full bg-brand-yellow shadow-md transition-all duration-200"
+        class="bg-brand-yellow absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full text-gray-900 shadow-md transition-all duration-200 hover:bg-primary-400 hover:text-white"
       >
         <ChevronDoubleLeftIcon v-show="!isNavCollapsed" class="h-4 w-4" />
         <ChevronDoubleRightIcon v-show="isNavCollapsed" class="h-4 w-4" />

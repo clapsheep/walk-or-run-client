@@ -1,14 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import ChallengeView from '@/views/ChallengeView.vue'
-import AccountView from '@/views/AccountView.vue'
-import AdminView from '@/views/AdminView.vue'
-import LoginView from '@/views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue'
+import { createRouter, createMemoryHistory, createWebHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  //linkExactActiveClass: 'bg-brand-yellow hover:bg-brand-yellowDark text-black font-[500]',
+  history: createWebHistory(),
+
   routes: [
     {
       path: '/',
@@ -31,14 +25,19 @@ const router = createRouter({
       component: () => import('@/views/AdminView.vue'),
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/LoginView.vue'),
+      path: '/signin',
+      name: 'signin',
+      component: () => import('@/views/SigninView.vue'),
     },
     {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/RegisterView.vue'),
+      path: '/signup',
+      name: 'signup',
+      component: () => import('@/views/SignupView.vue'),
+    },
+    {
+      path: '/find-account',
+      name: 'find-account',
+      component: () => import('@/views/FindAccountView.vue'),
     },
   ],
 })
