@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ChallengeView from '@/views/ChallengeView.vue'
 import AccountView from '@/views/AccountView.vue'
@@ -7,7 +7,7 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createMemoryHistory(),
   //linkExactActiveClass: 'bg-brand-yellow hover:bg-brand-yellowDark text-black font-[500]',
   routes: [
     {

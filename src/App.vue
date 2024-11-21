@@ -3,7 +3,7 @@ import NavigationBar from '@/components/molecules/NavigationBar.vue'
 </script>
 
 <template>
-  <div class="bg-brand-dark min-h-screen p-4">
+  <div class="min-h-screen bg-white p-4">
     <div class="flex h-[calc(100vh-32px)] gap-4">
       <NavigationBar />
       <main class="flex-1">
