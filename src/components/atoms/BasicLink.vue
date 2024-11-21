@@ -1,27 +1,15 @@
-<script setup>
-import { computed, useAttrs } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
-const attrs = useAttrs()
+interface BasicLinkProps {
+  to: string | object
+  color?: 'primary' | 'secondary' | 'success' | 'danger' | 'disabled'
+  size?: 'sm' | 'md' | 'lg'
+  className?: string
+}
 
-const {
-  to,
-  color = 'primary',
-  size = 'md',
-} = defineProps({
-  to: {
-    type: [String, Object],
-    required: true,
-  },
-  color: {
-    type: String,
-    validator: (value) => ['primary', 'secondary', 'success', 'danger', 'disabled'].includes(value),
-  },
-  size: {
-    type: String,
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
-  },
-})
+const { to, color = 'primary', size = 'md', className } = defineProps<BasicLinkProps>()
 
 const SIZE_CLASSES = {
   sm: 'px-4 py-1 text-sm rounded-3xl',
@@ -44,7 +32,7 @@ const linkClass = computed(() => [
   BASE_CLASSES,
   SIZE_CLASSES[size],
   COLOR_CLASSES[color],
-  attrs.class,
+  className,
 ])
 </script>
 

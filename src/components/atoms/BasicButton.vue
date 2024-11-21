@@ -1,34 +1,22 @@
-<script setup>
-import { computed, useAttrs } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 
-const attrs = useAttrs()
-
+interface BasicButtonProps {
+  type?: 'button' | 'submit' | 'reset'
+  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning'
+  size?: 'sm' | 'md' | 'lg'
+  variant?: 'filled' | 'outlined' | 'ghost'
+  disabled?: boolean
+  className?: string
+}
 const {
   type = 'button',
   color = 'primary',
   size = 'md',
   variant = 'filled',
-} = defineProps({
-  type: {
-    type: String,
-    default: 'button',
-  },
-  color: {
-    type: String,
-    validator: (value) =>
-      ['primary', 'secondary', 'accent', 'success', 'info', 'warning'].includes(value),
-    default: 'primary',
-  },
-  size: {
-    type: String,
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
-  },
-  variant: {
-    type: String,
-    validator: (value) => ['filled', 'outlined', 'ghost'].includes(value),
-    default: 'filled',
-  },
-})
+  disabled = false,
+  className = '',
+} = defineProps<BasicButtonProps>()
 
 const SIZE_CLASSES = {
   sm: 'px-3 py-1.5 text-sm gap-1.5',
@@ -93,12 +81,12 @@ const buttonClass = computed(() => [
   SIZE_CLASSES[size],
   VARIANT_CLASSES[variant][color],
   FOCUS_RING_COLORS[color],
-  attrs.class,
+  className,
 ])
 </script>
 
 <template>
-  <button :type="type" :class="buttonClass" :disabled="attrs.disabled">
+  <button :type="type" :class="buttonClass" :disabled="disabled">
     <slot name="prefix"></slot>
     <slot></slot>
     <slot name="suffix"></slot>

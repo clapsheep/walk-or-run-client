@@ -1,8 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import BasicSelect from '@/components/molecules/BasicSelect.vue'
+import {
+  validateEmailFormat,
+  passwordValidation,
+  matchPasswordValidation,
+  secondPasswordValidation,
+  nameValidation,
+  queryValidation,
+  queryAnswerValidation,
+} from '@/utils/inputValidation'
 
 const emailRef = ref('')
 const passwordRef = ref('')
@@ -10,6 +19,7 @@ const passwordValidRef = ref('')
 const nameRef = ref('')
 const nicknameRef = ref('')
 const queryRef = ref('')
+const queryAnswerRef = ref('')
 const isEmailChecked = ref(false)
 const isEmailCheckLoading = ref(false)
 
@@ -20,76 +30,43 @@ const errors = ref({
   name: '',
   nickname: '',
   query: '',
+  queryAnswer: '',
 })
 
 // 이메일 실시간 검증
 watch(emailRef, (newValue) => {
   isEmailChecked.value = false // 이메일이 변경되면 중복확인 초기화
-  if (!newValue) {
-    errors.value.email = '이메일을 입력해주세요'
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newValue)) {
-    errors.value.email = '올바른 이메일 형식이 아닙니다'
-  } else {
-    errors.value.email = ''
-  }
+  errors.value.email = validateEmailFormat(newValue)
 })
 
 // 비밀번호 실시간 검증
 watch(passwordRef, (newValue) => {
-  if (!newValue) {
-    errors.value.password = '비밀번호를 입력해주세요'
-  } else if (newValue.length < 8) {
-    errors.value.password = '비밀번호는 8자 이상이어야 합니다'
-  } else {
-    errors.value.password = ''
-  }
-
-  // 비밀번호 확인 필드가 비어있지 않은 경우 일치 여부 검사
-  if (passwordValidRef.value) {
-    if (newValue !== passwordValidRef.value) {
-      errors.value.passwordValid = '비밀번호가 일치하지 않습니다'
-    } else {
-      errors.value.passwordValid = ''
-    }
-  }
+  errors.value.password = passwordValidation(newValue)
+  errors.value.passwordValid = matchPasswordValidation(newValue, passwordValidRef.value)
 })
 
 // 비밀번호 확인 실시간 검증
 watch(passwordValidRef, (newValue) => {
-  if (!newValue) {
-    errors.value.passwordValid = '비밀번호를 한번 더 입력해주세요'
-  } else if (newValue !== passwordRef.value) {
-    errors.value.passwordValid = '비밀번호가 일치하지 않습니다'
-  } else {
-    errors.value.passwordValid = ''
-  }
+  errors.value.passwordValid = secondPasswordValidation(newValue, passwordRef.value)
 })
 
 // 이름 실시간 검증
 watch(nameRef, (newValue) => {
-  if (!newValue) {
-    errors.value.name = '이름을 입력해주세요'
-  } else {
-    errors.value.name = ''
-  }
+  errors.value.name = nameValidation(newValue, '이름')
 })
 
 // 닉네임 실시간 검증
 watch(nicknameRef, (newValue) => {
-  if (!newValue) {
-    errors.value.nickname = '닉네임을 입력해주세요'
-  } else {
-    errors.value.nickname = ''
-  }
+  errors.value.nickname = nameValidation(newValue, '닉네임')
 })
 
 // 질문 선택 실시간 검증
 watch(queryRef, (newValue) => {
-  if (!newValue) {
-    errors.value.query = '질문을 선택해주세요'
-  } else {
-    errors.value.query = ''
-  }
+  errors.value.query = queryValidation(newValue)
+})
+// 질문 답변 실시간 검증
+watch(queryAnswerRef, (newValue) => {
+  errors.value.queryAnswer = queryAnswerValidation(newValue)
 })
 
 // 이메일 중복 확인
@@ -98,7 +75,7 @@ const checkEmail = async () => {
 
   isEmailCheckLoading.value = true
   try {
-    // 실제 API 호출로 대체 필요
+    await // 실제 API 호출로 대체 필요
     await new Promise((resolve) => setTimeout(resolve, 1000)) // 임시 딜레이
     // const response = await checkEmailDuplicate(emailRef.value)
     // if (response.isDuplicate) {
@@ -124,6 +101,7 @@ const validateForm = () => {
     !errors.value.name &&
     !errors.value.nickname &&
     !errors.value.query &&
+    !errors.value.queryAnswer &&
     isEmailChecked.value
   )
 }
@@ -144,6 +122,14 @@ const onSubmit = async () => {
     console.error('회원가입 실패:', error)
   }
 }
+const TESTQUERY: Record<string, string>[] = [
+  { 1: '질문1' },
+  { 2: '질문2' },
+  { 3: '질문3' },
+  { 4: '질문4' },
+  { 5: '질문5' },
+  { 6: '질문6' },
+]
 </script>
 
 <template>
@@ -242,6 +228,14 @@ const onSubmit = async () => {
             direction="col"
             size="md"
             :error="errors.query"
+          />
+          <BasicInput
+            id="queryAnswer"
+            label="답변"
+            placeholder="질문의 답을 입력해주세요"
+            direction="col"
+            v-model="queryAnswerRef"
+            :error="errors.queryAnswer"
           />
 
           <!-- 제출 버튼 -->
