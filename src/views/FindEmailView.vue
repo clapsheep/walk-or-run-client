@@ -1,23 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue';
 import BasicInput from '@/components/atoms/BasicInput.vue';
 import axios from 'axios'
 
-const name = ref('');
-const phone = ref('');
-const isCorrectInfo = ref(false);
-const email = ref('');
+const nameRef = ref('');
+const phoneRef = ref('');
+const isCorrectInfoRef = ref(false);
+const emailRef = ref('');
 
 const onFindId = async () => {
   try {
     const response = await axios.post('/api/auth/email', {
-      userName: name.value,
-      userPhoneNumber: phone.value,
+      userName: nameRef.value,
+      userPhoneNumber: phoneRef.value,
     })
     if(true) { // 만약 ApiResponse가 "success"면
-      isCorrectInfo.value = true;
-      email.value = response.data["userEmail"];
+      isCorrectInfoRef.value = true;
+      emailRef.value = response.data["userEmail"];
     }
     console.log('아이디 찾기 결과:', response.data);
   } catch (error) {
@@ -39,19 +39,19 @@ const onFindId = async () => {
           label="이름"
           placeholder="이름을 입력해주세요"
           direction="col"
-          v-model="name"
+          v-model="nameRef"
         />
         <BasicInput
           id="userPhone"
           label="휴대폰 번호"
           placeholder="휴대폰 번호를 입력해주세요"
           direction="col"
-          v-model="phone"
+          v-model="phoneRef"
         />
         <BasicButton type="submit" class="w-full" @submit="onFindId">찾기</BasicButton>
       </form>
 
-      <p class="text-success-600 text-base" v-if="isCorrectInfo">{{ email }}</p>
+      <p class="text-success-600 text-base" v-if="isCorrectInfoRef">{{ emailRef }}</p>
 
       <div class="mt-4 text-right text-sm text-gray-600">
         <RouterLink

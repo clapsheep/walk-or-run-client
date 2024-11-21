@@ -1,19 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue';
 import BasicInput from '@/components/atoms/BasicInput.vue';
 import axios from 'axios'
 import BasicSelect from '@/components/molecules/BasicSelect.vue';
 
-const name = ref('')
-const phone = ref('')
-const userId = ref('')
-const email = ref('')
-const questionId = ref('')
-const answer = ref('')
-const isPasswordReset = ref(false)
-const isEmailChecked = ref(false)
-const isEmailCheckLoading = ref(false)
+const nameRef = ref('')
+const phoneRef = ref('')
+const userIdRef = ref('')
+const emailRef = ref('')
+const questionIdRef = ref('')
+const answerRef = ref('')
+const isEmailCheckedRef = ref(false)
+const isEmailCheckLoadingRef = ref(false)
 const queryRef = ref('')
 const errors = ref({
   email: '',
@@ -27,12 +26,12 @@ const errors = ref({
 const onFindPassword = async () => {
   try {
     const response = await axios.post('/api/user/password/find', {
-      userId: userId.value,
-      userName: name.value,
-      userEmail: email.value,
-      userPhoneNumber: phone.value,
-      userPasswordQuestionId: questionId.value,
-      userPasswordAnswer: answer.value,
+      userId: userIdRef.value,
+      userName: nameRef.value,
+      userEmail: emailRef.value,
+      userPhoneNumber: phoneRef.value,
+      userPasswordQuestionId: questionIdRef.value,
+      userPasswordAnswer: answerRef.value,
     })
     // ApiResponse("success, "changePassword", 200)이 오면 비밀번호 수정 라우터로 이동
     console.log('비밀번호 찾기 결과:', response.data);
@@ -44,7 +43,7 @@ const onFindPassword = async () => {
 const checkEmail = async () => {
   if (!emailRef.value || errors.value.email) return
 
-  isEmailCheckLoading.value = true
+  isEmailCheckLoadingRef.value = true
   try {
     // 실제 API 호출로 대체 필요
     await new Promise((resolve) => setTimeout(resolve, 1000)) // 임시 딜레이
@@ -53,16 +52,25 @@ const checkEmail = async () => {
     //   errors.value.email = '이미 사용 중인 이메일입니다'
     //   isEmailChecked.value = false
     // } else {
-    isEmailChecked.value = true
+    isEmailCheckedRef.value = true
     errors.value.email = ''
     // }
   } catch (error) {
     errors.value.email = '이메일 중복 확인에 실패했습니다'
-    isEmailChecked.value = false
+    isEmailCheckedRef.value = false
   } finally {
-    isEmailCheckLoading.value = false
+    isEmailCheckLoadingRef.value = false
   }
 }
+
+const TESTQUERY: Record<string, string>[] = [
+  { 1: '질문1' },
+  { 2: '질문2' },
+  { 3: '질문3' },
+  { 4: '질문4' },
+  { 5: '질문5' },
+  { 6: '질문6' },
+]
 </script>
 
 <template>
@@ -79,7 +87,7 @@ const checkEmail = async () => {
               id="userEmail"
               type="email"
               placeholder="이메일을 입력해주세요"
-              v-model="email"
+              v-model="emailRef"
               :error="errors.email"
               class="w-full"
               direction="col"
@@ -89,11 +97,11 @@ const checkEmail = async () => {
           <BasicButton
                 type="button"
                 @click="checkEmail"
-                :disabled="!email || !!errors.email || isEmailCheckLoading"
+                :disabled="!emailRef || !!errors.email || isEmailCheckLoadingRef"
                 class="h-[42px] w-32"
-                :color="isEmailChecked ? 'success' : 'primary'"
+                :color="isEmailCheckedRef ? 'success' : 'primary'"
               >
-              {{ isEmailChecked ? '확인완료' : '이메일 확인' }}
+              {{ isEmailCheckedRef ? '확인완료' : '이메일 확인' }}
           </BasicButton>
         </div>
         <BasicSelect
@@ -112,7 +120,7 @@ const checkEmail = async () => {
           label="비밀번호 답변"
           placeholder="비밀번호 답변을 입력해주세요"
           direction="col"
-          v-model="answer"
+          v-model="answerRef"
         />
 
         <BasicButton type="submit" class="w-full" @submit="onFindPassword">찾기</BasicButton>
