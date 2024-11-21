@@ -7,10 +7,11 @@ const {
   id,
   label = '',
   type = 'text',
-  value,
+  modelValue,
   placeholder = '',
   size = 'md',
   direction = 'row',
+  error = '',
 } = defineProps({
   id: {
     type: String,
@@ -18,7 +19,7 @@ const {
   },
   label: String,
   type: String,
-  value: {
+  modelValue: {
     type: String,
     required: true,
   },
@@ -32,10 +33,14 @@ const {
     validator: (value) => ['row', 'col'].includes(value),
     default: 'row',
   },
+  error: {
+    type: String,
+    default: '',
+  },
 })
 
 const SIZE_CLASSES = {
-  sm: 'px-3 py-1 text-sm',
+  sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-5 py-3 text-lg',
 }
@@ -47,12 +52,25 @@ const LABEL_SIZE_CLASSES = {
 }
 
 const BASE_INPUT_CLASSES = [
-  'rounded-3xl',
-  'border border-gray-300',
+  'rounded-lg',
+  'border',
+  'bg-white',
   'transition-all duration-200',
-  'focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20',
   'placeholder:text-gray-400',
-  'hover:border-gray-400',
+  'w-full',
+  // 기본 상태
+  'border-gray-300',
+  'hover:border-primary-300',
+  // 포커스 상태
+  'focus:outline-none',
+  'focus:border-primary-500',
+  'focus:ring-4',
+  'focus:ring-primary-100',
+  // 에러 상태
+  'disabled:bg-gray-100',
+  'disabled:text-gray-500',
+  'disabled:border-gray-200',
+  'disabled:cursor-not-allowed',
 ].join(' ')
 
 const containerClasses = computed(() => [
@@ -64,10 +82,23 @@ const containerClasses = computed(() => [
 const inputClasses = computed(() => [
   BASE_INPUT_CLASSES,
   SIZE_CLASSES[size],
-  direction === 'col' ? 'w-full' : '', // column일 때는 input을 전체 너비로
+  error
+    ? [
+        'border-warning-500',
+        'hover:border-warning-600',
+        'focus:border-warning-500',
+        'focus:ring-warning-100',
+      ].join(' ')
+    : '',
 ])
 
-const labelClasses = computed(() => ['font-medium text-gray-700', LABEL_SIZE_CLASSES[size]])
+const labelClasses = computed(() => ['font-medium', 'text-gray-700', LABEL_SIZE_CLASSES[size]])
+
+const errorClasses = computed(() => [
+  'text-warning-600',
+  LABEL_SIZE_CLASSES[size] === 'text-lg' ? 'text-base' : 'text-sm',
+])
+defineEmits(['update:modelValue'])
 </script>
 
 <template>
@@ -75,13 +106,18 @@ const labelClasses = computed(() => ['font-medium text-gray-700', LABEL_SIZE_CLA
     <label v-if="label" :for="id" :class="labelClasses">
       {{ label }}
     </label>
-    <input
-      :type="type"
-      :id="id"
-      :value="value"
-      :placeholder="placeholder"
-      :class="inputClasses"
-      @input="$emit('update:value', $event.target.value)"
-    />
+    <div class="relative w-full">
+      <input
+        :type="type"
+        :id="id"
+        :value="modelValue"
+        :placeholder="placeholder"
+        :class="inputClasses"
+        @input="$emit('update:modelValue', $event.target.value)"
+      />
+      <p v-if="error" :class="errorClasses" class="mt-1">
+        {{ error }}
+      </p>
+    </div>
   </div>
 </template>

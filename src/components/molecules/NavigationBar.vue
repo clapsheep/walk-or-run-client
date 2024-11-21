@@ -42,12 +42,12 @@ const menus = [
 const authMenus = [
   {
     name: '로그인',
-    path: '/login',
+    path: '/signin',
     icon: ArrowLeftEndOnRectangleIcon,
   },
   {
     name: '회원가입',
-    path: '/register',
+    path: '/signup',
     icon: UserGroupIcon,
   },
 ]
@@ -110,7 +110,7 @@ const authMenus = [
       <!-- Nav바 접기/펼치기 버튼 -->
       <button
         @click="isNavCollapsed = !isNavCollapsed"
-        class="hover:bg-primary-400 absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full bg-brand-yellow text-gray-900 shadow-md transition-all duration-200 hover:text-white"
+        class="bg-brand-yellow absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full text-gray-900 shadow-md transition-all duration-200 hover:bg-primary-400 hover:text-white"
       >
         <ChevronDoubleLeftIcon v-show="!isNavCollapsed" class="h-4 w-4" />
         <ChevronDoubleRightIcon v-show="isNavCollapsed" class="h-4 w-4" />
