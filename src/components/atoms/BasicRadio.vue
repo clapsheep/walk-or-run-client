@@ -1,14 +1,8 @@
-<script setup>
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <label>
-  </label>
+  <label> </label>
   <input type="text" />
 </template>
 
-
-<style scoped>
-
-</style>
+<style scoped></style>

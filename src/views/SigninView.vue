@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
@@ -6,6 +6,7 @@ import BasicInput from '@/components/atoms/BasicInput.vue'
 
 const emailRef = ref('')
 const passwordRef = ref('')
+console.log(emailRef.value)
 
 const onSubmit = () => {
   console.log(emailRef.value, passwordRef.value)
@@ -22,7 +23,7 @@ const onSubmit = () => {
         <BasicInput
           id="userEmail"
           label="이메일"
-          type="email"
+          type="text"
           placeholder="이메일을 입력해주세요"
           direction="col"
           v-model="emailRef"

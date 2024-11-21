@@ -1,43 +1,28 @@
-<script setup>
-import { computed, useAttrs } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 
-const attrs = useAttrs()
+interface BasicInputProps {
+  id: string
+  label?: string
+  type?: string
+  placeholder?: string
+  size?: 'sm' | 'md' | 'lg'
+  direction?: 'row' | 'col'
+  error?: string
+  className?: string
+}
 
 const {
   id,
   label = '',
   type = 'text',
-  modelValue,
   placeholder = '',
   size = 'md',
   direction = 'row',
   error = '',
-} = defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  label: String,
-  type: String,
-  modelValue: {
-    type: String,
-    required: true,
-  },
-  placeholder: String,
-  size: {
-    type: String,
-    validator: (value) => ['sm', 'md', 'lg'].includes(value),
-  },
-  direction: {
-    type: String,
-    validator: (value) => ['row', 'col'].includes(value),
-    default: 'row',
-  },
-  error: {
-    type: String,
-    default: '',
-  },
-})
+  className = '',
+} = defineProps<BasicInputProps>()
+const value = defineModel()
 
 const SIZE_CLASSES = {
   sm: 'px-3 py-1.5 text-sm',
@@ -58,15 +43,12 @@ const BASE_INPUT_CLASSES = [
   'transition-all duration-200',
   'placeholder:text-gray-400',
   'w-full',
-  // 기본 상태
   'border-gray-300',
   'hover:border-primary-300',
-  // 포커스 상태
   'focus:outline-none',
   'focus:border-primary-500',
   'focus:ring-4',
   'focus:ring-primary-100',
-  // 에러 상태
   'disabled:bg-gray-100',
   'disabled:text-gray-500',
   'disabled:border-gray-200',
@@ -76,7 +58,7 @@ const BASE_INPUT_CLASSES = [
 const containerClasses = computed(() => [
   'flex',
   direction === 'row' ? 'items-center gap-4' : 'flex-col items-start gap-2',
-  attrs.class,
+  className,
 ])
 
 const inputClasses = computed(() => [
@@ -98,7 +80,6 @@ const errorClasses = computed(() => [
   'text-warning-600',
   LABEL_SIZE_CLASSES[size] === 'text-lg' ? 'text-base' : 'text-sm',
 ])
-defineEmits(['update:modelValue'])
 </script>
 
 <template>
@@ -110,10 +91,9 @@ defineEmits(['update:modelValue'])
       <input
         :type="type"
         :id="id"
-        :value="modelValue"
         :placeholder="placeholder"
         :class="inputClasses"
-        @input="$emit('update:modelValue', $event.target.value)"
+        v-model="value"
       />
       <p v-if="error" :class="errorClasses" class="mt-1">
         {{ error }}
