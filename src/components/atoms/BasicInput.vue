@@ -4,17 +4,20 @@ import { computed } from 'vue'
 interface BasicInputProps {
   id: string
   label?: string
+  name:string
   type?: string
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
   direction?: 'row' | 'col'
   error?: string
   className?: string
+  autocomplete?: string
 }
 
 const {
   id,
   label = '',
+  name,
   type = 'text',
   placeholder = '',
   size = 'md',
@@ -89,9 +92,11 @@ const errorClasses = computed(() => [
     </label>
     <div class="relative w-full">
       <input
+        :autocomplete = 'autocomplete'
         :type="type"
         :id="id"
         :placeholder="placeholder"
+        :name = 'name'
         :class="inputClasses"
         v-model="value"
       />

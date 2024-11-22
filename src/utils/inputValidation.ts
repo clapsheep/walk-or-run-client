@@ -1,4 +1,4 @@
-export const validateEmailFormat = (email: string) => {
+export const validateEmailFormat = (email: string|undefined) => {
   if (!email) {
     return '이메일을 입력해주세요.'
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -8,7 +8,7 @@ export const validateEmailFormat = (email: string) => {
   }
 }
 
-export const passwordValidation = (password: string) => {
+export const passwordValidation = (password: string|undefined) => {
   if (!password) {
     return '비밀번호를 입력해주세요.'
   } else if (password.length < 8) {
@@ -18,7 +18,7 @@ export const passwordValidation = (password: string) => {
   }
 }
 
-export const matchPasswordValidation = (password: string, secondPassword: string) => {
+export const matchPasswordValidation = (password: string|undefined, secondPassword: string|undefined) => {
   if (secondPassword) {
     if (password !== secondPassword) {
       return '비밀번호가 일치하지 않습니다.'
@@ -28,7 +28,7 @@ export const matchPasswordValidation = (password: string, secondPassword: string
   }
   return ''
 }
-export const secondPasswordValidation = (password: string, secondPassword: string) => {
+export const secondPasswordValidation = (password: string|undefined, secondPassword: string|undefined) => {
   if (!password) {
     return '비밀번호를 한번 더 입력해주세요.'
   } else if (password !== secondPassword) {
@@ -37,22 +37,22 @@ export const secondPasswordValidation = (password: string, secondPassword: strin
     return ''
   }
 }
-export const nameValidation = (name: string, type: string) => {
-  if (!name) {
+export const inputValidation = (input: string|undefined, type: string|undefined) => {
+  if (!input) {
     return `${type}을 입력해주세요.`
   } else {
     return ''
   }
 }
-export const phoneValidation = (phone: string) => {}
-export const queryValidation = (query: string) => {
+
+export const queryValidation = (query: string|undefined) => {
   if (!query) {
     return '질문을 선택해주세요.'
   } else {
     return ''
   }
 }
-export const queryAnswerValidation = (answer: string) => {
+export const queryAnswerValidation = (answer: string|undefined) => {
   if (!answer) {
     return '답변을 입력해주세요.'
   } else {
