@@ -21,6 +21,8 @@ const onSubmit = () => {
 
       <form class="space-y-6" @submit.prevent="onSubmit">
         <BasicInput
+          name="userEmail"
+          autocomplete="email"
           id="userEmail"
           label="이메일"
           type="text"
@@ -30,6 +32,8 @@ const onSubmit = () => {
         />
 
         <BasicInput
+          name="userPassword"
+          autocomplete="new-password"
           id="userPassword"
           label="비밀번호"
           type="password"

@@ -16,9 +16,11 @@ const isOpen = computed(() => modalStore.modals[props.modalType].isOpen)
 const modalData = computed(() => modalStore.modals[props.modalType].data)
 
 const handleConfirm = () => {
+  const redirectPath = modalData.value?.redirectPath
   modalStore.closeModal(props.modalType)
-  if (modalData.value?.redirectPath) {
-    router.push(modalData.value.redirectPath)
+  if (redirectPath) {
+    console.log('Redirecting to:', redirectPath)
+    router.push(redirectPath)
   }
 }
 
@@ -37,9 +39,10 @@ const handleClose = () => {
         <h2 class="mb-4 text-xl font-bold" v-if="modalData?.title">
           {{ modalData.title }}
         </h2>
-        <p class="mb-8 text-gray-600">{{ modalData?.content }}</p>
+        <p class="mb-8 text-gray-600 whitespace-pre-line">{{ modalData?.content }}</p>
         <div class="flex justify-center">
           <BasicButton @click="handleConfirm"> 확인 </BasicButton>
+          <BasicButton v-if="modalData?.cancelButton" @click="handleClose"> {{modalData?.cancelButton}} </BasicButton>
         </div>
       </div>
     </div>
