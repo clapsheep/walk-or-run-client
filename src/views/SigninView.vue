@@ -4,12 +4,8 @@ import { ref, computed } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import { validateEmailFormat, passwordValidation } from '@/utils/inputValidation'
-import { signIn } from '@/services/authService'
-import type { AuthCredentials } from '@/services/authService'
-import { useUserStore } from '@/stores/userStore'
-
-const router = useRouter()
-const userStore = useUserStore()
+import { handleLogin } from '@/core/auth/AuthHook'
+import type { AuthCredentials } from '@/core/auth/AuthType'
 
 const inputData = ref<AuthCredentials>({
   userEmail: '',
@@ -20,6 +16,11 @@ const errors = ref({
   email: '',
   password: '',
 })
+
+const loading = ref(false)
+const error = ref('')
+
+const router = useRouter()
 
 const handleEmailValidation = () => {
   errors.value.email = validateEmailFormat(inputData.value.userEmail)
@@ -37,28 +38,20 @@ const isFormValid = computed(() => {
 })
 
 const onSubmit = async (inputData: AuthCredentials) => {
+  console.log(inputData)
+  errors.value.email = ''  // 에러 메시지 초기화
+
   try {
-    const { access_token } = await signIn(inputData);
-
-    if (access_token) {
-      // JWT 토큰 디코딩
-      const base64Payload = access_token.split('.')[1];
-      const payload = JSON.parse(atob(base64Payload));
-      console.log(payload);
-
-      // Pinia store에 사용자 정보 저장
-      userStore.setUserInfo(
-        payload.userId,
-        payload.userEmail,
-        payload.userRole
-      );
-
-      // 로그인 성공 후 메인 페이지로 이동
-      router.push('/');
+    const { loading: loginLoading, error: loginError } = await handleLogin(inputData)
+    loading.value = loginLoading.value
+    if (!loginError.value) {
+      router.push('/dashboard')
+    } else {
+      errors.value.email = loginError.value
     }
-  } catch (error) {
-    console.error('로그인 중 오류:', error);
-    errors.value.email = '아이디 혹은 비밀번호가 틀립니다. 다시 시도해주세요.';
+  } catch (err) {
+    console.log(err)
+    errors.value.email = err as string
   }
 }
 </script>
@@ -108,7 +101,7 @@ const onSubmit = async (inputData: AuthCredentials) => {
         <BasicButton
           type="submit"
           class="w-full"
-          :disabled="!isFormValid"
+          :disabled="!isFormValid || loading"
           @submit="onSubmit(inputData)"
         >
           로그인
