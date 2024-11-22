@@ -8,22 +8,20 @@ import {
   passwordValidation,
   matchPasswordValidation,
   secondPasswordValidation,
-  nameValidation,
+  inputValidation,
   queryValidation,
   queryAnswerValidation,
 } from '@/utils/inputValidation'
-import {
-  checkEmailDuplicatedFetch,
-  getPasswordQuestionFetch,
-  registerFetch,
-} from '@/core/auth/authApi'
+import { checkEmailDuplicatedFetch, getPasswordQuestionFetch } from '@/core/auth/AuthApi'
+import User from '@/core/user/UserType'
+import { useRegister } from '@/core/auth/AuthHook'
 
 const inputData = ref({
   userEmail: '',
   userPassword: '',
   userPasswordVaild: '',
   userName: '',
-  userNickName: '',
+  userNickname: '',
   userPhoneNumber: '',
   userPasswordQuestionId: '',
   userPasswordQuestionAnswer: '',
@@ -70,13 +68,13 @@ watch(
         )
         break
       case 'name':
-        errors.value.name = nameValidation(newValue.name, '이름')
+        errors.value.name = inputValidation(newValue.name, '이름')
         break
       case 'nickname':
-        errors.value.nickname = nameValidation(newValue.nickname, '닉네임')
+        errors.value.nickname = inputValidation(newValue.nickname, '닉네임')
         break
       case 'phone':
-        errors.value.phone = nameValidation(newValue.phone, '휴대폰 번호')
+        errors.value.phone = inputValidation(newValue.phone, '휴대폰 번호')
         break
       case 'passwordQuestionId':
         errors.value.passwordQuestionId = queryValidation(newValue.passwordQuestionId)
@@ -127,23 +125,20 @@ const validateForm = () => {
 }
 
 const onSubmit = async () => {
-  if (!validateForm()) return
-  const userData = {
+  const userData: User = {
     userEmail: inputData.value.userEmail,
     userPassword: inputData.value.userPassword,
     userName: inputData.value.userName,
-    userNickname: inputData.value.userNickName,
+    userNickname: inputData.value.userNickname,
     userPhoneNumber: inputData.value.userPhoneNumber,
     userPasswordQuestionId: inputData.value.userPasswordQuestionId,
     userPasswordAnswer: inputData.value.userPasswordQuestionAnswer,
   }
 
-  try {
-    await registerFetch(userData)
-  } catch (error) {
-    console.error('회원가입 실패:', error)
-  }
+  const result = await useRegister(userData)
+  console.log('Registration result:', result)
 }
+
 onMounted(async () => {
   const data = await getPasswordQuestionFetch()
   queryList.value = data
@@ -234,7 +229,7 @@ onMounted(async () => {
             name="userNickname"
             placeholder="닉네임을 입력해주세요"
             direction="col"
-            v-model="inputData.userNickName"
+            v-model="inputData.userNickname"
             :error="errors.nickname"
           />
           <BasicInput

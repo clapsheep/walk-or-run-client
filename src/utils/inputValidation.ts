@@ -37,14 +37,14 @@ export const secondPasswordValidation = (password: string, secondPassword: strin
     return ''
   }
 }
-export const nameValidation = (name: string, type: string) => {
-  if (!name) {
+export const inputValidation = (input: string, type: string) => {
+  if (!input) {
     return `${type}을 입력해주세요.`
   } else {
     return ''
   }
 }
-export const phoneValidation = (phone: string) => {}
+
 export const queryValidation = (query: string) => {
   if (!query) {
     return '질문을 선택해주세요.'

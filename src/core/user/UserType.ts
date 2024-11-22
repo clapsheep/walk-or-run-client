@@ -7,10 +7,10 @@ type User = {
   userPassword?: string
   userPasswordVaild?: string
   userName?: string
-  userNickName?: string
+  userNickname?: string
   userPhoneNumber?: string
   userPasswordQuestionId?: string
-  userPasswordQuestionAnswer?: string
+  userPasswordAnswer?: string
   userJoinDate?: string
   userWithdrawalDate?: string
   userWithdrawalStatus?: number

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import NavigationBar from '@/components/organisms/NavigationBar.vue'
+import Modal from '@/components/molecules/Modal.vue'
 </script>
 
 <template>
@@ -11,6 +12,7 @@ import NavigationBar from '@/components/organisms/NavigationBar.vue'
       </main>
     </div>
   </div>
+  <Modal modalType="oneButtonModal" />
 </template>
 
 <style>
