@@ -1,5 +1,5 @@
-import ApiResponse from '@/models/ApiResponse'
-import User from '@/models/User'
+import ApiResponse from '@/core/common/ApiResponse'
+import User from '@/core/user/UserType'
 import axios, { AxiosResponse } from 'axios'
 
 const { VITE_API_URL } = import.meta.env

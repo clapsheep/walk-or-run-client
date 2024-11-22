@@ -1,4 +1,4 @@
-interface Goal {
+type Goal = {
   userGoalId?: number
   userId?: number
   challengeCategoryCode?: number

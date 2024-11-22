@@ -1,7 +1,7 @@
-import Challenge from './Challenge'
-import Goal from './Goal'
+import Challenge from '../challenge/ChallengeType'
+import Goal from '../goal/GoalType'
 
-interface User {
+type User = {
   userId?: string
   userEmail?: string
   userPassword?: string
