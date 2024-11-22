@@ -20,7 +20,7 @@ type AuthError = {
 // 로그인
 export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse> => {
   try {
-    console.log(credentials);
+    console.log(credentials.userEmail, credentials.userPassword);
     const response = await axios.post(`${VITE_API_URL}/auth/login`, credentials)
     const { data } = response
     console.log(data);
@@ -32,7 +32,7 @@ export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse
     return data
   } catch (error: any) {
     throw {
-      message: error.response?.data?.message || '로그인 중 오류가 발생했습니다',
+      message: error.response?.data?.message || '아이디 혹은 비밀번호가 틀립니다. 다시 시도해주세요.',
       status: error.response?.status || 500
     } as AuthError
   }
