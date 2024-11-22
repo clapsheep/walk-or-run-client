@@ -11,6 +11,7 @@ interface BasicInputProps {
   direction?: 'row' | 'col'
   error?: string
   className?: string
+  autocomplete?: string
 }
 
 const {
@@ -91,6 +92,7 @@ const errorClasses = computed(() => [
     </label>
     <div class="relative w-full">
       <input
+        :autocomplete = 'autocomplete'
         :type="type"
         :id="id"
         :placeholder="placeholder"
