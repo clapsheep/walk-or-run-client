@@ -5,6 +5,7 @@ import { useUserStore } from '@/stores/userStore'
 import * as AuthApi from './AuthApi'
 import type User from '@/core/user/UserType'
 import type { AuthCredentials, TokenPayload } from './AuthType'
+import { registerFetch } from './AuthApi'
 
 export const useLoading = () => {
   const loading = ref(false)
@@ -42,7 +43,7 @@ export const setUserInfo = (payload: TokenPayload) => {
 }
 
 // 로그인 처리
-export const handleLogin = async (credentials: AuthCredentials) => {
+export const useLogin = async (credentials: AuthCredentials) => {
   const loading = ref(false)
   const error = ref('')
 
@@ -79,7 +80,7 @@ export const handleLogin = async (credentials: AuthCredentials) => {
 }
 
 // 로그아웃 처리
-export const handleLogout = () => {
+export const logout = () => {
   const router = useRouter()
   const userStore = useUserStore()
 
@@ -88,14 +89,8 @@ export const handleLogout = () => {
   router.push('/signin')
 }
 
-// 회원가입 처리
-export const handleRegister = async (user: User) => {
+export const useRegister = async (user: User) => {
   const modalStore = useModalStore()
-  const loading = ref(false)
-  const error = ref('')
-
-  loading.value = true
-  error.value = ''
 
   if (
     !user.userEmail ||
@@ -110,11 +105,11 @@ export const handleRegister = async (user: User) => {
       title: '입력 오류',
       content: '모든 필드를 입력해주세요.',
     })
-    return { success: false, loading, error }
+    return 0
   }
 
   try {
-    await AuthApi.registerFetch(user)
+    await registerFetch(user)
 
     modalStore.openModal('basicModal', {
       title: '회원가입 성공',
@@ -122,11 +117,15 @@ export const handleRegister = async (user: User) => {
       redirectPath: '/signin',
     })
 
-    return { success: true, loading, error }
-  } catch (err: any) {
-    error.value = err.response?.data?.message || '회원가입 중 오류가 발생했습니다.'
-    throw error.value
-  } finally {
-    loading.value = false
+    return 1
+  } catch (error) {
+    console.error('Registration error:', error)
+
+    modalStore.openModal('basicModal', {
+      title: '회원가입 실패',
+      content: '회원가입 중 오류가 발생했습니다. \n 다시 시도해주세요.',
+    })
+
+    return 0
   }
 }

@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import { validateEmailFormat, passwordValidation } from '@/utils/inputValidation'
-import { handleLogin } from '@/core/auth/AuthHook'
+import { useLogin } from '@/core/auth/AuthHook'
 import type { AuthCredentials } from '@/core/auth/AuthType'
 
 const inputData = ref<AuthCredentials>({
@@ -42,8 +42,7 @@ const onSubmit = async (inputData: AuthCredentials) => {
   errors.value.email = ''  // 에러 메시지 초기화
 
   try {
-    const { loading: loginLoading, error: loginError } = await handleLogin(inputData)
-    loading.value = loginLoading.value
+    const { error: loginError } = await useLogin(inputData)
     if (!loginError.value) {
       router.push('/dashboard')
     } else {
