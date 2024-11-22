@@ -27,7 +27,7 @@ export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse
 
     if (data.access_token) {
       console.log(data.access_token);
-      localStorage.setItem('accessToken', data.access_token)
+      localStorage.setItem('access_token', data.access_token)
     }
     return data
   } catch (error: any) {
@@ -40,22 +40,22 @@ export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse
 
 // 로그아웃
 export const logout = (): void => {
-  localStorage.removeItem('accessToken')
+  localStorage.removeItem('access_token')
 }
 
 // 토큰 가져오기
 export const getToken = (): string | null => {
-  return localStorage.getItem('accessToken')
+  return localStorage.getItem('access_token')
 }
 
 // 로그인 상태 확인
 export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('accessToken')
+  const token = localStorage.getItem('access_token')
   return !!token
 }
 
 // 인증 상태 확인
 export const checkAuthStatus = (): boolean => {
-  const token = localStorage.getItem('accessToken')
+  const token = localStorage.getItem('access_token')
   return !!token
 }
