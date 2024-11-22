@@ -1,4 +1,4 @@
-interface ApiResponse {
+type ApiResponse = {
   message: string
   text: string
   code: number

@@ -1,4 +1,4 @@
-interface Challenge {
+type Challenge = {
   challengeCategoryName?: string
   challengeTitle?: string
   challengeDescription?: string

@@ -12,7 +12,11 @@ import {
   queryValidation,
   queryAnswerValidation,
 } from '@/utils/inputValidation'
-import { getPasswordQuestionFetch, checkEmailDuplicatedFetch, registerFetch } from '@/apis/auth'
+import {
+  checkEmailDuplicatedFetch,
+  getPasswordQuestionFetch,
+  registerFetch,
+} from '@/core/auth/authApi'
 
 const inputData = ref({
   userEmail: '',
