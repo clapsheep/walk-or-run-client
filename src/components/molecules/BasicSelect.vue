@@ -2,10 +2,8 @@
 interface BasicSelectProps {
   id: string
   label: string
-  modelValue: string | number
-  options: Record<string, string>[]
-  valueKey: string
-  labelKey: string
+  name: string
+  options: Record<string | number, string>
   placeholder?: string
   error?: string
   direction?: 'row' | 'col'
@@ -15,16 +13,14 @@ interface BasicSelectProps {
 const {
   id,
   label,
-  modelValue,
+  name,
   options,
-  valueKey,
-  labelKey,
   placeholder,
   error = '',
   direction = 'row',
   size = 'md',
 } = defineProps<BasicSelectProps>()
-const value = defineModel()
+const queryId = defineModel()
 
 const SIZE_CLASSES = {
   sm: 'px-3 py-1.5 text-sm',
@@ -40,30 +36,23 @@ const SIZE_CLASSES = {
     </label>
     <div class="relative flex-1">
       <select
-        :name="id"
+        :name="name"
         :id="id"
-        v-model="value"
+        v-model="queryId"
         :class="[
           'w-full rounded-lg border bg-white transition-all duration-200',
           SIZE_CLASSES[size],
           error
-            ? 'border-warning-500 hover:border-warning-600 focus:border-warning-500 focus:ring-warning-100'
-            : 'border-gray-300 hover:border-primary-300 focus:border-primary-500 focus:ring-primary-100',
-          'focus:outline-none focus:ring-4',
-          'disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-500',
+            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+            : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500',
         ]"
       >
-        <option value="" disabled selected>{{ placeholder }}</option>
-        <option
-          v-for="item in options"
-          :key="item[valueKey]"
-          :value="item[valueKey]"
-          class="text-gray-700"
-        >
-          {{ item[labelKey] }}
+        <option v-if="placeholder" value="" disabled selected>{{ placeholder }}</option>
+        <option v-for="[key, value] in Object.entries(options)" :key="key" :value="key">
+          {{ value }}
         </option>
       </select>
-      <p v-if="error" class="mt-1 text-sm text-warning-600">
+      <p v-if="error" class="mt-1 text-sm text-red-600">
         {{ error }}
       </p>
     </div>
