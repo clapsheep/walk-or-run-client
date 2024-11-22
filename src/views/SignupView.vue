@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import BasicSelect from '@/components/molecules/BasicSelect.vue'
@@ -12,16 +12,22 @@ import {
   queryValidation,
   queryAnswerValidation,
 } from '@/utils/inputValidation'
+import { getPasswordQuestionFetch, checkEmailDuplicatedFetch, registerFetch } from '@/apis/auth'
 
-const emailRef = ref('')
-const passwordRef = ref('')
-const passwordValidRef = ref('')
-const nameRef = ref('')
-const nicknameRef = ref('')
-const queryRef = ref('')
-const queryAnswerRef = ref('')
+const inputData = ref({
+  userEmail: '',
+  userPassword: '',
+  userPasswordVaild: '',
+  userName: '',
+  userNickName: '',
+  userPhoneNumber: '',
+  userPasswordQuestionId: '',
+  userPasswordQuestionAnswer: '',
+})
+
 const isEmailChecked = ref(false)
 const isEmailCheckLoading = ref(false)
+const queryList = ref({})
 
 const errors = ref({
   email: '',
@@ -29,62 +35,72 @@ const errors = ref({
   passwordValid: '',
   name: '',
   nickname: '',
-  query: '',
-  queryAnswer: '',
+  phone: '',
+  passwordQuestionId: '',
+  passwordQuestionAnswer: '',
 })
 
-// 이메일 실시간 검증
-watch(emailRef, (newValue) => {
-  isEmailChecked.value = false // 이메일이 변경되면 중복확인 초기화
-  errors.value.email = validateEmailFormat(newValue)
-})
+watch(
+  inputData,
+  (newValue: Record<string, any>, oldValue) => {
+    // 변경된 속성 찾기
+    const changedKey = Object.keys(newValue).find((key: string) => newValue[key] !== oldValue[key])
 
-// 비밀번호 실시간 검증
-watch(passwordRef, (newValue) => {
-  errors.value.password = passwordValidation(newValue)
-  errors.value.passwordValid = matchPasswordValidation(newValue, passwordValidRef.value)
-})
-
-// 비밀번호 확인 실시간 검증
-watch(passwordValidRef, (newValue) => {
-  errors.value.passwordValid = secondPasswordValidation(newValue, passwordRef.value)
-})
-
-// 이름 실시간 검증
-watch(nameRef, (newValue) => {
-  errors.value.name = nameValidation(newValue, '이름')
-})
-
-// 닉네임 실시간 검증
-watch(nicknameRef, (newValue) => {
-  errors.value.nickname = nameValidation(newValue, '닉네임')
-})
-
-// 질문 선택 실시간 검증
-watch(queryRef, (newValue) => {
-  errors.value.query = queryValidation(newValue)
-})
-// 질문 답변 실시간 검증
-watch(queryAnswerRef, (newValue) => {
-  errors.value.queryAnswer = queryAnswerValidation(newValue)
-})
+    // 변경된 속성에 따른 유효성 검사
+    switch (changedKey) {
+      case 'email':
+        isEmailChecked.value = false
+        errors.value.email = validateEmailFormat(newValue.email)
+        break
+      case 'password':
+        errors.value.password = passwordValidation(newValue.password)
+        errors.value.passwordValid = matchPasswordValidation(
+          newValue.password,
+          newValue.passwordValid,
+        )
+        break
+      case 'passwordValid':
+        errors.value.passwordValid = secondPasswordValidation(
+          newValue.passwordValid,
+          newValue.password,
+        )
+        break
+      case 'name':
+        errors.value.name = nameValidation(newValue.name, '이름')
+        break
+      case 'nickname':
+        errors.value.nickname = nameValidation(newValue.nickname, '닉네임')
+        break
+      case 'phone':
+        errors.value.phone = nameValidation(newValue.phone, '휴대폰 번호')
+        break
+      case 'passwordQuestionId':
+        errors.value.passwordQuestionId = queryValidation(newValue.passwordQuestionId)
+        break
+      case 'passwordQuestionAnswer':
+        errors.value.passwordQuestionAnswer = queryAnswerValidation(newValue.passwordQuestionAnswer)
+        break
+    }
+  },
+  { deep: true },
+)
 
 // 이메일 중복 확인
 const checkEmail = async () => {
-  if (!emailRef.value || errors.value.email) return
+  if (!inputData.value.userEmail || errors.value.email) return
 
   isEmailCheckLoading.value = true
   try {
-    await // 실제 API 호출로 대체 필요
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // 임시 딜레이
-    // const response = await checkEmailDuplicate(emailRef.value)
-    // if (response.isDuplicate) {
-    //   errors.value.email = '이미 사용 중인 이메일입니다'
-    //   isEmailChecked.value = false
-    // } else {
-    isEmailChecked.value = true
-    errors.value.email = ''
-    // }
+    const { data } = await checkEmailDuplicatedFetch(inputData.value.userEmail)
+    console.log(data)
+
+    if (data.message === '1') {
+      errors.value.email = '이미 사용 중인 이메일입니다'
+      isEmailChecked.value = false
+    } else {
+      isEmailChecked.value = true
+      errors.value.email = ''
+    }
   } catch (error) {
     errors.value.email = '이메일 중복 확인에 실패했습니다'
     isEmailChecked.value = false
@@ -100,36 +116,34 @@ const validateForm = () => {
     !errors.value.passwordValid &&
     !errors.value.name &&
     !errors.value.nickname &&
-    !errors.value.query &&
-    !errors.value.queryAnswer &&
+    !errors.value.passwordQuestionId &&
+    !errors.value.passwordQuestionAnswer &&
     isEmailChecked.value
   )
 }
 
 const onSubmit = async () => {
   if (!validateForm()) return
+  const userData = {
+    userEmail: inputData.value.userEmail,
+    userPassword: inputData.value.userPassword,
+    userName: inputData.value.userName,
+    userNickname: inputData.value.userNickName,
+    userPhoneNumber: inputData.value.userPhoneNumber,
+    userPasswordQuestionId: inputData.value.userPasswordQuestionId,
+    userPasswordAnswer: inputData.value.userPasswordQuestionAnswer,
+  }
 
   try {
-    const userData = {
-      email: emailRef.value,
-      password: passwordRef.value,
-      name: nameRef.value,
-      nickname: nicknameRef.value,
-      securityQuestion: queryRef.value,
-    }
-    console.log('회원가입 시도:', userData)
+    await registerFetch(userData)
   } catch (error) {
     console.error('회원가입 실패:', error)
   }
 }
-const TESTQUERY: Record<string, string>[] = [
-  { 1: '질문1' },
-  { 2: '질문2' },
-  { 3: '질문3' },
-  { 4: '질문4' },
-  { 5: '질문5' },
-  { 6: '질문6' },
-]
+onMounted(async () => {
+  const data = await getPasswordQuestionFetch()
+  queryList.value = data
+})
 </script>
 
 <template>
@@ -152,8 +166,9 @@ const TESTQUERY: Record<string, string>[] = [
                 <BasicInput
                   id="userEmail"
                   type="email"
+                  name="userEmail"
                   placeholder="이메일을 입력해주세요"
-                  v-model="emailRef"
+                  v-model="inputData.userEmail"
                   :error="errors.email"
                   class="w-full"
                   direction="col"
@@ -163,7 +178,7 @@ const TESTQUERY: Record<string, string>[] = [
               <BasicButton
                 type="button"
                 @click="checkEmail"
-                :disabled="!emailRef || !!errors.email || isEmailCheckLoading"
+                :disabled="!inputData.userEmail || !!errors.email || isEmailCheckLoading"
                 class="h-[42px] w-32"
                 :color="isEmailChecked ? 'success' : 'primary'"
               >
@@ -176,66 +191,78 @@ const TESTQUERY: Record<string, string>[] = [
           </div>
 
           <!-- 비밀번호 섹션 -->
-
           <BasicInput
             id="userPassword"
             label="비밀번호"
+            name="userPassword"
             type="password"
             placeholder="비밀번호를 입력해주세요"
             direction="col"
-            v-model="passwordRef"
+            v-model="inputData.userPassword"
             :error="errors.password"
           />
 
           <BasicInput
             id="userPasswordValid"
             label="비밀번호 확인"
+            name="userPasswordValid"
             type="password"
             placeholder="비밀번호를 한번 더 입력해주세요"
             direction="col"
-            v-model="passwordValidRef"
+            v-model="inputData.userPasswordVaild"
             :error="errors.passwordValid"
           />
 
           <!-- 사용자 정보 섹션 -->
-
           <BasicInput
             id="name"
             label="이름"
+            name="userName"
             placeholder="이름을 입력해주세요"
             direction="col"
-            v-model="nameRef"
+            v-model="inputData.userName"
             :error="errors.name"
           />
 
           <BasicInput
             id="nickname"
             label="닉네임"
+            name="userNickname"
             placeholder="닉네임을 입력해주세요"
             direction="col"
-            v-model="nicknameRef"
+            v-model="inputData.userNickName"
             :error="errors.nickname"
+          />
+          <BasicInput
+            id="phone"
+            name="userPhone"
+            label="휴대폰 번호"
+            placeholder="휴대폰 번호를 입력해주세요"
+            direction="col"
+            v-model="inputData.userPhoneNumber"
+            :error="errors.phone"
           />
 
           <!-- 보안 질문 섹션 -->
           <BasicSelect
             id="query"
             label="비밀번호 확인 질문"
-            v-model="queryRef"
-            :options="TESTQUERY"
-            value-key="query_id"
-            label-key="query_name"
+            v-model="inputData.userPasswordQuestionId"
+            name="userPasswordQuestionId"
+            :options="queryList"
             direction="col"
+            placeholder="질문을 선택해주세요"
             size="md"
-            :error="errors.query"
+            :error="errors.passwordQuestionId"
           />
           <BasicInput
             id="queryAnswer"
+            name="userPasswordAnswer"
             label="답변"
             placeholder="질문의 답을 입력해주세요"
             direction="col"
-            v-model="queryAnswerRef"
-            :error="errors.queryAnswer"
+            v-model="inputData.userPasswordQuestionAnswer"
+            :error="errors.passwordQuestionAnswer"
           />
 
           <!-- 제출 버튼 -->
