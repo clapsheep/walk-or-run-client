@@ -1,15 +1,58 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-import { ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
+import { validateEmailFormat, passwordValidation } from '@/utils/inputValidation'
+import { handleLogin } from '@/core/auth/AuthHook'
+import type { AuthCredentials } from '@/core/auth/AuthType'
 
-const emailRef = ref('')
-const passwordRef = ref('')
-console.log(emailRef.value)
+const inputData = ref<AuthCredentials>({
+  userEmail: '',
+  userPassword: '',
+})
 
-const onSubmit = () => {
-  console.log(emailRef.value, passwordRef.value)
+const errors = ref({
+  email: '',
+  password: '',
+})
+
+const loading = ref(false)
+const error = ref('')
+
+const router = useRouter()
+
+const handleEmailValidation = () => {
+  errors.value.email = validateEmailFormat(inputData.value.userEmail)
+}
+
+const handlePasswordValidation = () => {
+  errors.value.password = passwordValidation(inputData.value.userPassword)
+}
+
+const isFormValid = computed(() => {
+  return !errors.value.email &&
+         !errors.value.password &&
+         inputData.value.userEmail &&
+         inputData.value.userPassword
+})
+
+const onSubmit = async (inputData: AuthCredentials) => {
+  console.log(inputData)
+  errors.value.email = ''  // 에러 메시지 초기화
+
+  try {
+    const { loading: loginLoading, error: loginError } = await handleLogin(inputData)
+    loading.value = loginLoading.value
+    if (!loginError.value) {
+      router.push('/dashboard')
+    } else {
+      errors.value.email = loginError.value
+    }
+  } catch (err) {
+    console.log(err)
+    errors.value.email = err as string
+  }
 }
 </script>
 
@@ -19,7 +62,7 @@ const onSubmit = () => {
       <!-- 로고나 타이틀 -->
       <h1 class="mb-8 text-center text-2xl font-bold text-gray-800">로그인</h1>
 
-      <form class="space-y-6" @submit.prevent="onSubmit">
+      <form class="space-y-6" @submit.prevent="onSubmit(inputData)">
         <BasicInput
           name="userEmail"
           autocomplete="email"
@@ -28,8 +71,11 @@ const onSubmit = () => {
           type="text"
           placeholder="이메일을 입력해주세요"
           direction="col"
-          v-model="emailRef"
+          v-model="inputData.userEmail"
+          @input="handleEmailValidation"
         />
+
+        <span v-if="errors.email" class="block mt-1 text-sm text-right text-red-500">{{ errors.email }}</span>
 
         <BasicInput
           name="userPassword"
@@ -39,8 +85,11 @@ const onSubmit = () => {
           type="password"
           placeholder="비밀번호를 입력해주세요"
           direction="col"
-          v-model="passwordRef"
+          v-model="inputData.userPassword"
+          @input="handlePasswordValidation"
         />
+
+        <span v-if="errors.password" class="block mt-1 text-sm text-right text-red-500">{{ errors.password }}</span>
 
         <!-- 아이디/비밀번호 찾기 -->
         <div class="flex justify-end">
@@ -49,7 +98,14 @@ const onSubmit = () => {
           </RouterLink>
         </div>
 
-        <BasicButton type="submit" class="w-full"> 로그인 </BasicButton>
+        <BasicButton
+          type="submit"
+          class="w-full"
+          :disabled="!isFormValid || loading"
+          @submit="onSubmit(inputData)"
+        >
+          로그인
+        </BasicButton>
 
         <!-- 회원가입 유도 -->
         <div class="text-center text-sm text-gray-600">
