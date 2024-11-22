@@ -5,7 +5,7 @@ type User = {
   userId?: string
   userEmail?: string
   userPassword?: string
-  userPasswordVaild?: string
+  userPasswordValid?: string
   userName?: string
   userNickname?: string
   userPhoneNumber?: string

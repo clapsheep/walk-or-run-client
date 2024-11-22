@@ -14,7 +14,7 @@ export const useRegister = async (user: User) => {
     !user.userPasswordQuestionId ||
     !user.userPasswordAnswer
   ) {
-    modalStore.openModal('oneButtonModal', {
+    modalStore.openModal('basicModal', {
       title: '입력 오류',
       content: '모든 필드를 입력해주세요.',
     })
@@ -23,8 +23,8 @@ export const useRegister = async (user: User) => {
 
   try {
     await registerFetch(user)
-    
-    modalStore.openModal('oneButtonModal', {
+
+    modalStore.openModal('basicModal', {
       title: '회원가입 성공',
       content: '회원가입이 완료되었습니다.',
       redirectPath: '/signin',
@@ -33,12 +33,12 @@ export const useRegister = async (user: User) => {
     return 1
   } catch (error) {
     console.error('Registration error:', error)
-    
-    modalStore.openModal('oneButtonModal', {
+
+    modalStore.openModal('basicModal', {
       title: '회원가입 실패',
-      content: '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.',
+      content: '회원가입 중 오류가 발생했습니다. \n 다시 시도해주세요.',
     })
-    
+
     return 0
   }
 }

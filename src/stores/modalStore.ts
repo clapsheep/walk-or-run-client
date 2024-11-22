@@ -2,12 +2,13 @@ import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 
 // 모달 타입 정의
-export type ModalType = 'oneButtonModal' | 'twoButtonModal' | 'confirmModal'
+export type ModalType = 'basicModal' | 'twoButtonModal' | 'confirmModal'
 
 interface ModalData {
   title?: string
   content: string
   redirectPath?: string
+  cancelButton?: string
 }
 
 type ModalState = Record<
@@ -21,7 +22,7 @@ type ModalState = Record<
 export const useModalStore = defineStore('modal', () => {
   // 모달 상태 초기화
   const modals = reactive<ModalState>({
-    oneButtonModal: {
+    basicModal: {
       isOpen: false,
       data: null,
     },
