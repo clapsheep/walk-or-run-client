@@ -1,0 +1,61 @@
+import axios from 'axios'
+const { VITE_API_URL } = import.meta.env
+
+// 인터페이스 정의
+type AuthCredentials = {
+  userEmail: string
+  userPassword: string
+}
+
+type AuthResponse = {
+  message: string
+  accessToken?: string
+}
+
+type AuthError = {
+  message: string
+  status: number
+}
+
+// 로그인
+export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse> => {
+  try {
+    console.log(credentials);
+    const response = await axios.post(`${VITE_API_URL}/auth/login`, credentials)
+    const { data } = response
+    console.log(data);
+
+    if (data.access_token) {
+      console.log(data.access_token);
+      localStorage.setItem('accessToken', data.access_token)
+    }
+    return data
+  } catch (error: any) {
+    throw {
+      message: error.response?.data?.message || '로그인 중 오류가 발생했습니다',
+      status: error.response?.status || 500
+    } as AuthError
+  }
+}
+
+// 로그아웃
+export const logout = (): void => {
+  localStorage.removeItem('accessToken')
+}
+
+// 토큰 가져오기
+export const getToken = (): string | null => {
+  return localStorage.getItem('accessToken')
+}
+
+// 로그인 상태 확인
+export const isAuthenticated = (): boolean => {
+  const token = localStorage.getItem('accessToken')
+  return !!token
+}
+
+// 인증 상태 확인
+export const checkAuthStatus = (): boolean => {
+  const token = localStorage.getItem('accessToken')
+  return !!token
+}
