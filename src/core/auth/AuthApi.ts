@@ -22,3 +22,8 @@ export const registerFetch = async (user: User): Promise<AxiosResponse> => {
   const res = await axios.post(`${VITE_API_URL}/auth/register`, user)
   return res
 }
+
+export const findPasswordFetch = async (userData: User): Promise<AxiosResponse> => {
+  const res = await axios.post(`${VITE_API_URL}/auth/find-password`, userData)
+  return res
+}
