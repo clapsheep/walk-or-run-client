@@ -5,6 +5,6 @@ export const getAuthHeader = (): Record<string, string> => {
     throw new Error('No authentication token found')
   }
   return {
-    'Authorization': `Bearer ${token}`
+    'Authorization': `${token}`
   }
 }

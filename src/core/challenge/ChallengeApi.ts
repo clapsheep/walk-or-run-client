@@ -1,4 +1,4 @@
-import type { PageResponse } from '@/core/common/PageType'
+import type { PageResponse } from '@/core/common/types/PageType'
 import type { Challenge } from '@/core/challenge/ChallengeType'
 import axios from 'axios'
 import { getToken } from '@/core/auth/services/loginService'
