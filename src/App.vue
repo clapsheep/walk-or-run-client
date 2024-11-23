@@ -12,7 +12,7 @@ import BasicModal from '@/components/molecules/BasicModal.vue'
       </main>
     </div>
   </div>
-  <BasicModal modalType="basicModal" />
+
 </template>
 
 <style>

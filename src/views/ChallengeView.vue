@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import {
   loading,
   error,
@@ -8,12 +7,7 @@ import {
   fetchChallenges,
   changePage as handlePageChange
 } from '@/core/challenge/ChallengeHook'
-
-const router = useRouter()
-
-const goToDetail = (challengeId?: string) => {
-  router.push(`/challenge/${challengeId}`)
-}
+import { goToDetail } from '@/core/challenge/ChallengeHook'
 
 onMounted(async () => {
   await fetchChallenges()
@@ -42,7 +36,7 @@ onMounted(async () => {
         <div v-for="challenge in challenges.content"
             :key="challenge.challengeTitle"
             class="cursor-pointer rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-            @click="goToDetail(challenge.challengeTitle)">
+            @click="goToDetail(challenge)">
           <div class="mb-4 flex items-start justify-between">
             <h2 class="text-md font-semibold text-gray-800 pr-16">{{ challenge.challengeTitle }}</h2>
             <!-- D-day 배지 크기 조정 및 위치 변경 -->

@@ -1,7 +1,8 @@
 import { ref, type Ref } from 'vue'
-import { getChallengesFetch } from './ChallengeApi'
+import { getChallengeDetailFetch, getChallengesFetch, participateChallengeFetch } from './ChallengeApi'
 import type { PageResponse } from '@/core/common/PageType'
 import type Challenge from './ChallengeType'
+import router from '@/router'
 
 // 챌린지 목록 관련 Hook
 // 상태 관리
@@ -54,7 +55,35 @@ export const fetchChallenges = async (page: number = 1): Promise<void> => {
   }
 }
 
+export const goToDetail = (challenge?: Challenge) => {
+  router.push(`/challenge/${challenge?.challengeId}`)
+}
+
 // 페이지 변경
 export const changePage = async (page: number): Promise<void> => {
   await fetchChallenges(page)
+}
+
+export const fetchChallengeDetail = async (challengeId: number) => {
+  try {
+    setLoading(true)
+    setError('')
+
+    const data = await getChallengeDetailFetch(challengeId);
+    return { data, loading, error: ref('') }
+  } catch (err) {
+    setError('챌린지 정보를 불러오는데 실패했습니다.')
+    console.error('Error fetching challenge detail:', err)
+  } finally {
+    setLoading(false)
+  }
+}
+
+export const handleParticipate = async (challengeId: number) => {
+  try {
+    participateChallengeFetch(challengeId);
+  } catch (err) {
+    error.value = '챌린지에 참여할 수 없습니다.'
+    console.error('Error participating in challenge:', err)
+  }
 }
