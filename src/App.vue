@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import NavigationBar from '@/components/organisms/NavigationBar.vue'
 import BasicModal from '@/components/molecules/BasicModal.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
@@ -12,7 +13,7 @@ import BasicModal from '@/components/molecules/BasicModal.vue'
       </main>
     </div>
   </div>
-  <BasicModal modalType="basicModal" />
+  <BasicModal />
 </template>
 
 <style>

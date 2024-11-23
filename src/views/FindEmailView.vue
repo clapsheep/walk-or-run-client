@@ -1,28 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue';
 import BasicInput from '@/components/atoms/BasicInput.vue';
-import axios from 'axios'
+import { findEmailFetch } from '@/core/auth/AuthApi';
+import { useFindEmail } from '@/core/auth/composables/useFindEmail';
 
-const nameRef = ref('');
-const phoneRef = ref('');
-const isCorrectInfoRef = ref(false);
-const emailRef = ref('');
+const { findEmail, form, errors, isLoading, error: findEmailError, isFormValid  } = useFindEmail(findEmailFetch)
 
-const onFindId = async () => {
-  try {
-    const response = await axios.post('/api/auth/email', {
-      userName: nameRef.value,
-      userPhoneNumber: phoneRef.value,
-    })
-    if(true) { // 만약 ApiResponse가 "success"면
-      isCorrectInfoRef.value = true;
-      emailRef.value = response.data["userEmail"];
-    }
-    console.log('아이디 찾기 결과:', response.data);
-  } catch (error) {
-    console.log('가입되지 않은 사용자입니다');
-  }
+const onSubmit = async () => {
+  if (!isFormValid.value || isLoading.value) return
+  await findEmail(form.value)
 }
 </script>
 
@@ -33,25 +19,36 @@ const onFindId = async () => {
         아이디 찾기
       </h1>
 
-      <form class="space-y-6">
+      <form class="space-y-6" @submit.prevent="onSubmit">
         <BasicInput
           id="userName"
           label="이름"
+          name="userName"
+          autocomplete="name"
           placeholder="이름을 입력해주세요"
           direction="col"
-          v-model="nameRef"
+          v-model="form.userName"
+          :error="errors.userName || findEmailError"
         />
         <BasicInput
           id="userPhone"
           label="휴대폰 번호"
+          name="userPhone"
+          autocomplete="phone"
           placeholder="휴대폰 번호를 입력해주세요"
           direction="col"
-          v-model="phoneRef"
+          v-model="form.userPhoneNumber"
+          :error="errors.userPhoneNumber "
         />
-        <BasicButton type="submit" class="w-full" @submit="onFindId">찾기</BasicButton>
+        <BasicButton
+          type="submit"
+          class="w-full"
+          :disabled="!isFormValid"
+          :isLoading="isLoading"
+        >
+          찾기
+        </BasicButton>
       </form>
-
-      <p class="text-success-600 text-base" v-if="isCorrectInfoRef">{{ emailRef }}</p>
 
       <div class="mt-4 text-right text-sm text-gray-600">
         <RouterLink

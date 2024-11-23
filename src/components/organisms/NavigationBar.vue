@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 import {
   FlagIcon,
@@ -16,8 +16,15 @@ import { RouterLink } from 'vue-router'
 
 import NavButton from '@/components/atoms/NavButton.vue'
 import LogoutButton from '@/components/atoms/LogoutButton.vue'
+import { useLogout } from '@/core/auth/composables/useLogout'
+import { logoutFetch } from '@/core/auth/AuthApi'
+import { useUserStore } from '@/stores/userStore'
 
+const userStore = useUserStore()
+const { logout, isLoading } = useLogout(logoutFetch)
 const isNavCollapsed = ref(false)
+const isLoggedIn = computed(() => !!userStore.userId)
+const isAdmin = computed(() => userStore.userRole === 'ADMIN')
 
 const menus = [
   {
@@ -35,6 +42,9 @@ const menus = [
     path: '/account',
     icon: UserIcon,
   },
+]
+
+const adminMenus = [
   {
     name: '관리자',
     path: '/admin',
@@ -82,13 +92,25 @@ const authMenus = [
               :isCollapsed="isNavCollapsed"
             />
           </li>
+          <li v-if="isAdmin" v-for="(menu, index) in adminMenus" :key="'admin-'+index">
+            <NavButton
+              :to="menu.path"
+              :icon="menu.icon"
+              :name="menu.name"
+              :isCollapsed="isNavCollapsed"
+            />
+          </li>
         </ul>
 
         <!-- 로그인 상태에 따른 영역 -->
-        <div class="space-y-2 p-4">
-          <LogoutButton :icon="ArrowLeftStartOnRectangleIcon" :isCollapsed="isNavCollapsed" />
+        <div v-if="isLoggedIn" class="space-y-2 p-4">
+          <LogoutButton
+            :icon="ArrowLeftStartOnRectangleIcon"
+            :isCollapsed="isNavCollapsed"
+            :onLogout="logout"
+          />
         </div>
-        <ul class="space-y-2 p-4">
+        <ul v-else class="space-y-2 p-4">
           <li v-for="(menu, index) in authMenus" :key="index">
             <NavButton
               :to="menu.path"

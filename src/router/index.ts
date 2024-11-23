@@ -1,5 +1,6 @@
+import { isAuthenticated } from '@/core/auth/services/loginService'
 import { createRouter, createWebHistory } from 'vue-router'
-import { isAuthenticated } from '@/core/auth/AuthHook'
+import { useUserStore } from '@/stores/userStore'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,7 +45,10 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('@/views/AdminView.vue'),
-      meta: { requiresAuth: true }
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      }
     },
     {
       path: '/signin',
@@ -76,12 +80,19 @@ const router = createRouter({
 
 // 전역 네비게이션 가드
 router.beforeEach((to, from, next) => {
-  // 인증이 필요한 페이지에 접근할 때
+  const userStore = useUserStore()
+
   if (to.meta.requiresAuth && !isAuthenticated()) {
-    next({ name: 'signin' })
-  } else {
-    next()
+    next({ path: '/signin' })
+    return
   }
+
+  if (to.meta.requiresAdmin && userStore.userRole !== 'ADMIN') {
+    next({ path: '/' })
+    return
+  }
+
+  next()
 })
 
 export default router

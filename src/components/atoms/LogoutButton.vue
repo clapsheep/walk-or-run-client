@@ -2,17 +2,15 @@
 interface LogoutButtonProps {
   icon: Function
   isCollapsed?: boolean
+  onLogout: () => void
 }
-const { icon, isCollapsed = false } = defineProps<LogoutButtonProps>()
+const { icon,onLogout, isCollapsed = false } = defineProps<LogoutButtonProps>()
 
-const handleLogout = () => {
-  console.log('로그아웃')
-}
 </script>
 
 <template>
   <button
-    @click="handleLogout"
+    @click="onLogout"
     :class="{ 'justify-center': isCollapsed }"
     class="flex w-full items-center rounded-lg p-2 text-gray-900 hover:bg-primary-200 active:bg-primary-500 active:font-semibold active:text-white"
   >

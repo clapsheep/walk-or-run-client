@@ -1,158 +1,32 @@
 <script setup lang="ts">
-import { onMounted, reactive, Ref, ref, watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import BasicSelect from '@/components/molecules/BasicSelect.vue'
-import {
-  validateEmailFormat,
-  passwordValidation,
-  matchPasswordValidation,
-  secondPasswordValidation,
-  inputValidation,
-  queryValidation,
-  queryAnswerValidation,
-} from '@/utils/inputValidation'
-import { checkEmailDuplicatedFetch, getPasswordQuestionFetch } from '@/core/auth/AuthApi'
-import User from '@/core/user/UserType'
-import { useRegister } from '@/core/auth/AuthHook'
+import { checkEmailDuplicatedFetch, getPasswordQuestionFetch, registerFetch } from '@/core/auth/AuthApi'
+import { useRegisterForm } from '@/core/auth/composables/useRegisterForm'
+import { onMounted, ref } from 'vue'
 
-const isEmailChecked = ref(false)
-const isEmailCheckLoading = ref(false)
 const queryList = ref({})
 
-const inputData = reactive<User>({
-  userEmail: '',
-  userPassword: '',
-  userPasswordValid: '',
-  userName: '',
-  userNickname: '',
-  userPhoneNumber: '',
-  userPasswordQuestionId: '',
-  userPasswordAnswer: '',
+const {
+  form,
+  errors,
+  emailError,
+  isEmailCheckLoading,
+  isEmailChecked,
+  isSubmitting,
+  checkEmail,
+  handleSubmit,
+  validateField,
+} = useRegisterForm({
+  registerFetch,
+  checkEmailFetch: checkEmailDuplicatedFetch,
 })
-
-const errors = reactive<User>({
-  userEmail: '',
-  userPassword: '',
-  userPasswordValid: '',
-  userName: '',
-  userNickname: '',
-  userPhoneNumber: '',
-  userPasswordQuestionId: '',
-  userPasswordAnswer: '',
-})
-
-// 각 필드별로 개별적인 watch를 설정
-watch(() => inputData.userEmail, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    isEmailChecked.value = false
-    errors.userEmail = validateEmailFormat(newValue)
-  }
-})
-
-watch(() => inputData.userPassword, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userPassword = passwordValidation(newValue)
-    errors.userPasswordValid = matchPasswordValidation(
-      newValue,
-      inputData.userPasswordValid,
-    )
-  }
-})
-
-watch(() => inputData.userPasswordValid, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userPasswordValid = secondPasswordValidation(
-      newValue,
-      inputData.userPassword
-    )
-  }
-})
-
-watch(() => inputData.userName, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userName = inputValidation(newValue, '이름')
-  }
-})
-
-watch(() => inputData.userNickname, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userNickname = inputValidation(newValue, '닉네임')
-  }
-})
-
-watch(() => inputData.userPhoneNumber, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userPhoneNumber = inputValidation(newValue, '휴대폰 번호')
-  }
-})
-
-watch(() => inputData.userPasswordQuestionId, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userPasswordQuestionId = queryValidation(newValue)
-  }
-})
-
-watch(() => inputData.userPasswordAnswer, (newValue, oldValue) => {
-  if (newValue !== oldValue) {
-    errors.userPasswordAnswer = queryAnswerValidation(newValue)
-  }
-})
-
-// 이메일 중복 확인
-const checkEmail = async () => {
-  if (!inputData.userEmail || errors.userEmail) return
-
-  isEmailCheckLoading.value = true
-  try {
-    const { data } = await checkEmailDuplicatedFetch(inputData.userEmail)
-    console.log(data)
-
-    if (data.message === '1') {
-      errors.userEmail = '이미 사용 중인 이메일입니다'
-      isEmailChecked.value = false
-    } else {
-      isEmailChecked.value = true
-      errors.userEmail = ''
-    }
-  } catch (error) {
-    errors.userEmail = '이메일 중복 확인에 실패했습니다'
-    isEmailChecked.value = false
-  } finally {
-    isEmailCheckLoading.value = false
-  }
-}
-
-const validateForm = () => {
-  return (
-    !errors.userEmail &&
-    !errors.userPassword &&
-    !errors.userPasswordValid &&
-    !errors.userName &&
-    !errors.userNickname &&
-    !errors.userPasswordQuestionId &&
-    !errors.userPasswordAnswer &&
-    isEmailChecked.value
-  )
-}
-
-const onSubmit = async () => {
-  const userData: User = {
-    userEmail: inputData.userEmail,
-    userPassword: inputData.userPassword,
-    userName: inputData.userName,
-    userNickname: inputData.userNickname,
-    userPhoneNumber: inputData.userPhoneNumber,
-    userPasswordQuestionId: inputData.userPasswordQuestionId,
-    userPasswordAnswer: inputData.userPasswordAnswer,
-  }
-
-  const result = await useRegister(userData)
-}
 
 onMounted(async () => {
-  const data = await getPasswordQuestionFetch()
+  const { data } = await getPasswordQuestionFetch()
   queryList.value = data
+
 })
 </script>
 
@@ -167,7 +41,7 @@ onMounted(async () => {
 
       <!-- 메인 폼 -->
       <div class="rounded-lg bg-white px-8 py-10 shadow-sm">
-        <form class="space-y-6" @submit.prevent="onSubmit">
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <!-- 이메일 입력 섹션 -->
           <div class="space-y-1">
             <label for="userEmail" class="block text-sm font-medium text-gray-700"> 이메일 </label>
@@ -178,25 +52,25 @@ onMounted(async () => {
                   type="email"
                   name="userEmail"
                   placeholder="이메일을 입력해주세요"
-                  v-model="inputData.userEmail"
-                  :error="errors.userEmail"
+                  v-model="form.userEmail"
+                  :error="emailError || errors.userEmail"
+                  @update:model-value="validateField('userEmail')"
                   class="w-full"
                   direction="col"
-                  hideLabel
                   autocomplete="email"
                 />
               </div>
               <BasicButton
                 type="button"
                 @click="checkEmail"
-                :disabled="!inputData.userEmail || !!errors.userEmail || isEmailCheckLoading"
+                :disabled="!form.userEmail || isEmailCheckLoading"
                 class="h-[42px] w-32"
                 :color="isEmailChecked ? 'success' : 'primary'"
               >
                 {{ isEmailChecked ? '확인완료' : '중복확인' }}
               </BasicButton>
             </div>
-            <p v-if="isEmailChecked && !errors.userEmail" class="mt-1 text-sm text-success-500">
+            <p v-if="isEmailChecked && !emailError" class="mt-1 text-sm text-success-500">
               사용 가능한 이메일입니다
             </p>
           </div>
@@ -206,81 +80,92 @@ onMounted(async () => {
             id="userPassword"
             label="비밀번호"
             name="userPassword"
-            type="password"
             placeholder="비밀번호를 입력해주세요"
-            direction="col"
-            v-model="inputData.userPassword"
+            type="password"
+            v-model="form.userPassword"
             :error="errors.userPassword"
+            @update:model-value="validateField('userPassword')"
+            direction="col"
             autocomplete="new-password"
           />
 
           <BasicInput
-            id="userPasswordValid"
+            id="userPasswordConfirm"
             label="비밀번호 확인"
-            name="userPasswordValid"
+            name="userPasswordConfirm"
+            placeholder="비밀번호를 확인해주세요"
             type="password"
-            placeholder="비밀번호를 한번 더 입력해주세요"
+            v-model="form.userPasswordConfirm"
+            :error="errors.userPasswordConfirm"
+            @update:model-value="validateField('userPasswordConfirm')"
             direction="col"
-            v-model="inputData.userPasswordValid"
-            :error="errors.userPasswordValid"
             autocomplete="new-password"
           />
 
           <!-- 사용자 정보 섹션 -->
           <BasicInput
-            id="name"
+            id="userName"
             label="이름"
             name="userName"
             placeholder="이름을 입력해주세요"
-            direction="col"
-            v-model="inputData.userName"
+            v-model="form.userName"
             :error="errors.userName"
+            @update:model-value="validateField('userName')"
+            direction="col"
           />
 
           <BasicInput
-            id="nickname"
+            id="userNickname"
             label="닉네임"
             name="userNickname"
             placeholder="닉네임을 입력해주세요"
-            direction="col"
-            v-model="inputData.userNickname"
+            v-model="form.userNickname"
             :error="errors.userNickname"
-          />
-          <BasicInput
-            id="phone"
-            name="userPhone"
-            label="휴대폰 번호"
-            placeholder="휴대폰 번호를 입력해주세요"
+            @update:model-value="validateField('userNickname')"
             direction="col"
-            v-model="inputData.userPhoneNumber"
+          />
+
+          <BasicInput
+            id="userPhoneNumber"
+            name="userPhoneNumber"
+            label="휴대폰 번호"
+            placeholder="휴대폰 번호를 입력해주세요(-)제외"
+            v-model="form.userPhoneNumber"
             :error="errors.userPhoneNumber"
+            @update:model-value="validateField('userPhoneNumber')"
+            direction="col"
+            type="tel"
           />
 
           <!-- 보안 질문 섹션 -->
           <BasicSelect
-            id="query"
+            id="userPasswordQuestionId"
             label="비밀번호 확인 질문"
-            v-model="inputData.userPasswordQuestionId"
+            v-model="form.userPasswordQuestionId"
             name="userPasswordQuestionId"
             :options="queryList"
+            :error="errors.userPasswordQuestionId"
+            @update:model-value="validateField('userPasswordQuestionId')"
             direction="col"
             placeholder="질문을 선택해주세요"
             size="md"
-            :error="errors.userPasswordQuestionId"
           />
+
           <BasicInput
-            id="queryAnswer"
+            id="userPasswordAnswer"
             name="userPasswordAnswer"
             label="답변"
-            placeholder="질문의 답을 입력해주세요"
-            direction="col"
-            v-model="inputData.userPasswordAnswer"
+            placeholder="답변을 입력해주세요"
+            v-model="form.userPasswordAnswer"
             :error="errors.userPasswordAnswer"
+            @update:model-value="validateField('userPasswordAnswer')"
+            direction="col"
+            type="text"
           />
 
           <!-- 제출 버튼 -->
           <div class="pt-4">
-            <BasicButton type="submit" class="w-full py-3" :disabled="!validateForm()">
+            <BasicButton type="submit" class="w-full py-3" :disabled="isSubmitting">
               회원가입
             </BasicButton>
           </div>

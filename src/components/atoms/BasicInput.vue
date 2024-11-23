@@ -60,7 +60,7 @@ const BASE_INPUT_CLASSES = [
 
 const containerClasses = computed(() => [
   'flex',
-  direction === 'row' ? 'items-center gap-4' : 'flex-col items-start gap-2',
+  direction === 'row' ? 'items-start gap-4' : 'flex-col gap-2',
   className,
 ])
 
@@ -77,7 +77,12 @@ const inputClasses = computed(() => [
     : '',
 ])
 
-const labelClasses = computed(() => ['font-medium', 'text-gray-700', LABEL_SIZE_CLASSES[size]])
+const labelClasses = computed(() => [
+  'font-medium',
+  'text-gray-700',
+  LABEL_SIZE_CLASSES[size],
+  direction === 'row' ? 'mt-[10px]' : 'mb-1',
+])
 
 const errorClasses = computed(() => [
   'text-warning-600',
@@ -90,19 +95,23 @@ const errorClasses = computed(() => [
     <label v-if="label" :for="id" :class="labelClasses">
       {{ label }}
     </label>
-    <div class="relative w-full">
-      <input
-        :autocomplete = 'autocomplete'
-        :type="type"
-        :id="id"
-        :placeholder="placeholder"
-        :name = 'name'
-        :class="inputClasses"
-        v-model="value"
-      />
-      <p v-if="error" :class="errorClasses" class="mt-1">
-        {{ error }}
-      </p>
+    <div class="flex-1">
+      <div class="relative">
+        <input
+          :autocomplete="autocomplete"
+          :type="type"
+          :id="id"
+          :placeholder="placeholder"
+          :name="name"
+          :class="inputClasses"
+          v-model="value"
+        />
+        <div class="min-h-[20px]">
+          <p v-if="error" :class="errorClasses" class="mt-1">
+            {{ error }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
