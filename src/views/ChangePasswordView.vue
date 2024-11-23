@@ -77,6 +77,7 @@ const onChangePassword = async (e: Event) => {
           <BasicInput
             id="password"
             label="새 비밀번호"
+            name="password"
             type="password"
             placeholder="새 비밀번호를 입력해주세요"
             v-model="passwordRef"
@@ -90,6 +91,7 @@ const onChangePassword = async (e: Event) => {
           <BasicInput
             id="confirmPassword"
             label="새 비밀번호 확인"
+            name="confirmPassword"
             type="password"
             placeholder="새 비밀번호를 한번 더 입력해주세요"
             v-model="confirmPasswordRef"

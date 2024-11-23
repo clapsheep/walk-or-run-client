@@ -11,12 +11,12 @@ import { useFindPassword } from '@/core/auth/AuthHook'
 
 const { VITE_API_URL } = import.meta.env
 const router = useRouter()
-const { findPassword, error: findPasswordError, isLoading: findPasswordLoading } = useFindPassword()
 
-const emailRef = ref('')
 const isEmailCheckedRef = ref(false)
 const isEmailCheckLoadingRef = ref(false)
-const queryList = ref([])
+const queryList = ref({})
+const findPasswordError = ref('')
+const findPasswordLoading = ref(false)
 
 const inputData = ref({
   userEmail: '',
@@ -75,7 +75,7 @@ const onFindPassword = async () => {
   if (!isFormValid.value) return
 
   try {
-    const success = await findPassword({
+    const success = await useFindPassword({
       userEmail: inputData.value.userEmail,
       userPasswordQuestionId: inputData.value.userPasswordQuestionId,
       userPasswordAnswer: inputData.value.userPasswordAnswer,
@@ -114,6 +114,7 @@ onMounted(async () => {
             <BasicInput
               id="userEmail"
               type="email"
+              name="userEmail"
               placeholder="이메일을 입력해주세요"
               v-model="inputData.userEmail"
               class="w-full"
@@ -158,9 +159,9 @@ onMounted(async () => {
           :error="errors.passwordAnswer"
         />
 
-        <BasicButton 
-          type="submit" 
-          class="w-full" 
+        <BasicButton
+          type="submit"
+          class="w-full"
           :disabled="!isFormValid || findPasswordLoading"
         >
           {{ findPasswordLoading ? '처리중...' : '찾기' }}

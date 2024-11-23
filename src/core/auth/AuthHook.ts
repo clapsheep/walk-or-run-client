@@ -129,3 +129,32 @@ export const useRegister = async (user: User) => {
     return 0
   }
 }
+
+export const useFindPassword = (userData: User) => {
+  const { error } = useLoading()
+  const modalStore = useModalStore()
+
+  // userData를 직접 사용하도록 수정
+  const findPassword = async () => {
+    if (!userData.userEmail || !userData.userPasswordQuestionId || !userData.userPasswordAnswer) {
+      modalStore.openModal('basicModal', {
+        title: '입력 오류',
+        content: '모든 필드를 입력해주세요.',
+      })
+      return false
+    }
+
+    try {
+      const { data } = await AuthApi.findPasswordFetch(userData)
+      return data.status === 200
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '비밀번호 찾기에 실패했습니다. 다시 시도해 주세요'
+      return false
+    }
+  }
+
+  return {
+    findPassword,
+    error
+  }
+}
