@@ -1,15 +1,22 @@
-type Challenge = {
+import { Ref } from "vue"
+
+export type Challenge = {
   challengeId?: number
   challengeTitle?: string
   challengeDescription?: string
-  startDate?: string
-  endDate?: string
-  isEnded?: boolean
+  challengeCreateDate?: string
+  challengeDeleteDate?: string
+  challengeIsEnded?: number
   challengeCategoryName?: string
-  author?: string
-  currentParticipants?: number
-  maxParticipants?: number
+  challengeAuthorId?: number
+  challengeParticipantCnt?: number
+  challengeTargetCnt?: number
+  challengeCategoryCode?: number
+  challengeSchedulerCycle?: number
   dday?: string
 }
 
-export default Challenge
+export type LoadingState = {
+  loading: Ref<boolean>
+  error: Ref<string>
+}

@@ -4,9 +4,10 @@ import Goal from '../goal/GoalType'
 type User = {
   userId?: string
   userEmail?: string
-  userPassword?: string
-  userPasswordValid?: string
   userName?: string
+  userRole?: string
+  userPassword?: string
+  userPasswordConfirm? :string
   userNickname?: string
   userPhoneNumber?: string
   userPasswordQuestionId?: string

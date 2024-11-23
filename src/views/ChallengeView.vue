@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import {
+import { getChallengesFetch } from '@/core/challenge/ChallengeApi'
+import { useGetAllChallenges } from '@/core/challenge/composables/useGetAllChallenges';
+
+const {
   loading,
   error,
   challenges,
   fetchChallenges,
-  changePage as handlePageChange
-} from '@/core/challenge/ChallengeHook'
-import { goToDetail } from '@/core/challenge/ChallengeHook'
+  changePage,
+  goToDetail
+} = useGetAllChallenges(getChallengesFetch);
 
 onMounted(async () => {
   await fetchChallenges()
@@ -58,7 +61,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage === 1"
-            @click="handlePageChange(challenges.pageInfo.currentPage - 1)">
+            @click="changePage(challenges.pageInfo.currentPage - 1)">
             이전
           </button>
           <span class="text-sm text-gray-700">
@@ -67,7 +70,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage >= challenges.pageInfo.totalPages"
-            @click="handlePageChange(challenges.pageInfo.currentPage + 1)">
+            @click="changePage(challenges.pageInfo.currentPage + 1)">
             다음
           </button>
         </nav>
