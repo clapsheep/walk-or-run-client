@@ -1,57 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
-import { validateEmailFormat, passwordValidation } from '@/utils/inputValidation'
-import { useLogin } from '@/core/auth/AuthHook'
-import type { AuthCredentials } from '@/core/auth/AuthType'
+import { loginFetch } from '@/core/auth/AuthApi'
+import { useLogin } from '@/core/auth/composables/useLogin'
+import { RouterLink } from 'vue-router'
 
-const inputData = ref<AuthCredentials>({
-  userEmail: '',
-  userPassword: '',
-})
+const { login, form, errors, isLoading, error: loginError, isFormValid } = useLogin(loginFetch)
 
-const errors = ref({
-  email: '',
-  password: '',
-})
-
-const loading = ref(false)
-const error = ref('')
-
-const router = useRouter()
-
-const handleEmailValidation = () => {
-  errors.value.email = validateEmailFormat(inputData.value.userEmail)
-}
-
-const handlePasswordValidation = () => {
-  errors.value.password = passwordValidation(inputData.value.userPassword)
-}
-
-const isFormValid = computed(() => {
-  return !errors.value.email &&
-         !errors.value.password &&
-         inputData.value.userEmail &&
-         inputData.value.userPassword
-})
-
-const onSubmit = async (inputData: AuthCredentials) => {
-  console.log(inputData)
-  errors.value.email = ''  // 에러 메시지 초기화
-
-  try {
-    const { error: loginError } = await useLogin(inputData)
-    if (!loginError.value) {
-      router.push('/dashboard')
-    } else {
-      errors.value.email = loginError.value
-    }
-  } catch (err) {
-    console.log(err)
-    errors.value.email = err as string
-  }
+const onSubmit = async () => {
+  if (!isFormValid.value || isLoading.value) return
+  await login(form.value)
 }
 </script>
 
@@ -61,7 +19,7 @@ const onSubmit = async (inputData: AuthCredentials) => {
       <!-- 로고나 타이틀 -->
       <h1 class="mb-8 text-center text-2xl font-bold text-gray-800">로그인</h1>
 
-      <form class="space-y-6" @submit.prevent="onSubmit(inputData)">
+      <form class="space-y-6" @submit.prevent="onSubmit">
         <BasicInput
           name="userEmail"
           autocomplete="email"
@@ -70,25 +28,21 @@ const onSubmit = async (inputData: AuthCredentials) => {
           type="text"
           placeholder="이메일을 입력해주세요"
           direction="col"
-          v-model="inputData.userEmail"
-          @input="handleEmailValidation"
+          v-model="form.userEmail"
+          :error="errors.userEmail || loginError"
         />
-
-        <span v-if="errors.email" class="block mt-1 text-sm text-right text-red-500">{{ errors.email }}</span>
 
         <BasicInput
           name="userPassword"
-          autocomplete="new-password"
+          autocomplete="current-password"
           id="userPassword"
           label="비밀번호"
           type="password"
           placeholder="비밀번호를 입력해주세요"
           direction="col"
-          v-model="inputData.userPassword"
-          @input="handlePasswordValidation"
+          v-model="form.userPassword"
+          :error="errors.userPassword "
         />
-
-        <span v-if="errors.password" class="block mt-1 text-sm text-right text-red-500">{{ errors.password }}</span>
 
         <!-- 아이디/비밀번호 찾기 -->
         <div class="flex justify-end">
@@ -100,8 +54,8 @@ const onSubmit = async (inputData: AuthCredentials) => {
         <BasicButton
           type="submit"
           class="w-full"
-          :disabled="!isFormValid || loading"
-          @submit="onSubmit(inputData)"
+          :disabled="!isFormValid || isLoading"
+          :loading="isLoading"
         >
           로그인
         </BasicButton>

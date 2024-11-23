@@ -1,101 +1,42 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
-import axios from 'axios'
 import BasicSelect from '@/components/molecules/BasicSelect.vue'
-import { validateEmailFormat } from '@/utils/inputValidation'
-import { getPasswordQuestionFetch } from '@/core/auth/AuthApi'
-import { useFindPassword } from '@/core/auth/AuthHook'
+import { findPasswordFetch } from '@/core/auth/AuthApi'
+import { useFindPassword } from '@/core/auth/composables/useFindPassword'
+import axios from 'axios'
+import { onMounted, ref } from 'vue'
 
 const { VITE_API_URL } = import.meta.env
-const router = useRouter()
-const { findPassword, error: findPasswordError, isLoading: findPasswordLoading } = useFindPassword()
 
-const emailRef = ref('')
-const isEmailCheckedRef = ref(false)
-const isEmailCheckLoadingRef = ref(false)
-const queryList = ref([])
+const {
+  form,
+  errors,
+  isLoading,
+  error: findPasswordError,
+  isFormValid,
+  findPassword,
+  isEmailCheckLoading,
+  isEmailChecked,
+  emailError,
+  validateAvailability,
+  validateEmail
+} = useFindPassword(findPasswordFetch)
 
-const inputData = ref({
-  userEmail: '',
-  userPasswordQuestionId: '',
-  userPasswordAnswer: '',
-})
+const queryList = ref({})
 
-const errors = ref({
-  email: '',
-  passwordQuestionId: '',
-  passwordAnswer: '',
-})
-
-const isFormValid = computed(() => {
-  return isEmailCheckedRef.value &&
-         inputData.value.userPasswordQuestionId &&
-         inputData.value.userPasswordAnswer
-})
-
-const validateEmail = () => {
-  const emailError = validateEmailFormat(inputData.value.userEmail)
-  errors.value.email = emailError
-}
-
-watch(() => inputData.value.userEmail, () => {
-  isEmailCheckedRef.value = false
-  validateEmail()
-})
-
-const checkEmail = async () => {
-  if (errors.value.email) return
-
-  isEmailCheckLoadingRef.value = true
-  try {
-    const { data } = await axios.get(`${VITE_API_URL}/auth/valid-email`, {
-      params: { email: inputData.value.userEmail }
-    })
-
-    if (data.message === '1') {
-      isEmailCheckedRef.value = true
-      errors.value.email = ''
-    } else {
-      errors.value.email = '존재하지 않는 이메일입니다'
-      isEmailCheckedRef.value = false
-    }
-  } catch (error: any) {
-    console.error('이메일 확인 중 오류:', error)
-    errors.value.email = '이메일 확인 중 오류가 발생했습니다'
-    isEmailCheckedRef.value = false
-  } finally {
-    isEmailCheckLoadingRef.value = false
-  }
-}
-
-const onFindPassword = async () => {
-  if (!isFormValid.value) return
-
-  try {
-    const success = await findPassword({
-      userEmail: inputData.value.userEmail,
-      userPasswordQuestionId: inputData.value.userPasswordQuestionId,
-      userPasswordAnswer: inputData.value.userPasswordAnswer,
-    })
-
-    if (success) {
-      router.push({
-        name: 'change-password',
-        query: { email: inputData.value.userEmail }
-      })
-    }
-  } catch (error) {
-    console.error('비밀번호 찾기 중 오류:', error)
-    errors.value.passwordAnswer = findPasswordError.value
-  }
+const onSubmit = async () => {
+  if (!isFormValid.value || isLoading.value) return
+  await findPassword({
+    userEmail: form.value.userEmail,
+    userPasswordQuestionId: form.value.userPasswordQuestionId,
+    userPasswordAnswer: form.value.userPasswordAnswer
+  })
 }
 
 onMounted(async () => {
   try {
-    const data = await getPasswordQuestionFetch()
+    const { data } = await axios.get(`${VITE_API_URL}/auth/password-question`)
     queryList.value = data
   } catch (error) {
     console.error('비밀번호 확인 질문을 가져오는데 실패했습니다:', error)
@@ -108,62 +49,67 @@ onMounted(async () => {
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="mb-8 text-center text-2xl font-bold text-gray-800">비밀번호 찾기</h1>
 
-      <form class="space-y-6" @submit.prevent="onFindPassword">
-        <div class="flex gap-2">
-          <div class="flex-1">
+      <form class="space-y-6" @submit.prevent="onSubmit">
+        <div class="space-y-1">
+            <label for="userEmail" class="block text-sm font-medium text-gray-700"> 이메일 </label>
+            <div class="flex gap-2">
+              <div class="flex-1">
             <BasicInput
               id="userEmail"
               type="email"
+              name="userEmail"
+              autocomplete="email"
               placeholder="이메일을 입력해주세요"
-              v-model="inputData.userEmail"
+              v-model="form.userEmail"
               class="w-full"
               direction="col"
-              :error="errors.email"
-              hideLabel
+              :error="errors.userEmail || emailError"
             />
           </div>
           <BasicButton
             type="button"
-            @click="checkEmail"
-            :disabled="!!errors.email || isEmailCheckLoadingRef"
+            @click="validateEmail"
+            :isLoading="isEmailCheckLoading"
+            :disabled="!!errors.userEmail || isEmailCheckLoading"
             class="h-[42px] w-32"
-            :color="isEmailCheckedRef ? 'success' : 'primary'"
+            :color="isEmailChecked ? 'success' : 'primary'"
           >
-            {{ isEmailCheckLoadingRef ? '확인중...' : isEmailCheckedRef ? '확인완료' : '이메일 확인' }}
+            {{ isEmailCheckLoading ? '확인중...' : isEmailChecked ? '확인완료' : '이메일 확인' }}
           </BasicButton>
         </div>
-        <span v-if="errors.email" class="block mt-1 text-sm text-right text-red-500">{{ errors.email }}</span>
-
+        <span v-if="errors.userEmail" class="block mt-1 text-sm text-right text-red-500">{{ errors.userEmail }}</span>
+      </div>
         <BasicSelect
           id="query"
           label="비밀번호 확인 질문"
-          v-model="inputData.userPasswordQuestionId"
+          v-model="form.userPasswordQuestionId"
           name="userPasswordQuestionId"
           :options="queryList"
           value-key="query_id"
           label-key="query_name"
           direction="col"
-          placeholder="질문을 선택해주세요"
+          placeholder="비밀번호 확인 질문을 선택해주세요"
           size="md"
-          :error="errors.passwordQuestionId"
+          :error="errors.userPasswordQuestionId"
         />
 
         <BasicInput
           id="queryAnswer"
           name="userPasswordAnswer"
-          label="답변"
+          label="비밀번호 확인 답변"
           placeholder="질문의 답을 입력해주세요"
           direction="col"
-          v-model="inputData.userPasswordAnswer"
-          :error="errors.passwordAnswer"
+          v-model="form.userPasswordAnswer"
+          :error="errors.userPasswordAnswer"
         />
 
-        <BasicButton 
-          type="submit" 
-          class="w-full" 
-          :disabled="!isFormValid || findPasswordLoading"
+        <BasicButton
+          type="submit"
+          class="w-full"
+          :disabled="!isFormValid || isLoading"
+          :isLoading="isLoading"
         >
-          {{ findPasswordLoading ? '처리중...' : '찾기' }}
+          {{ isLoading ? '처리중...' : '찾기' }}
         </BasicButton>
       </form>
 

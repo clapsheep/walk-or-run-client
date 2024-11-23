@@ -1,65 +1,54 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 
-// 모달 타입 정의
-export type ModalType = 'basicModal' | 'twoButtonModal' | 'confirmModal'
-
 interface ModalData {
   title?: string
   content: string
-  redirectPath?: string
-  cancelButton?: string
+  confirmText?: string
+  cancelText?: string
+  onConfirm?: () => void
+  onCancel?: () => void
 }
 
-type ModalState = Record<
-  ModalType,
-  {
-    isOpen: boolean
-    data: ModalData | null
-  }
->
+interface ModalState {
+  isOpen: boolean
+  data: ModalData | null
+}
 
 export const useModalStore = defineStore('modal', () => {
-  // 모달 상태 초기화
-  const modals = reactive<ModalState>({
-    basicModal: {
-      isOpen: false,
-      data: null,
-    },
-    twoButtonModal: {
-      isOpen: false,
-      data: null,
-    },
-    confirmModal: {
-      isOpen: false,
-      data: null,
-    },
+  const modal = reactive<ModalState>({
+    isOpen: false,
+    data: null,
   })
 
-  // 모달 열기
-  const openModal = (modalType: ModalType, data: ModalData) => {
-    modals[modalType].isOpen = true
-    modals[modalType].data = data
+  const openModal = (data: ModalData) => {
+    modal.data = {
+      confirmText: '확인',
+      ...data
+    }
+    modal.isOpen = true
   }
 
-  // 모달 닫기
-  const closeModal = (modalType: ModalType) => {
-    modals[modalType].isOpen = false
-    modals[modalType].data = null
+  const closeModal = () => {
+    modal.isOpen = false
+    modal.data = null
   }
 
-  // 모든 모달 닫기
-  const closeAllModals = () => {
-    Object.keys(modals).forEach((modalType) => {
-      modals[modalType as ModalType].isOpen = false
-      modals[modalType as ModalType].data = null
-    })
+  const handleConfirm = () => {
+    modal.data?.onConfirm?.()
+    closeModal()
+  }
+
+  const handleCancel = () => {
+    modal.data?.onCancel?.()
+    closeModal()
   }
 
   return {
-    modals,
+    modal,
     openModal,
     closeModal,
-    closeAllModals,
+    handleConfirm,
+    handleCancel
   }
 })

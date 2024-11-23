@@ -1,37 +1,58 @@
-import type ApiResponse from '@/core/common/ApiResponse'
+import type ApiResponse from '@/core/common/types/ApiResponse'
 import type User from '@/core/user/UserType'
-import type { AuthCredentials, AuthResponse } from './AuthType'
 import axios, { type AxiosResponse } from 'axios'
+import { AuthCredentials, AuthResponse } from './services/loginService'
+import { FindEmailForm } from './composables/useFindEmail'
+import { FindPasswordForm } from './composables/useFindPassword'
 
 const { VITE_API_URL } = import.meta.env
 
 export const loginFetch = async (credentials: AuthCredentials): Promise<AxiosResponse<AuthResponse>> => {
-  const response = await axios.post(`${VITE_API_URL}/auth/login`, credentials, {
-    headers: {
-      'Content-Type': 'application/json',
-    }
+  const response = await axios.post(`${VITE_API_URL}/auth/login`, credentials)
+  return response
+}
+export const registerFetch = async (user: User): Promise<AxiosResponse<ApiResponse>> => {
+  const response = await axios.post(`${VITE_API_URL}/auth/register`, user)
+  return response
+}
+export const logoutFetch = async (): Promise<AxiosResponse<ApiResponse>> => {
+  const response = await axios.post(`${VITE_API_URL}/user/logout`)
+  return response
+}
+
+export const findPasswordFetch = async ({userEmail, userPasswordQuestionId, userPasswordAnswer}: FindPasswordForm): Promise<AxiosResponse<ApiResponse>> => {
+  const response = await axios.post(`${VITE_API_URL}/auth/password/find`, {
+     userEmail,
+     userPasswordQuestionId,
+     userPasswordAnswer})
+  return response
+}
+
+export const findEmailFetch = async ({userName, userPhoneNumber}: FindEmailForm): Promise<AxiosResponse<string|ApiResponse>> => {
+  const response = await axios.post(`${VITE_API_URL}/auth/email`, {
+     userName,
+     userPhoneNumber})
+  return response
+}
+
+export const changePasswordFetch = async (email: string, password: string): Promise<AxiosResponse<ApiResponse>> => {
+  console.log(email, password);
+
+  const response = await axios.post(`${VITE_API_URL}/auth/password/change`, {
+    userEmail: email,
+    userPassword: password
   })
   return response
 }
 
 export const getPasswordQuestionFetch = async (): Promise<AxiosResponse<ApiResponse | { string: string }>> => {
-  const { data } = await axios.get(`${VITE_API_URL}/auth/password-question`)
-  return data
+  const response = await axios.get(`${VITE_API_URL}/auth/password-question`)
+  return response
 }
 
 export const checkEmailDuplicatedFetch = async (email: string): Promise<AxiosResponse<ApiResponse>> => {
-  const res = await axios.get(`${VITE_API_URL}/auth/valid-email`, {
+  const response = await axios.get(`${VITE_API_URL}/auth/valid-email`, {
     params: { email },
   })
-  return res
-}
-
-export const registerFetch = async (user: User): Promise<AxiosResponse> => {
-  const res = await axios.post(`${VITE_API_URL}/auth/register`, user)
-  return res
-}
-
-export const findPasswordFetch = async (userData: User): Promise<AxiosResponse> => {
-  const res = await axios.post(`${VITE_API_URL}/auth/find-password`, userData)
-  return res
+  return response
 }
