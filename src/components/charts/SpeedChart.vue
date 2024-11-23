@@ -1,55 +1,31 @@
+<template>
+  <div class="relative h-[300px] w-full p-4 bg-white rounded-lg shadow-sm">
+    <BaseChart
+      :type="'line'"
+      :chart-data="processChartData()"
+      :loading="loading"
+      :error="error"
+      :options="chartOptions"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Line } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  CategoryScale,
-} from 'chart.js'
-import type { Record } from '@/core/record/Record'
+import BaseChart from './BaseChart.vue'
+import { useChart } from '@/core/record/composables/useChart'
+import { useUserStore } from '@/stores/userStore'
+import { getSpeed } from '@/core/record/recordApi'
+import { onMounted } from 'vue'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-)
+const userStore = useUserStore()
+const userId = userStore.userId ? userStore.userId : ''
 
-const props = defineProps<{
-  records: Record[]
-}>()
-
-const chartData = computed(() => ({
-  labels: props.records.map(record =>
-    new Date(record.createdAt).toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric'
-    })
-  ),
-  datasets: [
-    {
-      label: '평균 속도',
-      data: props.records.map(record => record.speed),
-      backgroundColor: '#FACC15',
-      borderColor: '#EAB308',
-      borderWidth: 2,
-      tension: 0.4,
-      pointBackgroundColor: '#CA8A04',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointRadius: 4,
-      fill: false
-    }
-  ]
-}))
+const { loading, error, processChartData, fetchData } = useChart(userId, {
+  fetchFn: getSpeed,
+  label: '속도',
+  dataKey: 'speed',
+  color: '#2196F3'
+})
 
 const chartOptions = {
   responsive: true,
@@ -113,10 +89,8 @@ const chartOptions = {
     }
   }
 }
-</script>
 
-<template>
-  <div class="h-[300px] w-full p-4 bg-white rounded-lg shadow-sm">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
-</template>
+onMounted(() => {
+  fetchData()
+})
+</script>

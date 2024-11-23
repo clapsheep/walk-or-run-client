@@ -1,53 +1,31 @@
+<template>
+  <div class="relative h-[300px] w-full p-4 bg-white rounded-lg shadow-sm">
+    <BaseChart
+      :type="'line'"
+      :chart-data="processChartData()"
+      :loading="loading"
+      :error="error"
+      :options="chartOptions"
+    />
+  </div>
+</template>
+
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Line } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  CategoryScale,
-} from 'chart.js'
-import type { Record } from '@/core/record/Record'
+import BaseChart from './BaseChart.vue'
+import { useChart } from '@/core/record/composables/useChart'
+import { useUserStore } from '@/stores/userStore'
+import { getExerciseTime } from '@/core/record/recordApi'
+import { onMounted } from 'vue'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+const userStore = useUserStore()
+const userId = userStore.userId ? userStore.userId : ''
 
-const props = defineProps<{
-  records: Record[]
-}>()
-
-const getExerciseMinutes = (startTime: string, endTime: string): number => {
-  const start = new Date(startTime)
-  const end = new Date(endTime)
-  return Math.round((end.getTime() - start.getTime()) / (1000 * 60))
-}
-
-const chartData = computed(() => ({
-  labels: props.records.map((record) =>
-    new Date(record.createdAt).toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric',
-    }),
-  ),
-  datasets: [
-    {
-      label: '운동 시간',
-      data: props.records.map((record) => getExerciseMinutes(record.startTime, record.endTime)),
-      backgroundColor: '#2DD4BF',
-      borderColor: '#14B8A6',
-      borderWidth: 2,
-      tension: 0.4,
-      pointBackgroundColor: '#0D9488',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointRadius: 4,
-      fill: false,
-    },
-  ],
-}))
+const { loading, error, processChartData, fetchData } = useChart(userId, {
+  fetchFn: getExerciseTime,
+  label: '운동 시간',
+  dataKey: 'exerciseTime',
+  color: '#FFC107'
+})
 
 const chartOptions = {
   responsive: true,
@@ -93,7 +71,7 @@ const chartOptions = {
       },
       ticks: {
         font: {
-          family: "Pretendard', sans-serif",
+          family: "'Pretendard', sans-serif",
         },
         color: '#64748B',
       },
@@ -111,10 +89,8 @@ const chartOptions = {
     },
   },
 }
-</script>
 
-<template>
-  <div class="h-[300px] w-full rounded-lg bg-white p-4 shadow-sm">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
-</template>
+onMounted(() => {
+  fetchData()
+})
+</script>
