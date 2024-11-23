@@ -1,7 +1,7 @@
 import type ApiResponse from '@/core/common/types/ApiResponse'
 import type User from '@/core/user/UserType'
 import axios, { type AxiosResponse } from 'axios'
-import { AuthCredentials, AuthResponse } from './services/loginService'
+import { AuthCredentials, AuthResponse, getToken } from './services/loginService'
 import { FindEmailForm } from './composables/useFindEmail'
 import { FindPasswordForm } from './composables/useFindPassword'
 
@@ -16,7 +16,11 @@ export const registerFetch = async (user: User): Promise<AxiosResponse<ApiRespon
   return response
 }
 export const logoutFetch = async (): Promise<AxiosResponse<ApiResponse>> => {
-  const response = await axios.post(`${VITE_API_URL}/user/logout`)
+  const response = await axios.post(`${VITE_API_URL}/user/logout`, null, {
+    headers: {
+      Authorization: getToken()
+    }
+  })
   return response
 }
 
