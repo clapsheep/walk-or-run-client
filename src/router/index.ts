@@ -36,6 +36,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/challenge/:id',
+      name: 'challenge-detail',
+      component: () => import('@/views/ChallengeDetailView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/account',
       name: 'account',
       component: () => import('@/views/AccountView.vue'),
