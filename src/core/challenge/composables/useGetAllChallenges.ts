@@ -1,4 +1,4 @@
-import { PageResponse } from "@/core/common/PageType";
+import { PageResponse } from "@/core/common/types/PageType";
 import type { Challenge } from "../ChallengeType";
 import { ref } from "vue";
 import { setLoading, setError } from '../utils/settingUtils';

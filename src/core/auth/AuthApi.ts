@@ -4,6 +4,7 @@ import axios, { type AxiosResponse } from 'axios'
 import { AuthCredentials, AuthResponse, getToken } from './services/loginService'
 import { FindEmailForm } from './composables/useFindEmail'
 import { FindPasswordForm } from './composables/useFindPassword'
+import { getAuthHeader } from '../common/services/commonService'
 
 const { VITE_API_URL } = import.meta.env
 
@@ -16,11 +17,9 @@ export const registerFetch = async (user: User): Promise<AxiosResponse<ApiRespon
   return response
 }
 export const logoutFetch = async (): Promise<AxiosResponse<ApiResponse>> => {
-  const response = await axios.post(`${VITE_API_URL}/user/logout`, null, {
-    headers: {
-      Authorization: getToken()
-    }
-  })
+  const response = await axios.post(`${VITE_API_URL}/user/logout`, null,
+      { headers: getAuthHeader() }
+  )
   return response
 }
 

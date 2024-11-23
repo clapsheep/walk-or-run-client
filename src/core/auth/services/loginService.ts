@@ -1,6 +1,6 @@
 
 import { useUserStore } from '@/stores/userStore'
-import { validateEmailFormat } from '../../../utils/inputVaildation'
+import { validateEmailFormat } from '@/utils/inputVaildation'
 
 export type AuthCredentials = {
   userEmail: string

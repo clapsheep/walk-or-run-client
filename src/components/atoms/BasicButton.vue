@@ -59,12 +59,12 @@ const VARIANT_CLASSES = {
 }
 
 const FOCUS_RING_COLORS = {
-  primary: 'focus:ring-primary-200',
-  secondary: 'focus:ring-secondary-200',
-  accent: 'focus:ring-accent-200',
-  success: 'focus:ring-success-200',
-  info: 'focus:ring-info-200',
-  warning: 'focus:ring-warning-200',
+  primary: 'focus:ring-primary-500 focus:ring-offset-2',
+  secondary: 'focus:ring-secondary-500 focus:ring-offset-2',
+  accent: 'focus:ring-accent-500 focus:ring-offset-2',
+  success: 'focus:ring-success-500 focus:ring-offset-2',
+  info: 'focus:ring-info-500 focus:ring-offset-2',
+  warning: 'focus:ring-warning-500 focus:ring-offset-2',
 }
 
 const BASE_CLASSES = [
@@ -72,7 +72,7 @@ const BASE_CLASSES = [
   'font-medium',
   'rounded-lg',
   'transition-all duration-200',
-  'focus:outline-none focus:ring-4',
+  'focus:outline-none focus:ring-2',
   'disabled:opacity-50 disabled:cursor-not-allowed',
 ].join(' ')
 

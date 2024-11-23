@@ -11,6 +11,7 @@ import {
   ArrowLeftStartOnRectangleIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  HomeIcon,
 } from '@heroicons/vue/24/outline'
 import { RouterLink } from 'vue-router'
 
@@ -30,7 +31,8 @@ const menus = [
   {
     name: '홈',
     path: '/',
-    icon: ChartBarSquareIcon,
+    icon: HomeIcon,
+    activeRoutes: ['/home', '/dashboard']
   },
   {
     name: '챌린지',
@@ -90,6 +92,7 @@ const authMenus = [
               :icon="menu.icon"
               :name="menu.name"
               :isCollapsed="isNavCollapsed"
+              :active-routes="menu.activeRoutes"
             />
           </li>
           <li v-if="isAdmin" v-for="(menu, index) in adminMenus" :key="'admin-'+index">

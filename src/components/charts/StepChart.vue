@@ -1,49 +1,26 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Bar } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from 'chart.js'
-import type { Record } from '@/core/record/Record'
+import { onMounted } from 'vue'
+import BaseChart from './BaseChart.vue'
+import ChartWrapper from './ChartWrapper.vue'
+import { useChart } from '@/core/record/composables/useChart'
 
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
+import { getCurrentMonthRange } from '@/utils/formatDate'
+import { getStepsFetch } from '@/core/record/recordApi'
+
+const { startDate, endDate } = getCurrentMonthRange()
+const { data, loading, error, fetchData, processChartData } = useChart(
+  '16',
+  startDate,
+  endDate,
+  {
+    fetchFn: getStepsFetch,
+    label: '걸음 수',
+    dataKey: 'steps',
+    color: '#41B883'
+  }
 )
 
-const props = defineProps<{
-  records: Record[]
-}>()
-
-const chartData = computed(() => ({
-  labels: props.records.map(record =>
-    new Date(record.createdAt).toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric'
-    })
-  ),
-  datasets: [
-    {
-      label: '걸음 수',
-      data: props.records.map(record => record.step),
-      backgroundColor: '#FF5A5F',
-      borderColor: '#E6474C',
-      borderWidth: 1,
-      borderRadius: 8
-    }
-  ]
-}))
-
+const chartData = processChartData()
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -106,10 +83,16 @@ const chartOptions = {
     }
   }
 }
-</script>
 
+onMounted(() => {
+  fetchData()
+})
+</script>
 <template>
-  <div class="h-[300px] w-full p-4 bg-white rounded-lg shadow-sm">
-    <Bar :data="chartData" :options="chartOptions" />
-  </div>
+  <ChartWrapper :loading="loading" :error="error">
+    <BaseChart
+      :chart-data="chartData"
+      :options="chartOptions"
+    />
+  </ChartWrapper>
 </template>
