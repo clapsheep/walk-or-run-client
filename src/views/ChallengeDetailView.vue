@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge';
-import { getChallengeDetailFetch } from '@/core/challenge/ChallengeApi';
+import { getChallengeDetailFetch, participateChallengeFetch } from '@/core/challenge/ChallengeApi';
 import { useRoute } from 'vue-router';
 import { useParticipateChallenge } from '@/core/challenge/composables/useParticipateChallenge';
 
@@ -19,7 +19,7 @@ const {
 
 const {
   handleParticipate
-} = useParticipateChallenge(getChallengeDetailFetch)
+} = useParticipateChallenge(participateChallengeFetch)
 
 onMounted(async () => {
   await fetchChallengeDetail(challengeId);

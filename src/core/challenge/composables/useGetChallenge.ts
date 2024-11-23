@@ -29,6 +29,9 @@ export const useGetChallenge = (
     try {
       const response = await getChallengeDetailFetch(challengeId)
       setChallenge(response)
+      if(challenge.value?.challengeIsParticipant || challenge.value?.challengeIsEnded) {
+        isParticipating.value = true
+      }
     } catch (err) {
       setError(state, '챌린지 정보를 불러오는데 실패했습니다.')
       console.error('Error fetching challenge detail:', err)
