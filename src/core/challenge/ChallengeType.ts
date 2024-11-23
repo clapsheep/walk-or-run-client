@@ -11,6 +11,7 @@ export type Challenge = {
   challengeAuthorId?: number
   challengeParticipantCnt?: number
   challengeTargetCnt?: number
+  challengeIsParticipant?: number
   challengeCategoryCode?: number
   challengeSchedulerCycle?: number
   dday?: string
