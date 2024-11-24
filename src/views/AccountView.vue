@@ -6,9 +6,6 @@ import { getUserInfoFetch } from '@/core/user/UserApi';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
 
-const userStore = useUserStore();
-const userId = Number(userStore.userId);
-
 const {
   userInfo,
   goToChangePassword,
@@ -20,36 +17,6 @@ const myChallenges = ref([
   { id: 1, title: '매일 1만보 걷기', status: '진행중' },
   { id: 2, title: '30일 런닝 챌린지', status: '완료' },
 ]);
-
-const myGoals = ref([
-  { id: 1, title: '주 3회 운동하기', progress: 70 },
-  { id: 2, title: '한 달 5kg 감량', progress: 40 },
-]);
-
-const showGoalSettingModal = ref(false);
-const authStore = useAuthStore();
-const showPasswordVerificationModal = ref(false);
-
-const openGoalSettingModal = () => {
-  showGoalSettingModal.value = true;
-};
-
-const closeGoalSettingModal = () => {
-  showGoalSettingModal.value = false;
-};
-
-const openPasswordVerificationModal = () => {
-  showPasswordVerificationModal.value = true;
-};
-
-const closePasswordVerificationModal = () => {
-  showPasswordVerificationModal.value = false;
-};
-
-const handleGoalSubmit = (goal) => {
-  console.log('Goal submitted:', goal);
-  closeGoalSettingModal();
-};
 
 onMounted(async () => {
   await getUserInfo();
@@ -89,7 +56,7 @@ onMounted(async () => {
               </div>
               <div class="flex items-center">
                 <button
-                  @click="openPasswordVerificationModal"
+                  @click="goToChangePassword"
                   class="bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600 transition-colors"
                 >
                   비밀번호 변경
