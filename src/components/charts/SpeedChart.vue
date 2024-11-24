@@ -1,56 +1,28 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import { Line } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  CategoryScale,
-} from 'chart.js'
-import type { Record } from '@/core/record/Record'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
+
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import BaseChart from './BaseChart.vue'
+import ChartWrapper from './ChartWrapper.vue'
+import { useChart } from '@/core/record/composables/useChart'
+
+import { getCurrentMonthRange } from '@/utils/formatDate'
+import { getSpeedFetch } from '@/core/record/recordApi'
+
+const { startDate, endDate } = getCurrentMonthRange()
+const { data, loading, error, fetchData, processChartData } = useChart(
+  '16',
+  startDate,
+  endDate,
+  {
+    fetchFn: getSpeedFetch,
+    label: '평균 속도',
+    dataKey: 'speed',
+    color: '#2196F3'
+  }
 )
 
-const props = defineProps<{
-  records: Record[]
-}>()
-
-const chartData = computed(() => ({
-  labels: props.records.map(record =>
-    new Date(record.createdAt).toLocaleDateString('ko-KR', {
-      month: 'short',
-      day: 'numeric'
-    })
-  ),
-  datasets: [
-    {
-      label: '평균 속도',
-      data: props.records.map(record => record.speed),
-      backgroundColor: '#FACC15',
-      borderColor: '#EAB308',
-      borderWidth: 2,
-      tension: 0.4,
-      pointBackgroundColor: '#CA8A04',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointRadius: 4,
-      fill: false
-    }
-  ]
-}))
-
+const chartData = processChartData()
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -113,10 +85,16 @@ const chartOptions = {
     }
   }
 }
-</script>
 
+onMounted(() => {
+  fetchData()
+})
+</script>
 <template>
-  <div class="h-[300px] w-full p-4 bg-white rounded-lg shadow-sm">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
+  <ChartWrapper :loading="loading" :error="error">
+    <BaseChart
+      :chart-data="chartData"
+      :options="chartOptions"
+    />
+  </ChartWrapper>
 </template>

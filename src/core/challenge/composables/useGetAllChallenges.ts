@@ -1,8 +1,8 @@
-import { ref, type Ref } from 'vue'
-import type { PageResponse } from "@/core/common/PageType"
-import type { Challenge } from "../ChallengeType"
-import { challengeService } from '../services/challengesService'
-import { setLoading, setError } from '../utils/settingUtils'
+import { PageResponse } from "@/core/common/types/PageType";
+import type { Challenge } from "../ChallengeType";
+import { ref } from "vue";
+import { setLoading, setError } from '../utils/settingUtils';
+import router from "@/router";
 
 export const useGetAllChallenges = (
   getChallengesFetch: (page: number) => Promise<PageResponse<Challenge>>

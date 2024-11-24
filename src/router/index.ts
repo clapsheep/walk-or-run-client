@@ -51,7 +51,34 @@ const router = createRouter({
     {
       path: '/admin',
       name: 'admin',
-      component: () => import('@/views/AdminView.vue'),
+      component: () => import('@/layouts/AdminLayout.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true
+      },
+      children: [
+        {
+          path: 'challenges/ongoing',
+          name: 'admin-ongoing-challenges',
+          component: () => import('@/views/admin/OngoingChallengeView.vue')
+        },
+        {
+          path: 'challenges/ended',
+          name: 'admin-ended-challenges',
+          component: () => import('@/views/admin/EndedChallengeView.vue')
+        },
+        {
+          path: 'challenges/schedule',
+          name: 'admin-schedule',
+          component: () => import('@/views/admin/ScheduleManageView.vue')
+        }
+      ],
+      redirect: { name: 'admin-ongoing-challenges' }
+    },
+    {
+      path: '/admin/challenge/create',
+      name: 'create-challenge',
+      component: () => import('@/views/admin/CreateChallengeView.vue'),
       meta: {
         requiresAuth: true,
         requiresAdmin: true

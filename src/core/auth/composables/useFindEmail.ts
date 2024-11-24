@@ -5,8 +5,8 @@ import { computed, ref } from "vue";
 
 import { useModalStore } from "@/stores/modalStore";
 import { useRouter } from "vue-router";
-import { validatePhoneNumber } from "../../../utils/inputVaildation";
-import { validateRequired } from "../utils/validationUtils";
+import { validatePhoneNumber } from "@/utils/inputVaildation";
+import { validateRequired } from "@/utils/inputVaildation";
 
 export type FindEmailForm = {
   userName?: string
