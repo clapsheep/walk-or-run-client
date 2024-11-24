@@ -102,7 +102,7 @@ onMounted(async () => {
         <div class="flex justify-center">
           <button
             class="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors"
-            :disabled="isParticipating || challenge.challengeIsEnded"
+            :disabled="isParticipating"
             @click="handleParticipate(challengeId)"
           >
             {{ isParticipating ? '참여중' : '참여하기' }}

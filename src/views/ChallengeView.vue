@@ -50,7 +50,7 @@ onMounted(async () => {
           <p class="mb-4 text-sm text-gray-600">{{ challenge.challengeDescription }}</p>
           <div class="flex justify-between text-sm text-gray-500">
             <span>카테고리: {{ challenge.challengeCategoryName }}</span>
-            <span>작성자: {{ challenge.author }}</span>
+            <span>작성자: 관리자</span>
           </div>
         </div>
       </div>

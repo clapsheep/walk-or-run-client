@@ -1,6 +1,7 @@
 import { isAuthenticated } from '@/core/auth/services/loginService'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import MyPasswordChangeView from '@/views/MyPasswordChangeView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -80,6 +81,14 @@ const router = createRouter({
       path: '/change-password',
       name: 'change-password',
       component: () => import('@/views/ChangePasswordView.vue'),
+    },
+    {
+      path: '/my-password-change',
+      name: 'my-password-change',
+      component: MyPasswordChangeView,
+      meta: {
+        requiresAuth: true
+      }
     },
   ],
 })
