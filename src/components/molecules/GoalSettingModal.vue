@@ -1,177 +1,148 @@
+<!-- components/molecules/GoalSettingModal.vue -->
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
-import BasicInput from '@/components/atoms/BasicInput.vue'
-import BasicSelect from '@/components/molecules/BasicSelect.vue'
+import { watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
+import BasicInput from '@/components/atoms/BasicInput.vue'
+import { useGoalSetting } from '@/core/goal/composables/useGoalSetting'
+import { createUserGoalFetch } from '@/core/goal/GoalApi'
+
+const props = defineProps<{
+  show: boolean
+}>()
 
 const emit = defineEmits(['close', 'submit'])
-
-const form = ref({
-  startDate: '',
-  endDate: '',
-  targetAmount: '',
-  goalType: '',  // 1: 걷기, 2: 뛰기
-  unitType: ''   // 1: 시간(hour), 2: 거리(km)
-})
-
-const errors = ref({
-  startDate: '',
-  endDate: '',
-  targetAmount: '',
-  goalType: '',
-  unitType: ''
-})
-
-const goalTypes = [
-  { id: 1, name: '뛰기' },
-  { id: 2, name: '걷기' }
-]
-
-const unitTypes = [
-  { id: 1, name: '시간 (hour)' },
-  { id: 2, name: '거리 (km)' }
-]
-
-const validateForm = () => {
-  let isValid = true
-  errors.value = {
-    startDate: '',
-    endDate: '',
-    targetAmount: '',
-    goalType: '',
-    unitType: ''
-  }
-
-  if (!form.value.startDate) {
-    errors.value.startDate = '시작일을 선택해주세요'
-    isValid = false
-  }
-
-  if (!form.value.endDate) {
-    errors.value.endDate = '종료일을 선택해주세요'
-    isValid = false
-  } else if (new Date(form.value.endDate) <= new Date(form.value.startDate)) {
-    errors.value.endDate = '종료일은 시작일 이후여야 합니다'
-    isValid = false
-  }
-
-  if (!form.value.targetAmount) {
-    errors.value.targetAmount = '목표량을 입력해주세요'
-    isValid = false
-  } else if (isNaN(Number(form.value.targetAmount)) || Number(form.value.targetAmount) <= 0) {
-    errors.value.targetAmount = '올바른 목표량을 입력해주세요'
-    isValid = false
-  }
-
-  if (!form.value.goalType) {
-    errors.value.goalType = '목표 종류를 선택해주세요'
-    isValid = false
-  }
-
-  if (!form.value.unitType) {
-    errors.value.unitType = '목표 단위를 선택해주세요'
-    isValid = false
-  }
-
-  return isValid
-}
-
-const handleSubmit = () => {
-  if (!validateForm()) return
-
-  emit('submit', {
-    startDate: form.value.startDate,
-    endDate: form.value.endDate,
-    targetAmount: Number(form.value.targetAmount),
-    goalType: Number(form.value.goalType),
-    unitType: Number(form.value.unitType)
-  })
-}
 
 const handleClose = () => {
   emit('close')
 }
+
+const {
+  loading,
+  error,
+  form,
+  categoryOptions,
+  unitOptions,
+  handleSubmit,
+  resetForm
+} = useGoalSetting(createUserGoalFetch)
+
+watch(() => props.show, (newValue) => {
+  if (!newValue) {
+    resetForm()
+  }
+})
+
+const onSubmit = async () => {
+  const success = await handleSubmit()
+  if (success) {
+    emit('submit')
+    emit('close')
+  }
+}
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-8 w-full max-w-md">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-gray-800">목표 설정</h2>
-        <button
-          @click="handleClose"
-          class="text-gray-500 hover:text-gray-700"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+  <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
 
-      <form @submit.prevent="handleSubmit" class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <BasicInput
-            type="date"
-            label="시작일"
-            v-model="form.startDate"
-            :error="errors.startDate"
-            direction="col"
-          />
-          <BasicInput
-            type="date"
-            label="종료일"
-            v-model="form.endDate"
-            :error="errors.endDate"
-            direction="col"
-          />
-        </div>
-
-        <BasicSelect
-          label="목표 종류"
-          v-model="form.goalType"
-          :options="goalTypes"
-          value-key="id"
-          label-key="name"
-          placeholder="목표 종류를 선택해주세요"
-          :error="errors.goalType"
-          direction="col"
-        />
-
-        <BasicSelect
-          label="목표 단위"
-          v-model="form.unitType"
-          :options="unitTypes"
-          value-key="id"
-          label-key="name"
-          placeholder="목표 단위를 선택해주세요"
-          :error="errors.unitType"
-          direction="col"
-        />
-
-        <BasicInput
-          type="number"
-          label="목표량"
-          v-model="form.targetAmount"
-          :error="errors.targetAmount"
-          :placeholder="form.unitType === 1 ? '시간을 입력하세요' : '거리를 입력하세요'"
-          direction="col"
-        />
-
-        <div class="flex justify-end space-x-4 mt-6">
-          <BasicButton
-            type="button"
+    <div class="flex min-h-screen items-center justify-center p-4">
+      <div class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <!-- 헤더 -->
+        <div class="mb-6 flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-gray-900">목표 설정</h3>
+          <button
             @click="handleClose"
-            color="secondary"
+            class="text-gray-400 hover:text-gray-500"
           >
-            취소
-          </BasicButton>
-          <BasicButton
-            type="submit"
-          >
-            설정하기
-          </BasicButton>
+            <span class="sr-only">Close</span>
+            <span class="text-2xl">&times;</span>
+          </button>
         </div>
-      </form>
+
+        <!-- 폼 -->
+        <form @submit.prevent="onSubmit" class="space-y-4">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">운동 종류</label>
+              <select
+                v-model="form.challengeCategoryCode"
+                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+              >
+                <option value="">선택해주세요</option>
+                <option
+                  v-for="category in categoryOptions"
+                  :key="category.code"
+                  :value="category.code"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">단위</label>
+              <select
+                v-model="form.challengeCategoryUnitCode"
+                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+              >
+                <option value="">선택해주세요</option>
+                <option
+                  v-for="unit in unitOptions"
+                  :key="unit.code"
+                  :value="unit.code"
+                >
+                  {{ unit.name }}
+                </option>
+              </select>
+            </div>
+
+            <BasicInput
+              id="targetAmount"
+              name="targetAmount"
+              label="목표량"
+              type="number"
+              v-model="form.targetAmount"
+              placeholder="목표량을 입력해주세요"
+              direction="col"
+            />
+
+            <BasicInput
+              id="startDate"
+              name="startDate"
+              label="시작일"
+              type="date"
+              v-model="form.startDate"
+              direction="col"
+            />
+
+            <BasicInput
+              id="endDate"
+              name="endDate"
+              label="종료일"
+              type="date"
+              v-model="form.endDate"
+              direction="col"
+            />
+          </div>
+
+          <div class="mt-6 flex justify-end space-x-3">
+            <BasicButton
+              type="button"
+              variant="outlined"
+              color="secondary"
+              @click="handleClose"
+            >
+              취소
+            </BasicButton>
+            <BasicButton
+              type="submit"
+              color="primary"
+            >
+              설정하기
+            </BasicButton>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>

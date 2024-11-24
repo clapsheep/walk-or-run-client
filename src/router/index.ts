@@ -46,7 +46,7 @@ const router = createRouter({
       name: 'account',
       component: () => import('@/layouts/MyPageLayout.vue'),
       meta: { requiresAuth: true },
-      redirect: '/account/mypage/profile',  
+      redirect: '/account/mypage/profile',
       children: [
         {
           path: 'mypage/profile',
@@ -70,6 +70,11 @@ const router = createRouter({
           path: 'mypage/challenges',
           name: 'challenges',
           component: () => import('@/views/account/MyChallengesView.vue'),
+        },
+        {
+          path: 'mypage/goals',
+          name: 'goals',
+          component: () => import('@/views/account/MyUserGoalView.vue'),
         }
       ]
     },

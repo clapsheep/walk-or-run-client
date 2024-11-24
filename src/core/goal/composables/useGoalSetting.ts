@@ -1,55 +1,61 @@
-import { setError, setLoading } from "@/core/challenge/utils/settingUtils";
-import { useGetUserInfo } from "@/core/user/composables/useGetUserInfo";
-import { getUserInfoFetch } from "@/core/user/UserApi";
-import { AxiosResponse } from "axios";
-import { ref } from "vue";
-import Goal from "../GoalType";
-import { Ref } from "vue";
+// core/goal/composables/useGoalSetting.ts
+import { ref } from 'vue'
+import type { AxiosResponse } from 'axios'
+import type ApiResponse from '@/core/common/types/ApiResponse'
+import { setError, setLoading } from '@/core/challenge/utils/settingUtils'
+import Goal from '../GoalType'
 
 export const useGoalSetting = (
-  createUserGoalFetch: (goalData: {
-    startDate: string
-    endDate: string
-    targetAmount: number
-    goalType: number
-    unitType: number
-  }) => Promise<AxiosResponse>
+  createGoalFetch: (data: Goal) => Promise<AxiosResponse<ApiResponse>>
 ) => {
+  const loading = ref(false)
+  const error = ref('')
 
-  const loading = ref(false);
-  const error = ref('');
-  const showGoalSettingModal = ref(false);
-  const myGoals: Ref<Goal[]> = ref([]);
 
-  const {  } = useGetUserInfo(getUserInfoFetch);
+  const form = ref<Goal>({
+    challengeCategoryCode: 1,
+    challengeCategoryUnitCode: 1,
+    targetAmount: 0,
+    startDate: '',
+    endDate: ''
+  })
 
-  const openGoalSettingModal = () => {
-    showGoalSettingModal.value = true
+  const categoryOptions = [
+    { code: '1', name: '걷기' },
+    { code: '2', name: '뛰기' }
+  ]
+
+  const unitOptions = [
+    { code: '1', name: '시간', unit: 'hour' },
+    { code: '2', name: '거리', unit: 'km' }
+  ]
+
+  const resetForm = () => {
+    form.value = {
+      challengeCategoryCode: 1,
+      challengeCategoryUnitCode: 1,
+      targetAmount: 0,
+      startDate: '',
+      endDate: ''
+    }
   }
 
-  const closeGoalSettingModal = () => {
-    showGoalSettingModal.value = false
-  }
-
-  const handleGoalSubmit = async (goalData: {
-    startDate: string
-    endDate: string
-    targetAmount: number
-    goalType: number
-    unitType: number
-  }) => {
+  const handleSubmit = async () => {
     const state = { loading, error }
     setLoading(state, true)
     setError(state, '')
 
     try {
-      const response = await createUserGoalFetch(goalData)
+      const response = await createGoalFetch(form.value)
       console.log(response)
-      closeGoalSettingModal()
-      getUserInfo() // 목표 설정 후 사용자 정보 새로고침
+      if (response.data.message === 'success') {
+        resetForm()
+        return true
+      }
+      return false
     } catch (err: any) {
       setError(state, err.response?.data?.message || '목표 설정에 실패했습니다.')
-      console.error('목표 설정에 실패했습니다:', err)
+      return false
     } finally {
       setLoading(state, false)
     }
@@ -58,10 +64,10 @@ export const useGoalSetting = (
   return {
     loading,
     error,
-    showGoalSettingModal,
-    myGoals,
-    openGoalSettingModal,
-    closeGoalSettingModal,
-    handleGoalSubmit
+    form,
+    categoryOptions,
+    unitOptions,
+    handleSubmit,
+    resetForm
   }
 }

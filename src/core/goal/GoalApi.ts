@@ -6,7 +6,7 @@ import Goal from "./GoalType";
 const { VITE_API_URL } = import.meta.env;
 const userStore = useUserStore();
 
-export const getUserGoalFetch = async (): Promise<AxiosResponse> => {
+export const getUserGoalFetch = async (): Promise<Goal[]> => {
   const { data } = await axios.get(`${VITE_API_URL}/user/${userStore.userId}/goal`, {
     headers: {
       Authorization: getToken()

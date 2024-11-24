@@ -57,7 +57,7 @@ const {
       </div>
       <div
         v-else
-        v-for="(challenge: Challenge) in challenges"
+        v-for="challenge in challenges"
         :key="challenge.challengeId"
         class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
         @click="goToDetail(challenge)"
