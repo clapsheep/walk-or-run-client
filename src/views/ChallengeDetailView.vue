@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge';
-import { getChallengeDetailFetch, participateChallengeFetch } from '@/core/challenge/ChallengeApi';
-import { useRoute } from 'vue-router';
-import { useParticipateChallenge } from '@/core/challenge/composables/useParticipateChallenge';
+import { useRoute } from 'vue-router'
+import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
+import { useParticipateChallenge } from '@/core/challenge/composables/useParticipateChallenge'
+import { getChallengeDetailFetch, participateChallengeFetch } from '@/core/challenge/ChallengeApi'
+import BasicButton from '@/components/atoms/BasicButton.vue'
 
-const route = useRoute();
-const challengeId = Number(route.params.id);
+const route = useRoute()
+const challengeId = Number(route.params.id)
 
 const {
   loading,
@@ -14,99 +14,80 @@ const {
   challenge,
   isParticipating,
   getParticipationRate,
-  fetchChallengeDetail
-} = useGetChallenge(getChallengeDetailFetch)
+} = useGetChallenge(getChallengeDetailFetch, challengeId)
 
 const {
   handleParticipate
 } = useParticipateChallenge(participateChallengeFetch)
-
-onMounted(async () => {
-  await fetchChallengeDetail(challengeId);
-  console.log(challenge.value);
-})
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100 p-6">
     <div class="container mx-auto">
-      <!-- 로딩 상태 -->
-      <div v-if="loading" class="flex justify-center items-center h-64">
-        <p class="text-gray-600">챌린지 정보를 불러오는 중...</p>
+      <!-- 로딩 상태 (스켈레톤 UI) -->
+      <div v-if="loading" class="bg-white rounded-lg shadow-sm p-6 space-y-4">
+        <div class="animate-pulse">
+          <div class="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div class="space-y-3">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+          </div>
+          <div class="mt-6 space-y-3">
+            <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+          <div class="mt-6">
+            <div class="h-10 bg-gray-200 rounded w-32"></div>
+          </div>
+        </div>
       </div>
 
       <!-- 에러 상태 -->
-      <div v-else-if="error" class="flex justify-center items-center h-64">
-        <p class="text-red-500">{{ error }}</p>
+      <div v-else-if="error" class="bg-white rounded-lg shadow-sm p-6">
+        <p class="text-red-500 text-center">{{ error }}</p>
       </div>
 
       <!-- 챌린지 상세 정보 -->
-      <div v-else-if="challenge" class="bg-white rounded-lg shadow-md p-6">
-        <!-- 챌린지 헤더 -->
-        <div class="mb-6 flex items-start justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ challenge.challengeTitle }}</h1>
-            <p class="text-gray-600">{{ challenge.challengeDescription }}</p>
-          </div>
-          <div class="flex flex-col items-end">
-            <span class="rounded-full bg-primary-500 px-3 py-1 text-sm text-white mb-2">
-              {{ challenge.dday }}
-            </span>
-            <span class="text-sm text-gray-500">
-              상태: <span :class="challenge.challengeIsEnded ? 'text-red-500' : 'text-green-500'">
-                {{ challenge.challengeIsEnded ? '종료됨' : '진행중' }}
-              </span>
-          </span>
-          </div>
-        </div>
+      <div v-else-if="challenge" class="bg-white rounded-lg shadow-sm p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">
+          {{ challenge.challengeTitle }}
+        </h1>
+        <div class="space-y-4">
+          <p class="text-gray-600">{{ challenge.challengeDescription }}</p>
 
-        <!-- 챌린지 기간 및 참여 정보 -->
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-          <div class="space-y-2">
-          <div class="flex items-center text-gray-600">
-              <span class="font-semibold mr-2">시작일:</span>
-              <span>{{ challenge.challengeCreateDate }}</span>
-          </div>
-          <div class="flex items-center text-gray-600">
-              <span class="font-semibold mr-2">종료일:</span>
-              <span>{{ challenge.challengeDeleteDate }}</span>
+          <div class="border-t border-gray-200 pt-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-500 text-center">카테고리</p>
+                <p class="font-medium text-center">{{ challenge.challengeCategoryName }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 text-center">작성자</p>
+                <p class="font-medium text-center">관리자</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 text-center">참여율</p>
+                <p class="font-medium text-center">{{ getParticipationRate() }}%</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 text-center">남은 기간</p>
+                <p class="font-medium text-center">{{ challenge.dday }}</p>
+              </div>
             </div>
           </div>
-          <div class="space-y-2">
-            <div class="flex items-center text-gray-600">
-              <span class="font-semibold mr-2">현재 참여인원:</span>
-              <span class="text-primary-500">{{ challenge.challengeParticipantCnt }}명</span>
-          </div>
-          <div class="flex items-center text-gray-600">
-              <span class="font-semibold mr-2">참여 가능 인원:</span>
-              <span>{{ challenge.challengeTargetCnt }}명</span>
-            </div>
-          </div>
-        </div>
 
-        <!-- 진행률 표시 -->
-        <div class="mb-6">
-          <div class="flex justify-between mb-2">
-            <span class="text-sm text-gray-600">참여율</span>
-            <span class="text-sm font-semibold">{{ getParticipationRate() }}%</span>
+          <div class="mt-6 flex justify-center">
+            <BasicButton
+              v-if="!isParticipating"
+              @click="handleParticipate(challengeId)"
+              color="primary"
+            >
+              참여하기
+            </BasicButton>
+            <p v-else class="text-green-600 font-medium">
+              이미 참여 중인 챌린지입니다
+            </p>
           </div>
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              class="bg-primary-500 h-2.5 rounded-full transition-all duration-300"
-              :style="{ width: getParticipationRate() + '%' }"
-            ></div>
-          </div>
-        </div>
-
-        <!-- 참여하기 버튼 -->
-        <div class="flex justify-center">
-          <button
-            class="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors"
-            :disabled="isParticipating || challenge.challengeIsEnded"
-            @click="handleParticipate(challengeId)"
-          >
-            {{ isParticipating ? '참여중' : '참여하기' }}
-          </button>
         </div>
       </div>
     </div>

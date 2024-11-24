@@ -1,6 +1,3 @@
-import Challenge from '../challenge/ChallengeType'
-import Goal from '../goal/GoalType'
-
 type User = {
   userId?: string
   userEmail?: string
@@ -15,7 +12,5 @@ type User = {
   userJoinDate?: string
   userWithdrawalDate?: string
   userWithdrawalStatus?: number
-  challenges?: Challenge[]
-  goals?: Goal[]
 }
-export default User
+export default User;
