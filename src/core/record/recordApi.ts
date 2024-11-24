@@ -2,18 +2,29 @@ import { getAuthHeader } from '@/core/common/services/commonService'
 import axios, { AxiosResponse } from 'axios'
 import ApiResponse from '../common/types/ApiResponse'
 import type * as type from './types/RecordType'
+import { UploadResponse } from './services/uploadService'
 
 const { VITE_API_URL } = import.meta.env
 
 
 
 // 레코드 업로드
-export const uploadRecordFetch = async (userId: string, recordData: type.Record): Promise<AxiosResponse<ApiResponse>> => {
+export const uploadRecordFetch = async (userId: string, file: File): Promise<AxiosResponse<UploadResponse|ApiResponse>> => {
+  const formData = new FormData()
+  formData.append('csv', file)
+  console.log(getAuthHeader());
+  console.log(formData.get('csv'));
+
 
   const response = await axios.post(
-    `${VITE_API_URL}/user/${userId}`,
-    recordData,
-    { headers: getAuthHeader() }
+    `${VITE_API_URL}/user/${userId}/record`,
+    formData,
+    {
+      headers: {
+        ...getAuthHeader(),
+        'Content-Type': 'multipart/form-data'
+      }
+    }
   )
   return response
 }
