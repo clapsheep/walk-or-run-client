@@ -1,7 +1,7 @@
-  <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M28 4H12C10.9 4 10 4.9 10 6V42C10 43.1 10.9 44 12 44H36C37.1 44 38 43.1 38 42V14L28 4Z" fill="#E9EEF4"/>
-  <path d="M27 4V14H37L27 4Z" fill="#C5D0DD"/>
-  <path d="M14 22H34V24H14V22ZM14 26H34V28H14V26ZM14 30H34V32H14V30ZM14 34H26V36H14V34Z" fill="#8DA2B5"/>
-  <text x="24" y="40" font-size="8" fill="#4B6A88" text-anchor="middle" font-family="sans-serif" font-weight="bold">CSV</text>
+<path d="M28 4H12C10.9 4 10 4.9 10 6V42C10 43.1 10.9 44 12 44H36C37.1 44 38 43.1 38 42V14L28 4Z" fill="#E9EEF4"/>
+<path d="M27 4V14H37L27 4Z" fill="#C5D0DD"/>
+<path d="M14 22H34V24H14V22ZM14 26H34V28H14V26ZM14 30H34V32H14V30ZM14 34H26V36H14V34Z" fill="#8DA2B5"/>
+<text x="24" y="40" font-size="8" fill="#4B6A88" text-anchor="middle" font-family="sans-serif" font-weight="bold">CSV</text>
 </svg>

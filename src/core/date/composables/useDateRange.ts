@@ -22,6 +22,10 @@ export const useDateRange = (onDateRangeChange: (dates: Date[]) => void) => {
     showPicker.value = !showPicker.value
   }
 
+  const closePicker = () => {
+    showPicker.value = false
+  }
+
   const getFormattedDate = () => {
     return formatDateRange(date.value)
   }
@@ -31,6 +35,7 @@ export const useDateRange = (onDateRangeChange: (dates: Date[]) => void) => {
     showPicker,
     handleDateSelect,
     togglePicker,
-    getFormattedDate
+    getFormattedDate,
+    closePicker
   }
 }

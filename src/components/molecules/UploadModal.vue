@@ -5,7 +5,8 @@ import { XMarkIcon } from '@heroicons/vue/24/outline'
 import { useUserStore } from '@/stores/userStore'
 import { uploadRecordFetch } from '@/core/record/recordApi'
 import { useUpload } from '@/core/record/composables/useUpload'
-import csvIcon from '@/assets/images/csv.svg'
+import BasicButton from '@/components/atoms/BasicButton.vue'
+
 
 const props = defineProps<{
   show: boolean
@@ -141,7 +142,7 @@ const closeModal = () => {
                   @change="handleFileInputChange"
                 />
                 <div class="text-center flex flex-col items-center gap-3">
-                  <img :src="csvIcon" alt="csvIcon" class="w-20 h-20" />
+                  <img src="/images/csv.svg" alt="csvIcon" class="w-20 h-20" />
                   <div v-if="!selectedFile" class="space-y-2">
                     <div class="text-gray-500">
                       삼성 헬스 운동 데이터 파일을 업로드하세요
@@ -170,22 +171,18 @@ const closeModal = () => {
               </div>
 
               <div class="mt-6 flex justify-end gap-3">
-                <button
+                <BasicButton
                   type="button"
-                  class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                  variant="outlined"
+                  color="secondary"
                   @click="closeModal"
                 >
                   취소
-                </button>
-                <button
+                </BasicButton>
+                <BasicButton
                   type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white focus:outline-none"
-                  :class="{
-                    'bg-primary-600 hover:bg-primary-700': uploadStatus === 'idle' && isValidFile,
-                    'bg-gray-400 cursor-not-allowed': !isValidFile || uploadStatus === 'uploading',
-                    'bg-green-600': uploadStatus === 'success',
-                    'bg-red-600': uploadStatus === 'error'
-                  }"
+                  :color="uploadStatus === 'error' ? 'warning' : 'primary'"
+                  :variant="uploadStatus === 'success' ? 'ghost' : 'filled'"
                   :disabled="!isValidFile || uploadStatus === 'uploading' || uploadStatus === 'success'"
                   @click="uploadFile"
                 >
@@ -193,7 +190,7 @@ const closeModal = () => {
                   <span v-else-if="uploadStatus === 'uploading'">업로드 중...</span>
                   <span v-else-if="uploadStatus === 'success'">완료!</span>
                   <span v-else>실패</span>
-                </button>
+                </BasicButton>
               </div>
             </DialogPanel>
           </TransitionChild>

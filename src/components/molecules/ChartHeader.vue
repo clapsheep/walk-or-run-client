@@ -5,16 +5,39 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import { useDateRange } from '@/core/date/composables/useDateRange'
 import { datePickerStyle } from '@/core/date/services/dateService'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const emit = defineEmits(['openUploadModal', 'updateDateRange'])
+
+const pickerRef = ref<HTMLElement | null>(null)
+const datePickerContainer = ref<HTMLElement | null>(null)
 
 const {
   date,
   showPicker,
   handleDateSelect,
   togglePicker,
-  getFormattedDate
+  getFormattedDate,
+  closePicker
 } = useDateRange((dates) => emit('updateDateRange', dates))
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (showPicker.value &&
+      datePickerContainer.value &&
+      !datePickerContainer.value.contains(event.target as Node) &&
+      pickerRef.value &&
+      !pickerRef.value.contains(event.target as Node)) {
+    closePicker()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 const handleOpenModal = () => {
   emit('openUploadModal')
@@ -22,11 +45,12 @@ const handleOpenModal = () => {
 </script>
 
 <template>
-  <div class="flex justify-between items-center bg-white p-3 rounded-2xl shadow-sm sticky top-0">
+  <div class="flex justify-between items-center bg-white p-3 rounded-2xl shadow-sm sticky top-0 z-10">
     <div class="flex-1">
       <div class="w-full flex justify-center relative">
         <!-- 날짜 표시 영역 -->
         <div
+          ref="pickerRef"
           @click="togglePicker"
           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all duration-200
                   text-black
@@ -39,7 +63,11 @@ const handleOpenModal = () => {
         </div>
 
         <!-- 숨겨진 데이트피커 -->
-        <div v-if="showPicker" class="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50">
+        <div 
+          v-if="showPicker" 
+          ref="datePickerContainer"
+          class="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[100]"
+        >
           <Datepicker
             v-model="date"
             range
