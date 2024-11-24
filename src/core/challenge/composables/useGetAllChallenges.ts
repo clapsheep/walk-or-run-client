@@ -3,12 +3,14 @@ import type { Challenge } from "../ChallengeType";
 import { ref } from "vue";
 import { setLoading, setError } from '../utils/settingUtils';
 import router from "@/router";
+import { challengeService } from "../services/challengesService";
 
 export const useGetAllChallenges = (
   getChallengesFetch: (page: number) => Promise<PageResponse<Challenge>>
 ) => {
   const loading = ref(false)
   const error = ref('')
+  const { formatChallengeResponse, navigateToDetail, handleError } = challengeService
   const challenges = ref<PageResponse<Challenge>>({
     content: [],
     pageInfo: {
@@ -19,11 +21,6 @@ export const useGetAllChallenges = (
     }
   })
 
-  // 챌린지 데이터 설정
-  const setChallenges = (data: PageResponse<Challenge>): void => {
-    challenges.value = data
-  }
-
   // 챌린지 목록 조회
   const fetchChallenges = async (page: number = 1): Promise<void> => {
     const state = { loading, error }
@@ -32,9 +29,10 @@ export const useGetAllChallenges = (
 
     try {
       const response = await getChallengesFetch(page)
-      setChallenges(response)
+      console.log(response)
+      challenges.value = formatChallengeResponse(response)
     } catch (err: any) {
-      setError(state, '챌린지 목록을 불러오는데 실패했습니다.')
+      setError(state, handleError(err))
       console.error('챌린지 목록을 불러오는데 실패했습니다:', err)
     } finally {
       setLoading(state, false)
@@ -47,7 +45,7 @@ export const useGetAllChallenges = (
   }
 
   const goToDetail = (challenge?: Challenge) => {
-    router.push(`/challenge/${challenge?.challengeId}`)
+    navigateToDetail(challenge?.challengeId);
   }
 
   return {

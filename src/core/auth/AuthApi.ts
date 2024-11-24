@@ -59,3 +59,4 @@ export const checkEmailDuplicatedFetch = async (email: string): Promise<AxiosRes
   })
   return response
 }
+
