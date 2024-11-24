@@ -35,3 +35,16 @@ export const changeUserPasswordFetch = async (data: {
   )
   return response
 }
+
+export const changeUserInfoFetch = async (data: User): Promise<ApiResponse> => {
+  const { data: response } = await axios.put(
+    `${VITE_API_URL}/user/${data.userId}`,
+    data,
+    {
+      headers: {
+        Authorization: getToken()
+      }
+    }
+  )
+  return response
+}

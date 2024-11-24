@@ -5,6 +5,8 @@ import { useGetUserInfo } from '@/core/user/composables/useGetUserInfo';
 import { getUserInfoFetch } from '@/core/user/UserApi';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useGoalSetting } from '@/core/goal/composables/useGoalSetting';
+import { createUserGoalFetch } from '@/core/goal/GoalApi';
 
 const {
   userInfo,
@@ -12,6 +14,14 @@ const {
   goToGoalSetting,
   getUserInfo
 } = useGetUserInfo(getUserInfoFetch);
+
+const {
+  showGoalSettingModal,
+  myGoals,
+  openGoalSettingModal,
+  closeGoalSettingModal,
+  handleGoalSubmit
+} = useGoalSetting(createUserGoalFetch);
 
 const myChallenges = ref([
   { id: 1, title: '매일 1만보 걷기', status: '진행중' },
@@ -93,11 +103,29 @@ onMounted(async () => {
         <div class="mb-8">
           <div class="flex flex-col gap-4">
             <h2 class="text-xl font-bold">나의 목표</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div v-if="userInfo?.goals?.length > 0">
-                <!-- 목표 목록 표시 -->
+            <div class="grid grid-cols-1 gap-4">
+              <div v-if="myGoals?.length > 0" class="bg-gray-50 p-4 rounded-lg">
+                <div
+                  v-for="(goal, index) in myGoals.slice(0, 3)"
+                  :key="index"
+                  class="bg-white p-4 rounded-md shadow-sm mb-3 last:mb-0"
+                >
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-700">{{ goal.title }}</span>
+                    <span
+                      class="px-3 py-1 rounded-full text-sm"
+                      :class="{
+                        'bg-green-100 text-green-800': goal.status === 'active',
+                        'bg-blue-100 text-blue-800': goal.status === 'completed'
+                      }"
+                    >
+                      {{ goal.status === 'active' ? '진행중' : '완료' }}
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-2">{{ goal.description }}</p>
+                </div>
               </div>
-              <div v-else class="text-gray-500">
+              <div v-else class="bg-gray-50 p-4 rounded-lg text-gray-500 text-center">
                 설정된 목표가 없습니다.
               </div>
               <button

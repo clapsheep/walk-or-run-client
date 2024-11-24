@@ -1,4 +1,4 @@
-import { validatePassword } from "@/core/auth/utils/validationUtils"
+import { validatePassword } from "@/utils/inputVaildation"
 import ApiResponse from "@/core/common/types/ApiResponse"
 import { useModalStore } from "@/stores/modalStore"
 import { useUserStore } from "@/stores/userStore"

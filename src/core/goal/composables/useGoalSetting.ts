@@ -3,6 +3,8 @@ import { useGetUserInfo } from "@/core/user/composables/useGetUserInfo";
 import { getUserInfoFetch } from "@/core/user/UserApi";
 import { AxiosResponse } from "axios";
 import { ref } from "vue";
+import Goal from "../GoalType";
+import { Ref } from "vue";
 
 export const useGoalSetting = (
   createUserGoalFetch: (goalData: {
@@ -17,9 +19,9 @@ export const useGoalSetting = (
   const loading = ref(false);
   const error = ref('');
   const showGoalSettingModal = ref(false);
-  const myGoals = ref([]);
+  const myGoals: Ref<Goal[]> = ref([]);
 
-  const { getUserInfo } = useGetUserInfo(getUserInfoFetch);
+  const {  } = useGetUserInfo(getUserInfoFetch);
 
   const openGoalSettingModal = () => {
     showGoalSettingModal.value = true
@@ -51,5 +53,15 @@ export const useGoalSetting = (
     } finally {
       setLoading(state, false)
     }
+  }
+
+  return {
+    loading,
+    error,
+    showGoalSettingModal,
+    myGoals,
+    openGoalSettingModal,
+    closeGoalSettingModal,
+    handleGoalSubmit
   }
 }

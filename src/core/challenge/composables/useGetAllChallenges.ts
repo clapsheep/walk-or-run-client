@@ -3,6 +3,7 @@ import type { Challenge } from "../ChallengeType";
 import { ref } from "vue";
 import { setLoading, setError } from '../utils/settingUtils';
 import router from "@/router";
+import { challengeService } from "../services/challengesService";
 
 export const useGetAllChallenges = (
   getChallengesFetch: (page: number) => Promise<PageResponse<Challenge>>

@@ -1,5 +1,5 @@
 // challengeService.ts
-import type { PageResponse } from "@/core/common/PageType"
+import type { PageResponse } from "@/core/common/types/PageType"
 import type { Challenge } from "../ChallengeType"
 import router from "@/router"
 

@@ -1,29 +1,38 @@
-import { AxiosResponse } from "axios";
-import { ref } from "vue";
-import { Challenge } from "../ChallengeType";
-import { setError, setLoading } from "../utils/settingUtils";
-import router from "@/router";
+import { ref, onMounted } from "vue"
+import { Challenge } from "../ChallengeType"
+import { setError, setLoading } from "../utils/settingUtils"
+import router from "@/router"
+import { PageResponse } from "@/core/common/types/PageType"
 
 export const useGetUserChallenges = (
-  getUserChallengeFetch: (userId: number) => Promise<AxiosResponse>
+  getUserChallengeFetch: (userId: number, page: number) => Promise<PageResponse<Challenge>>,
+  userId: number
 ) => {
   const loading = ref(false)
   const error = ref('')
-  const userChallenges = ref<Challenge[]>([])
+  const challenges = ref<Challenge[]>([])
+  const pageInfo = ref({
+    totalPages: 0,
+    totalElements: 0,
+    pageSize: 10,
+    pageNumber: 0
+  })
 
-  const setUserChallenges = (data: Challenge[]): void => {
-    userChallenges.value = data
-  }
-
-  const fetchUserChallenges = async (userId: number) => {
+  const fetchUserChallenges = async () => {
     const state = { loading, error }
     setLoading(state, true)
     setError(state, '')
 
     try {
-      const response = await getUserChallengeFetch(userId)
-      setUserChallenges(response.data)
-      if(response.data.length === 0) {
+      const data = await getUserChallengeFetch(userId, pageInfo.value.pageNumber)
+      console.log("data", data)
+      challenges.value = data.content
+      pageInfo.value = {
+        ...pageInfo.value,
+        ...data.pageInfo
+      }
+
+      if(challenges.value.length === 0) {
         error.value = '참여한 챌린지가 없습니다.'
       }
     } catch (err) {
@@ -32,18 +41,27 @@ export const useGetUserChallenges = (
     } finally {
       setLoading(state, false)
     }
-
   }
 
-  const goToDetail = (challenge?: Challenge) => {
-    router.push(`/challenge/${challenge?.challengeId}`)
+  const goToDetail = (challenge: Challenge) => {
+    router.push(`/challenge/${challenge.challengeId}`)
   }
+
+  const changePage = async (page: number) => {
+    pageInfo.value.pageNumber = page - 1  // 서버는 0-based index 사용
+    await fetchUserChallenges()
+  }
+
+  // 컴포저블이 생성될 때 자동으로 데이터를 불러옵니다
+  onMounted(fetchUserChallenges)
 
   return {
     loading,
     error,
-    userChallenges,
+    challenges,
+    pageInfo,
     fetchUserChallenges,
-    goToDetail
+    goToDetail,
+    changePage
   }
 }

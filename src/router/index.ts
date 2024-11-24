@@ -1,7 +1,6 @@
 import { isAuthenticated } from '@/core/auth/services/loginService'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import MyPasswordChangeView from '@/views/MyPasswordChangeView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -40,13 +39,39 @@ const router = createRouter({
       path: '/challenge/:id',
       name: 'challenge-detail',
       component: () => import('@/views/ChallengeDetailView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/account',
       name: 'account',
-      component: () => import('@/views/AccountView.vue'),
-      meta: { requiresAuth: true }
+      component: () => import('@/layouts/MyPageLayout.vue'),
+      meta: { requiresAuth: true },
+      redirect: '/account/mypage/profile',  
+      children: [
+        {
+          path: 'mypage/profile',
+          name: 'profile',
+          component: () => import('@/views/account/ProfileView.vue'),
+        },
+        {
+          path: 'mypage/profile/change-password',
+          name: 'change-password',
+          component: () => import('@/views/account/MyPasswordView.vue'),
+        },
+        {
+          path: 'mypage/profile/my-password-change',
+          name: 'my-password-change',
+          component: () => import('@/views/account/MyPasswordChangeView.vue'),
+          meta: {
+            requiresAuth: true
+          }
+        },
+        {
+          path: 'mypage/challenges',
+          name: 'challenges',
+          component: () => import('@/views/account/MyChallengesView.vue'),
+        }
+      ]
     },
     {
       path: '/admin',
@@ -103,19 +128,6 @@ const router = createRouter({
       path: '/find-password',
       name: 'find-password',
       component: () => import('@/views/FindPasswordView.vue'),
-    },
-    {
-      path: '/change-password',
-      name: 'change-password',
-      component: () => import('@/views/ChangePasswordView.vue'),
-    },
-    {
-      path: '/my-password-change',
-      name: 'my-password-change',
-      component: MyPasswordChangeView,
-      meta: {
-        requiresAuth: true
-      }
     },
   ],
 })
