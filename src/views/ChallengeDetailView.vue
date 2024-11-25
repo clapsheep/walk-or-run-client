@@ -2,10 +2,20 @@
 import { useRoute } from 'vue-router'
 import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
 import { getChallengeDetailFetch } from '@/core/challenge/ChallengeApi'
+import { useDeleteChallenge } from '@/core/challenge/composables/useDeleteChallenge'
+import { useUserStore } from '@/stores/userStore'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 
 const route = useRoute()
 const challengeId = Number(route.params.id)
+const userStore = useUserStore()
+
+const {
+  loading: deleteLoading,
+  error: deleteError,
+  deleteChallenge,
+  handleDelete
+} = useDeleteChallenge()
 
 const {
   loading,
@@ -15,6 +25,7 @@ const {
   getParticipationRate,
   participate
 } = useGetChallenge(getChallengeDetailFetch, challengeId)
+
 
 </script>
 
@@ -89,7 +100,21 @@ const {
                 이미 참여 중인 챌린지입니다
               </p>
             </template>
+            <div v-if="userStore.userRole === 'ADMIN'" class="mt-6">
+              <BasicButton
+                color="warning"
+                :loading="deleteLoading"
+                @click="handleDelete(challengeId)"
+              >
+                삭제하기
+              </BasicButton>
+              <p v-if="deleteError" class="mt-2 text-red-500 text-sm">
+                {{ deleteError }}
+              </p>
+            </div>
           </div>
+          <!-- 관리자용 삭제 버튼 -->
+
         </div>
       </div>
     </div>

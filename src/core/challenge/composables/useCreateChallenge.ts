@@ -18,6 +18,11 @@ export const useCreateChallenge = () => {
   const errors = ref<ChallengeErrors>({})
   const userStore = useUserStore()
 
+  const categoryOptions = {
+    '1': '뛰기',
+    '2': '걷기',
+  }
+
   const form = ref<Challenge>({
     challengeCategoryCode: 0,
     challengeTitle: '',
@@ -100,6 +105,7 @@ export const useCreateChallenge = () => {
     isRecurring,
     error,
     isFormValid,
-    submitForm
+    submitForm,
+    categoryOptions
   }
 }
