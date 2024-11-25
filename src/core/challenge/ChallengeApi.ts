@@ -46,20 +46,17 @@ export const getEndedChallengeSchedulesFetch = async (page: number = 1, size: nu
       Authorization: getToken()
     }
   })
-  console.log('API Response:', data)  // 응답 데이터 로깅
   return data
 }
 
-export const getChallengeDetailFetch = async (challengeId: number): Promise<Challenge> => {
+export const getChallengeDetailFetch = async (challengeId: number): Promise<Challenge > => {
   const { data } = await axios.get(`${VITE_API_URL}/challenge/${challengeId}`, {
-    params: {
-      userId: userStore.userId
-    },
     headers: {
       Authorization: getToken()
     }
   })
-  console.log('API Response:', data)  // 응답 데이터 로깅
+  console.log(data);
+
   return data
 }
 
@@ -73,7 +70,6 @@ export const participateChallengeFetch = async (challengeId: number): Promise<Ax
         Authorization: getToken()
       }
     })
-  console.log('API Response:', response)  // 응답 데이터 로깅
   return response
 }
 
@@ -87,7 +83,6 @@ export const getUserChallengeFetch = async (userId: number, page: number = 0): P
       Authorization: getToken()
     }
   })
-  console.log('API Response:', data)  // 응답 데이터 로깅
   return data
 }
 
