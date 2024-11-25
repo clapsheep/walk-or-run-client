@@ -25,7 +25,7 @@ export const addChallengeScheduleFetch = async (challenge: Challenge): Promise<A
   return response
 }
 
-export const getChallengeSchedulesFetch = async (): Promise<AxiosResponse<Challenge[] |ApiResponse>> => {
+export const getChallengeSchedulesFetch = async (): Promise<AxiosResponse<Challenge[] | ApiResponse>> => {
   const response = await axios.get(`${VITE_API_URL}/admin/challenge/schedule`, {
     headers: {
       Authorization: getToken()

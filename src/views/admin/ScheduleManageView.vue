@@ -1,69 +1,60 @@
-<!-- views/admin/ChallengeScheduleView.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
-import { useRouter } from 'vue-router'
+import { useGetSchedules } from '@/core/challenge/composables/useGetSchedules'
+import { deleteChallengeScheduleFetch, getChallengeSchedulesFetch, updateChallengeScheduleFetch } from '@/core/challenge/AdminChallengeApi'
+import { useUpdateChallengeSchedule } from '@/core/challenge/composables/useUpdateChallengeSchedule'
+import { useDeleteChallengeSchedule } from '@/core/challenge/composables/useDeleteChallengeSchedule'
+import { Challenge } from '@/core/challenge/ChallengeType'
 
-interface Schedule {
-  id: number
-  title: string
-  frequency: string
-  nextRunDate: string
-  status: 'active' | 'paused'
+const {
+  loading: fetchLoading,
+  error: fetchError,
+  schedules,
+  fetchSchedules,
+} = useGetSchedules(getChallengeSchedulesFetch)
+
+const {
+  loading: updateLoading,
+  error: updateError,
+  updateSchedule
+} = useUpdateChallengeSchedule(updateChallengeScheduleFetch)
+
+const {
+  loading: deleteLoading,
+  error: deleteError,
+  deleteSchedule
+} = useDeleteChallengeSchedule(deleteChallengeScheduleFetch)
+
+const selectedCycles = ref<{ [key: string]: number }>({})
+
+const initializeSelectedCycles = () => {
+  schedules.value.forEach(schedule => {
+    selectedCycles.value[schedule.challengeId] = schedule.challengeSchedulerCycle ?? 0
+  })
 }
 
-const router = useRouter()
-const loading = ref(false)
-const error = ref('')
-const schedules = ref<Schedule[]>([])
+onMounted(async () => {
+  await fetchSchedules()
+  initializeSelectedCycles()
+})
 
-const mockSchedules: Schedule[] = [
-  {
-    id: 1,
-    title: '주간 걷기 챌린지',
-    frequency: '매주 월요일',
-    nextRunDate: '2024-01-22',
-    status: 'active'
-  },
-  {
-    id: 2,
-    title: '월간 달리기 챌린지',
-    frequency: '매월 1일',
-    nextRunDate: '2024-02-01',
-    status: 'active'
-  }
-]
+const handleSubmit = async (schedule: Challenge) => {
+  const cycle = selectedCycles.value[schedule.challengeId]
 
-// 실제 API 연동 시 사용할 함수
-const fetchSchedules = async () => {
-  loading.value = true
-  error.value = ''
-
-  try {
-    // TODO: API 연동
-    schedules.value = mockSchedules
-  } catch (e) {
-    error.value = '스케줄 목록을 불러오는데 실패했습니다.'
-  } finally {
-    loading.value = false
-  }
-}
-
-const toggleScheduleStatus = async (schedule: Schedule) => {
-  try {
-    // TODO: API 연동
-    schedule.status = schedule.status === 'active' ? 'paused' : 'active'
-  } catch (e) {
-    error.value = '스케줄 상태 변경에 실패했습니다.'
+  if (cycle === 0) {
+    if (await deleteSchedule(schedule)) {
+      await fetchSchedules()
+    }
+  } else {
+    if (await updateSchedule(schedule, cycle)) {
+      await fetchSchedules()
+    }
   }
 }
 
-const goToScheduleDetail = (id: number) => {
-  router.push(`/admin/schedule/${id}`)
-}
-
-// Initial fetch
-fetchSchedules()
+const loading = computed(() => fetchLoading.value || updateLoading.value || deleteLoading.value)
+const error = computed(() => fetchError.value || updateError.value || deleteError.value)
 </script>
 
 <template>
@@ -96,28 +87,33 @@ fetchSchedules()
       <div
         v-else
         v-for="schedule in schedules"
-        :key="schedule.id"
-        class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        :key="schedule.challengeId"
+        class="bg-white p-6 rounded-lg shadow-sm"
       >
         <div class="flex justify-between items-center">
           <div class="space-y-2">
-            <h3 class="text-lg font-semibold text-gray-800">{{ schedule.title }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ schedule.challengeTitle }}</h3>
             <p class="text-sm text-gray-600">
-              {{ schedule.frequency }} · 다음 실행일: {{ schedule.nextRunDate }}
+              {{ schedule.challengeSchedulerCycle }} · 다음 실행일: {{
+                new Date(Date.now() + 1000 * 60 * 60 * 24 * (schedule.challengeSchedulerCycle ?? 0)).toISOString().slice(0, 10)
+              }}
             </p>
           </div>
-          <div class="space-x-2">
-            <BasicButton
-              :color="schedule.status === 'active' ? 'warning' : 'primary'"
-              @click="toggleScheduleStatus(schedule)"
+          <div class="flex items-center space-x-4">
+            <select
+              v-model="selectedCycles[schedule.challengeId]"
+              class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              {{ schedule.status === 'active' ? '일시중지' : '재시작' }}
-            </BasicButton>
+              <option :value="0">삭제</option>
+              <option :value="1">일일</option>
+              <option :value="2">일주일</option>
+              <option :value="3">한달</option>
+            </select>
             <BasicButton
-              color="secondary"
-              @click="goToScheduleDetail(schedule.id)"
+              :color="selectedCycles[schedule.challengeId] === 0 ? 'danger' : 'primary'"
+              @click="handleSubmit(schedule)"
             >
-              수정하기
+              {{ selectedCycles[schedule.challengeId] === 0 ? '삭제' : '수정' }}
             </BasicButton>
           </div>
         </div>

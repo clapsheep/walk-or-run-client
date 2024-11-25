@@ -5,6 +5,7 @@ import { getChallengeDetailFetch } from '@/core/challenge/ChallengeApi'
 import { useDeleteChallenge } from '@/core/challenge/composables/useDeleteChallenge'
 import { useUserStore } from '@/stores/userStore'
 import BasicButton from '@/components/atoms/BasicButton.vue'
+import { deleteChallengeFetch } from '@/core/challenge/AdminChallengeApi'
 
 const route = useRoute()
 const challengeId = Number(route.params.id)
@@ -15,7 +16,7 @@ const {
   error: deleteError,
   deleteChallenge,
   handleDelete
-} = useDeleteChallenge()
+} = useDeleteChallenge(deleteChallengeFetch)
 
 const {
   loading,
