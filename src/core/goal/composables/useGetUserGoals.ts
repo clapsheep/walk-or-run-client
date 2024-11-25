@@ -1,63 +1,56 @@
-import { ref, onMounted } from 'vue'
-import Goal from '../GoalType'
-import { setError, setLoading } from '@/core/challenge/utils/settingUtils'
+import type ApiResponse from '@/core/common/types/ApiResponse'
+import { AxiosResponse } from 'axios'
+import { computed, ref } from 'vue'
+import type Goal from '../GoalType'
+import { filterGoalsByStatus, isGoalCompleted } from '../services/GoalService'
 
-export const useGetUserGoals = (getUserGoalFetch: () => Promise<Goal[]>) => {
+export type GoalStatus = 'all' | 'active' | 'completed'
+
+export const useGetUserGoals = (
+  getUserGoalFetch: () => Promise<AxiosResponse<Goal[] | ApiResponse>>,
+) => {
   const loading = ref(false)
-  const error = ref('')
-  const showModal = ref(false)
+  const error = ref<string | null>(null)
   const goals = ref<Goal[]>([])
-
-  const handleOpenModal = () => {
-    showModal.value = true
-  }
-
-  const handleCloseModal = () => {
-    showModal.value = false
-  }
-
-  const handleSubmitGoal = async (formData: Goal) => {
-    console.log('Form submitted:', formData)
-    await fetchGoals()
-  }
+  const selectedStatus = ref<GoalStatus>('all')
 
   const fetchGoals = async () => {
-    const state = { loading, error }
-    setLoading(state, true)
-    setError(state, '')
-
+    loading.value = true
+    error.value = null
     try {
-      const data = await getUserGoalFetch()
-      goals.value = data
-      if(goals.value.length === 0) {
-        error.value = '목표가 없습니다.'
+      const response = await getUserGoalFetch()
+      if (response?.status === 204) {
+        goals.value = []
+      } else if (response?.data) {
+        goals.value = response.data as Goal[]
       }
-    } catch (err: any) {
-      setError(state, err.response?.data?.message || '목표 조회에 실패했습니다.')
-      console.error('목표 조회에 실패했습니다:', err)
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : '목표를 불러오는데 실패했습니다.'
     } finally {
-      setLoading(state, false)
+      loading.value = false
     }
   }
 
-  const calculateAchievementRate = (goal: Goal) => {
-    if (!goal.targetAmount || !goal.currentAmount) return 0
-    return Math.round((goal.currentAmount / goal.targetAmount) * 100)
+  const setStatus = (status: GoalStatus) => {
+    selectedStatus.value = status
   }
 
-  onMounted(() => {
-    fetchGoals()
+  const getActiveGoals = computed(() => {
+    return goals.value.filter((goal) => !isGoalCompleted(goal))
+  })
+
+  const filteredGoals = computed(() => {
+    return filterGoalsByStatus(goals.value, selectedStatus.value)
   })
 
   return {
     loading,
     error,
     goals,
-    showModal,
-    handleOpenModal,
-    handleCloseModal,
-    handleSubmitGoal,
+    selectedStatus,
+    filteredGoals,
+    getActiveGoals,
     fetchGoals,
-    calculateAchievementRate
+    setStatus,
   }
 }

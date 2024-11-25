@@ -9,6 +9,11 @@ export interface ValidationErrors {
   userPasswordConfirm?: string
   userPasswordQuestionId?: string
   userPasswordAnswer?: string
+  challengeCategoryCode?: string
+  challengeCategoryUnitCode?: string
+  targetAmount?: string
+  startDate?: string
+  endDate?: string
 }
 
 export interface EmailValidationResult {
@@ -61,6 +66,59 @@ export const validatePasswordAnswer = (answer: string | undefined): string => {
 export const validatePhoneNumber = (phone: string | undefined): string => {
   if (!phone) return '전화번호를 입력해주세요.'
   if (!/^01\d{9}$/.test(phone)) return '-(하이픈) 없이 입력해주세요.'
+  return ''
+}
+
+export const validateNumber = (value: number | undefined, fieldName: string, min?: number, max?: number): string => {
+  if (value === undefined || value === null) {
+    return `${fieldName}을(를) 입력해주세요.`
+  }
+  
+  if (typeof value !== 'number' || isNaN(value)) {
+    return `${fieldName}은(는) 숫자여야 합니다.`
+  }
+  
+  if (min !== undefined && value < min) {
+    return `${fieldName}은(는) ${min} 이상이어야 합니다.`
+  }
+  
+  if (max !== undefined && value > max) {
+    return `${fieldName}은(는) ${max} 이하여야 합니다.`
+  }
+  
+  return ''
+}
+
+export const validateDate = (value: string | undefined, fieldName: string): string => {
+  if (!value) {
+    return `${fieldName}을(를) 선택해주세요.`
+  }
+  
+  const date = new Date(value)
+  if (isNaN(date.getTime())) {
+    return `${fieldName}이(가) 올바르지 않습니다.`
+  }
+  
+  return ''
+}
+
+export const validateDateRange = (startDate: string | undefined, endDate: string | undefined): string => {
+  if (!startDate || !endDate) return ''
+  
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  
+  if (start > end) {
+    return '종료일은 시작일보다 늦어야 합니다.'
+  }
+  
+  return ''
+}
+
+export const validateSelect = (value: string | number | undefined, fieldName: string): string => {
+  if (!value && value !== 0) {
+    return `${fieldName}을(를) 선택해주세요.`
+  }
   return ''
 }
 
