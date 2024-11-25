@@ -3,10 +3,16 @@ import type { AxiosResponse } from 'axios'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { AuthCredentials, AuthResponse, handleLoginSuccess, validateLoginForm, type LoginErrors } from '../services/loginService'
+import {
+  AuthCredentials,
+  AuthResponse,
+  handleLoginSuccess,
+  validateLoginForm,
+  type LoginErrors,
+} from '../services/loginService'
 
 export const useLogin = (
-  loginFetch: (credentials: AuthCredentials) => Promise<AxiosResponse<AuthResponse>>
+  loginFetch: (credentials: AuthCredentials) => Promise<AxiosResponse<AuthResponse>>,
 ) => {
   const router = useRouter()
   const modalStore = useModalStore()
@@ -15,9 +21,8 @@ export const useLogin = (
   const errors = ref<LoginErrors>({})
   const form = ref<AuthCredentials>({
     userEmail: '',
-    userPassword: ''
+    userPassword: '',
   })
-
 
   const validateForm = () => {
     errors.value = validateLoginForm(form.value)
@@ -25,16 +30,13 @@ export const useLogin = (
   }
 
   const isFormValid = computed(() => {
-    return form.value.userEmail &&
-           form.value.userPassword &&
-           Object.keys(errors.value).length === 0
+    return form.value.userEmail && form.value.userPassword && Object.keys(errors.value).length === 0
   })
 
   const login = async (credentials: AuthCredentials) => {
     if (isLoading.value) return false
 
     form.value = credentials
-
 
     isLoading.value = true
     error.value = ''
@@ -48,7 +50,7 @@ export const useLogin = (
           modalStore.openModal({
             title: '로그인 성공',
             content: '환영합니다!',
-            onConfirm: () => router.push('/')
+            onConfirm: () => router.push('/'),
           })
           return true
         }
@@ -57,10 +59,10 @@ export const useLogin = (
       error.value = data.message || '로그인에 실패했습니다.'
       return false
     } catch (err: any) {
-      error.value = err.response?.data?.message || '로그인 중 오류가 발생했습니다.'
+      error.value = '아이디랑 비밀번호를 다시 확인해주세요.'
       modalStore.openModal({
-        title: '오류',
-        content: error.value
+        title: '로그인 실패',
+        content: '아이디랑 비밀번호를 다시 확인해주세요.',
       })
       return false
     } finally {
@@ -74,6 +76,6 @@ export const useLogin = (
     errors,
     isLoading,
     error,
-    isFormValid
+    isFormValid,
   }
 }

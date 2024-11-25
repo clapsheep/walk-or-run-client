@@ -10,6 +10,7 @@ import { FireIcon } from '@heroicons/vue/24/solid'
 const showUploadModal = ref(false)
 const showGoalsSidebar = ref(false)
 const dateRange = ref<[Date, Date]>([new Date(), new Date()])
+const chartGridRef = ref<InstanceType<typeof ChartGrid> | null>(null)
 
 const handleOpenUploadModal = () => {
   showUploadModal.value = true
@@ -22,6 +23,11 @@ const handleUpdateDateRange = (dates: [Date, Date]) => {
 const toggleGoalsSidebar = () => {
   showGoalsSidebar.value = !showGoalsSidebar.value
 }
+
+const handleUploadSuccess = () => {
+  // 업로드 성공 시 차트 데이터 새로고침
+  chartGridRef.value?.fetchData()
+}
 </script>
 
 <template>
@@ -31,7 +37,7 @@ const toggleGoalsSidebar = () => {
         @open-upload-modal="handleOpenUploadModal"
         @update-date-range="handleUpdateDateRange"
       />
-      <ChartGrid :dateRange="dateRange" />
+      <ChartGrid ref="chartGridRef" :dateRange="dateRange" />
     </div>
 
     <!-- 플로팅 버튼 -->
@@ -53,7 +59,7 @@ const toggleGoalsSidebar = () => {
       <GoalsSidebar
         v-if="showGoalsSidebar"
         :showUploadModal="showUploadModal"
-        class="fixed top-[88px] right-0 h-[calc(100vh-88px)] shadow-lg"
+        class="fixed top-[88px] right-0 bottom-0 h-[calc(100vh-88px)] shadow-lg overflow-y-auto w-1/4"
       />
     </Transition>
 
@@ -61,6 +67,7 @@ const toggleGoalsSidebar = () => {
       v-if="showUploadModal"
       :show="showUploadModal"
       @close="showUploadModal = false"
+      @upload-success="handleUploadSuccess"
     />
   </div>
 </template>
