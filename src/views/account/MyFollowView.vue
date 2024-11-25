@@ -91,7 +91,7 @@ onMounted(async () => {
           <BasicButton
             v-else
             variant="outlined"
-            color="secondary"
+            color="primary"
             size="sm"
             @click="toggleFollow(Number(user.userId))"
           >

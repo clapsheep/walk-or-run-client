@@ -139,6 +139,12 @@ const router = createRouter({
       name: 'find-password',
       component: () => import('@/views/FindPasswordView.vue'),
     },
+    {
+      path: '/find-user',
+      name: 'find-user',
+      component: () => import('@/views/FindUserView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 

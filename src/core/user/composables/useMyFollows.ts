@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import User from '../UserType'
 import { useUserFollow } from './useUserFollow'
@@ -39,6 +39,13 @@ export const useMyFollows = () => {
     }
   }
 
+  const handleFollowings = async() => {
+    const response = await fetchFollowings()
+    if (response &&Array.isArray(response.data)) {
+      following.value = response.data;
+    }
+  }
+
   const toggleFollow = async (userId: number) => {
     if (isFollowing(userId)) {
       const response = await handleUnfollow(userId)
@@ -48,7 +55,7 @@ export const useMyFollows = () => {
       }
     } else {
       const response = await handleFollow(userId)
-      if (response && response.data.message === 'success') {
+      if (response?.data.message === 'success') {
         // 팔로잉 목록에 추가
         const newFollowing = followers.value.find(f => Number(f.userId) === userId)
         if (newFollowing) {
@@ -57,6 +64,10 @@ export const useMyFollows = () => {
       }
     }
   }
+
+  onMounted(async () => {
+    await handleFollowings()
+  })
 
   return {
     activeTab,
@@ -68,6 +79,7 @@ export const useMyFollows = () => {
     handleFollow,
     handleUnfollow,
     isFollowing,
-    toggleFollow
+    toggleFollow,
+    handleFollowings
     }
 }
