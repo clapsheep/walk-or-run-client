@@ -6,7 +6,7 @@ import router from "@/router";
 import { challengeService } from "../services/challengesService";
 
 export const useGetAllChallenges = (
-  getChallengesFetch: (page: number) => Promise<PageResponse<Challenge>>
+  getChallengesFetch: (page: number, pageSize: number) => Promise<PageResponse<Challenge>>
 ) => {
   const loading = ref(false)
   const error = ref('')
@@ -22,13 +22,13 @@ export const useGetAllChallenges = (
   })
 
   // 챌린지 목록 조회
-  const fetchChallenges = async (page: number = 1): Promise<void> => {
+  const fetchChallenges = async (page: number = 1, pageSize: number = 10): Promise<void> => {
     const state = { loading, error }
     setLoading(state, true)
     setError(state, '')
 
     try {
-      const response = await getChallengesFetch(page)
+      const response = await getChallengesFetch(page, pageSize)
       console.log(response)
       challenges.value = formatChallengeResponse(response)
     } catch (err: any) {
@@ -40,8 +40,8 @@ export const useGetAllChallenges = (
   }
 
   // 페이지 변경
-  const changePage = async (page: number): Promise<void> => {
-    await fetchChallenges(page)
+  const changePage = async (page: number, pageSize: number): Promise<void> => {
+    await fetchChallenges(page, pageSize);
   }
 
   const goToDetail = (challenge?: Challenge) => {

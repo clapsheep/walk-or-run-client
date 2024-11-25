@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import BasicInput from '@/components/atoms/BasicInput.vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicSelect from '@/components/molecules/BasicSelect.vue'
@@ -12,11 +11,6 @@ const {
   form,
   errors,
   loading,
-  error,
-  isFormValid,
-  validateCurPasswordField,
-  validatePasswordField,
-  validateConfirmPassword,
   handleSubmit,
   handleCancel
 } = useChangeUserPassword(changeUserPasswordFetch)

@@ -1,6 +1,8 @@
 import { ref, onMounted } from "vue"
 import type { Challenge } from "../ChallengeType"
 import { setLoading, setError } from '../utils/settingUtils'
+import { useParticipateChallenge } from "./useParticipateChallenge"
+import { participateChallengeFetch } from "../ChallengeApi"
 
 export const useGetChallenge = (
   getChallengeDetailFetch: (challengeId: number) => Promise<Challenge>,
@@ -10,6 +12,17 @@ export const useGetChallenge = (
   const error = ref('')
   const challenge = ref<Challenge | null>(null)
   const isParticipating = ref(false)
+
+  const {
+    handleParticipate
+  } = useParticipateChallenge(participateChallengeFetch)
+
+  const participate = async (challengeId: number) => {
+    const response = await handleParticipate(challengeId);
+    if(response?.data?.message === 'success') {
+      isParticipating.value = true
+    }
+  }
 
   const fetchChallengeDetail = async () => {
     const state = { loading, error }
@@ -47,6 +60,7 @@ export const useGetChallenge = (
     challenge,
     isParticipating,
     getParticipationRate,
-    fetchChallengeDetail
+    fetchChallengeDetail,
+    participate
   }
 }
