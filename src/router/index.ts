@@ -75,6 +75,11 @@ const router = createRouter({
           path: 'mypage/goals',
           name: 'goals',
           component: () => import('@/views/account/MyUserGoalView.vue'),
+        },
+        {
+          path: 'mypage/follows',
+          name: 'follows',
+          component: () => import('@/views/account/MyFollowView.vue'),
         }
       ]
     },

@@ -21,8 +21,8 @@ export const useGoalSetting = (
   })
 
   const categoryOptions = [
-    { code: '1', name: '걷기' },
-    { code: '2', name: '뛰기' }
+    { code: '1', name: '뛰거나(뛰기)' },
+    { code: '2', name: '걷거나(걷기)' }
   ]
 
   const unitOptions = [

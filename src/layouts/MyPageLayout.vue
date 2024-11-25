@@ -34,6 +34,7 @@ watch(
       <TabNavigation
         :tabs="tabs"
         :active-tab="activeTab"
+        :show-add-button="false"
         @tab-click="handleTabChange"
       />
 

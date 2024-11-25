@@ -4,7 +4,6 @@ import BasicButton from '@/components/atoms/BasicButton.vue'
 import { useGetUserChallenges } from '@/core/challenge/composables/useGetUserChallenges'
 import { getUserChallengeFetch } from '@/core/challenge/ChallengeApi'
 import { useUserStore } from '@/stores/userStore'
-import { Challenge } from '@/core/challenge/ChallengeType'
 
 const userStore = useUserStore()
 
