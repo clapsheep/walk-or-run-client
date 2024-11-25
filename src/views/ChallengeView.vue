@@ -22,11 +22,11 @@ const challengesList = computed(() => challenges.value?.content || [])
 const pageInfo = computed(() => challenges.value?.pageInfo || { currentPage: 1, totalPages: 1, pageSize: 10, totalElements: 0 })
 
 const handleSizeSelect = (size: number) => {
-  changePage(1, size)
+  changePage(fetchChallenges, 1, size)
 }
 
 const handlePageChange = (page: number, pageSize: number) => {
-  changePage(page, pageSize)
+  changePage(fetchChallenges, page, pageSize)
 }
 
 onMounted(async () => {

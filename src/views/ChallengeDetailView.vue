@@ -186,6 +186,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
+          <!-- 관리자용 삭제 버튼 -->
+
         </div>
       </div>
     </div>

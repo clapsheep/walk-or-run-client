@@ -2,13 +2,18 @@ import { PageResponse } from "@/core/common/types/PageType";
 import type { Challenge } from "../ChallengeType";
 import { ref } from "vue";
 import { setLoading, setError } from '../utils/settingUtils';
-import { challengeService } from "../services/challengesService";
-import { getEndedChallengeSchedulesFetch } from '../ChallengeApi';
+import {
+  formatChallengeResponse,
+  navigateToDetail,
+  handleError,
+  changePage
+} from "../services/challengesService";
 
-export const useGetEndedChallenges = () => {
+export const useGetEndedChallenges = (
+  getEndedChallengeSchedulesFetch: (page: number, pageSize: number) => Promise<PageResponse<Challenge>>
+) => {
   const loading = ref(false)
   const error = ref('')
-  const { formatChallengeResponse, navigateToDetail, handleError } = challengeService
   const challenges = ref<PageResponse<Challenge>>({
     content: [],
     pageInfo: {
@@ -26,7 +31,7 @@ export const useGetEndedChallenges = () => {
     setError(state, '')
 
     try {
-      const response = await getEndedChallengeSchedulesFetch(page, pageSize)
+      const response = await changePage(getEndedChallengeSchedulesFetch, page, pageSize)
       console.log(response)
       challenges.value = formatChallengeResponse(response)
     } catch (err: any) {
@@ -35,11 +40,6 @@ export const useGetEndedChallenges = () => {
     } finally {
       setLoading(state, false)
     }
-  }
-
-  // 페이지 변경
-  const changePage = async (page: number, pageSize: number): Promise<void> => {
-    await fetchEndedChallenges(page, pageSize);
   }
 
   const goToDetail = (challengeId: number) => {
@@ -51,7 +51,7 @@ export const useGetEndedChallenges = () => {
     error,
     challenges,
     fetchEndedChallenges,
-    changePage,
+    changePage: (fetchFn: any, page: number, size: number) => fetchEndedChallenges(page, size),
     goToDetail
   }
 }

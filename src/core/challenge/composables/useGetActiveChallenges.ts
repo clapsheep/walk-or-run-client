@@ -2,13 +2,18 @@ import { PageResponse } from "@/core/common/types/PageType";
 import type { Challenge } from "../ChallengeType";
 import { ref } from "vue";
 import { setLoading, setError } from '../utils/settingUtils';
-import { challengeService } from "../services/challengesService";
-import { getActiveChallengesFetch } from '../ChallengeApi';
+import {
+  navigateToDetail,
+  handleError,
+  changePage
+} from "../services/challengesService";
 
-export const useGetActiveChallenges = () => {
+export const useGetActiveChallenges = (
+  getActiveChallengesFetch: (page: number, pageSize: number) => Promise<PageResponse<Challenge>>
+) => {
   const loading = ref(false)
   const error = ref('')
-  const { formatChallengeResponse, navigateToDetail, handleError } = challengeService
+
   const challenges = ref<PageResponse<Challenge>>({
     content: [],
     pageInfo: {
@@ -26,20 +31,13 @@ export const useGetActiveChallenges = () => {
     setError(state, '')
 
     try {
-      const response = await getActiveChallengesFetch(page, pageSize)
-      console.log(response)
-      challenges.value = formatChallengeResponse(response)
-    } catch (err: any) {
-      setError(state, handleError(err))
-      console.error('진행 중인 챌린지 목록을 불러오는데 실패했습니다:', err)
+      const response = await changePage(getActiveChallengesFetch, page, pageSize)
+      challenges.value = response
+    } catch (e) {
+      setError(state, handleError(e))
     } finally {
       setLoading(state, false)
     }
-  }
-
-  // 페이지 변경
-  const changePage = async (page: number, pageSize: number): Promise<void> => {
-    await fetchActiveChallenges(page, pageSize);
   }
 
   const goToDetail = (challengeId: number) => {
@@ -51,7 +49,7 @@ export const useGetActiveChallenges = () => {
     error,
     challenges,
     fetchActiveChallenges,
-    changePage,
+    changePage: (fetchFn: any, page: number, size: number) => fetchActiveChallenges(page, size),
     goToDetail
   }
 }

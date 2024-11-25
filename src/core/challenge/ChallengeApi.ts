@@ -36,7 +36,7 @@ export const getActiveChallengesFetch = async (page: number = 1, size: number = 
   return data
 }
 
-export const getEndedChallengeSchedulesFetch = async (page: number = 1, size: number = 10): Promise<PageResponse<Challenge>> => {
+export const getEndedChallengesFetch = async (page: number = 1, size: number = 10): Promise<PageResponse<Challenge>> => {
   const { data } = await axios.get(`${VITE_API_URL}/challenge/end`, {
     params: {
       page,
