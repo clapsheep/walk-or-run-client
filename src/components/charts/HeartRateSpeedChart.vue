@@ -83,6 +83,8 @@ const chartOptions = {
   },
   scales: {
     y: {
+      min: 60,
+      max: 200,
       beginAtZero: true,
       title: {
         display: true,
@@ -92,6 +94,7 @@ const chartOptions = {
         }
       },
       ticks: {
+        stepSize: 20,
         font: {
           size: 11
         }
