@@ -8,11 +8,11 @@ import ApiResponse from '../common/types/ApiResponse'
 const { VITE_API_URL } = import.meta.env
 const userStore = useUserStore()
 
-export const getChallengesFetch = async (page: number = 1): Promise<PageResponse<Challenge>> => {
+export const getChallengesFetch = async (page: number = 1, size: number = 10): Promise<PageResponse<Challenge>> => {
   const { data } = await axios.get(`${VITE_API_URL}/challenge`, {
     params: {
       page,
-      size: 10
+      size,
     },
     headers: {
       Authorization: getToken()
@@ -37,7 +37,7 @@ export const getChallengeDetailFetch = async (challengeId: number): Promise<Chal
 
 export const participateChallengeFetch = async (challengeId: number): Promise<AxiosResponse<ApiResponse>> => {
   console.log('Participating in challenge:', challengeId);
-  const { data } = await axios.post(
+  const response = await axios.post(
     `${VITE_API_URL}/challenge/${challengeId}`,
     { userId: userStore.userId },
     {
@@ -45,8 +45,8 @@ export const participateChallengeFetch = async (challengeId: number): Promise<Ax
         Authorization: getToken()
       }
     })
-  console.log('API Response:', data)  // 응답 데이터 로깅
-  return data
+  console.log('API Response:', response)  // 응답 데이터 로깅
+  return response
 }
 
 export const getUserChallengeFetch = async (userId: number, page: number = 0): Promise<PageResponse<Challenge>> => {

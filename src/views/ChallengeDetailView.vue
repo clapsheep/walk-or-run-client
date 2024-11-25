@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
-import { useParticipateChallenge } from '@/core/challenge/composables/useParticipateChallenge'
-import { getChallengeDetailFetch, participateChallengeFetch } from '@/core/challenge/ChallengeApi'
+import { getChallengeDetailFetch } from '@/core/challenge/ChallengeApi'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 
 const route = useRoute()
@@ -14,11 +13,9 @@ const {
   challenge,
   isParticipating,
   getParticipationRate,
+  participate
 } = useGetChallenge(getChallengeDetailFetch, challengeId)
 
-const {
-  handleParticipate
-} = useParticipateChallenge(participateChallengeFetch)
 </script>
 
 <template>
@@ -77,16 +74,21 @@ const {
           </div>
 
           <div class="mt-6 flex justify-center">
-            <BasicButton
-              v-if="!isParticipating"
-              @click="handleParticipate(challengeId)"
-              color="primary"
-            >
-              참여하기
-            </BasicButton>
-            <p v-else class="text-green-600 font-medium">
-              이미 참여 중인 챌린지입니다
-            </p>
+            <template v-if="challenge.challengeIsEnded">
+              <p class="text-red-600 font-medium">종료된 챌린지입니다</p>
+            </template>
+            <template v-else>
+              <BasicButton
+                v-if="!isParticipating"
+                @click="participate(challengeId)"
+                color="primary"
+              >
+                참여하기
+              </BasicButton>
+              <p v-else class="text-green-600 font-medium">
+                이미 참여 중인 챌린지입니다
+              </p>
+            </template>
           </div>
         </div>
       </div>

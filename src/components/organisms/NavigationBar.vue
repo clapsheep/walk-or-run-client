@@ -67,6 +67,11 @@ const menus = [
     path: '/account',
     icon: UserIcon,
   },
+  {
+    name: '유저 찾기',
+    path: '/find-user',
+    icon: UserGroupIcon,
+  },
 ]
 
 const adminMenus = [

@@ -75,6 +75,11 @@ const router = createRouter({
           path: 'mypage/goals',
           name: 'goals',
           component: () => import('@/views/account/MyUserGoalView.vue'),
+        },
+        {
+          path: 'mypage/follows',
+          name: 'follows',
+          component: () => import('@/views/account/MyFollowView.vue'),
         }
       ]
     },
@@ -133,6 +138,12 @@ const router = createRouter({
       path: '/find-password',
       name: 'find-password',
       component: () => import('@/views/FindPasswordView.vue'),
+    },
+    {
+      path: '/find-user',
+      name: 'find-user',
+      component: () => import('@/views/FindUserView.vue'),
+      meta: { requiresAuth: true }
     },
   ],
 })

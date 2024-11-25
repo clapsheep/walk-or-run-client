@@ -22,6 +22,23 @@ onMounted(async () => {
     <div class="container mx-auto">
       <!-- 챌린지 목록 타이틀 -->
       <h1 class="mb-8 text-3xl font-bold text-gray-800">진행중인 챌린지</h1>
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-600">페이지당 표시:</span>
+        <div class="flex space-x-1">
+          <button
+            v-for="size in [10, 20, 30]"
+            :key="size"
+            class="px-3 py-1 text-sm rounded-md border"
+            :class="[
+              challenges.pageInfo.pageSize === size
+                ? 'bg-primary-500 text-white border-primary-500'
+                : 'border-gray-300 hover:bg-gray-50'
+            ]"
+            @click="changePage(1, size)">
+            {{ size }}
+          </button>
+        </div>
+      </div>
 
       <!-- 로딩 상태 -->
       <div v-if="loading" class="flex justify-center">
@@ -34,7 +51,7 @@ onMounted(async () => {
       </div>
 
       <!-- 챌린지 카드 그리드 -->
-      <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <!-- 챌린지 카드 -->
         <div v-for="challenge in challenges.content"
             :key="challenge.challengeTitle"
@@ -61,7 +78,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage === 1"
-            @click="changePage(challenges.pageInfo.currentPage - 1)">
+            @click="changePage(challenges.pageInfo.currentPage - 1, challenges.pageInfo.pageSize)">
             이전
           </button>
           <span class="text-sm text-gray-700">
@@ -70,7 +87,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage >= challenges.pageInfo.totalPages"
-            @click="changePage(challenges.pageInfo.currentPage + 1)">
+            @click="changePage(challenges.pageInfo.currentPage + 1, challenges.pageInfo.pageSize)">
             다음
           </button>
         </nav>
