@@ -8,7 +8,7 @@ export type Challenge = {
   challengeDeleteDate?: string
   challengeIsEnded?: number
   challengeCategoryName?: string
-  challengeAuthorId?: number
+  challengeAuthorId?: string
   challengeParticipantCnt?: number
   challengeTargetCnt?: number
   challengeIsParticipant?: number
