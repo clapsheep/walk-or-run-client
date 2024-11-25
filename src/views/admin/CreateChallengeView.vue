@@ -12,14 +12,12 @@ const {
   isLoading,
   isRecurring,
   submitForm,
-  isFormValid
+  isFormValid,
+  categoryOptions
 } = useCreateChallenge()
 
 // 임시 카테고리 데이터
-const categoryOptions = {
-  '1': '뛰기',
-  '2': '걷기',
-}
+
 </script>
 
 <template>

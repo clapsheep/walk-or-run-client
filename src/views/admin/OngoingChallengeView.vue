@@ -4,15 +4,16 @@ import { useGetActiveChallenges } from '@/core/challenge/composables/useGetActiv
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import { useRouter } from 'vue-router'
 import { onMounted } from 'vue';
+import { getActiveChallengesFetch } from '@/core/challenge/ChallengeApi';
 
-const router = useRouter()
 const {
   loading,
   error,
   challenges,
   fetchActiveChallenges,
+  changePage,
   goToDetail
-} = useGetActiveChallenges()
+} = useGetActiveChallenges(getActiveChallengesFetch)
 
 // Initial fetch
 onMounted(async () => {
@@ -23,6 +24,28 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6">
+    <!-- 페이지 크기 선택 -->
+    <div class="flex justify-end">
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-600">페이지당 항목:</span>
+        <div class="flex space-x-1">
+          <button
+            v-for="size in [10, 20, 30]"
+            :key="size"
+            class="px-3 py-1 text-sm border rounded-md"
+            :class="[
+              challenges.pageInfo.pageSize === size
+                ? 'bg-primary-500 text-white border-primary-500'
+                : 'border-gray-300 hover:bg-gray-50'
+            ]"
+            @click="changePage(getActiveChallengesFetch, 1, size)"
+          >
+            {{ size }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 로딩 상태 -->
     <div v-if="loading" class="space-y-4">
       <div v-for="n in 3" :key="n" class="animate-pulse">
@@ -70,6 +93,29 @@ onMounted(async () => {
             관리하기
           </BasicButton>
         </div>
+      </div>
+
+      <!-- 페이지네이션 -->
+      <div v-if="!loading && !error && challenges.content.length > 0" class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+          <button
+            class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="challenges.pageInfo.currentPage === 1"
+            @click="changePage(getActiveChallengesFetch, challenges.pageInfo.currentPage - 1, challenges.pageInfo.pageSize)"
+          >
+            이전
+          </button>
+          <span class="text-sm text-gray-700">
+            {{ challenges.pageInfo.currentPage }} / {{ challenges.pageInfo.totalPages }}
+          </span>
+          <button
+            class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="challenges.pageInfo.currentPage >= challenges.pageInfo.totalPages"
+            @click="changePage(getActiveChallengesFetch, challenges.pageInfo.currentPage + 1, challenges.pageInfo.pageSize)"
+          >
+            다음
+          </button>
+        </nav>
       </div>
     </div>
   </div>

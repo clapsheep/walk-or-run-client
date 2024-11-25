@@ -34,7 +34,7 @@ onMounted(async () => {
                 ? 'bg-primary-500 text-white border-primary-500'
                 : 'border-gray-300 hover:bg-gray-50'
             ]"
-            @click="changePage(1, size)">
+            @click="changePage(getChallengesFetch, 1, size)">
             {{ size }}
           </button>
         </div>
@@ -78,7 +78,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage === 1"
-            @click="changePage(challenges.pageInfo.currentPage - 1, challenges.pageInfo.pageSize)">
+            @click="changePage(getChallengesFetch, challenges.pageInfo.currentPage - 1, challenges.pageInfo.pageSize)">
             이전
           </button>
           <span class="text-sm text-gray-700">
@@ -87,7 +87,7 @@ onMounted(async () => {
           <button
             class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="challenges.pageInfo.currentPage >= challenges.pageInfo.totalPages"
-            @click="changePage(challenges.pageInfo.currentPage + 1, challenges.pageInfo.pageSize)">
+            @click="changePage(getChallengesFetch, challenges.pageInfo.currentPage + 1, challenges.pageInfo.pageSize)">
             다음
           </button>
         </nav>
