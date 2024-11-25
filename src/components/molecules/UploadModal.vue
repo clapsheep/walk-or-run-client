@@ -7,7 +7,6 @@ import { uploadRecordFetch } from '@/core/record/recordApi'
 import { useUpload } from '@/core/record/composables/useUpload'
 import BasicButton from '@/components/atoms/BasicButton.vue'
 
-
 const props = defineProps<{
   show: boolean
 }>()
@@ -23,7 +22,7 @@ const {
   isValidFile,
   handleFileSelection,
   upload,
-  reset
+  reset,
 } = useUpload(uploadRecordFetch)
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
@@ -71,7 +70,7 @@ const uploadFile = async () => {
     setTimeout(() => {
       emit('close')
       reset()
-    }, 1500)
+    }, 1000)
   }
 }
 
@@ -79,7 +78,6 @@ const closeModal = () => {
   emit('close')
   reset()
 }
-
 </script>
 
 <template>
@@ -108,8 +106,10 @@ const closeModal = () => {
             leave-from="opacity-100 scale-100"
             leave-to="opacity-0 scale-95"
           >
-            <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
-              <div class="flex items-center justify-between mb-4">
+            <DialogPanel
+              class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all"
+            >
+              <div class="mb-4 flex items-center justify-between">
                 <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
                   데이터 업로드
                 </DialogTitle>
@@ -123,10 +123,10 @@ const closeModal = () => {
               </div>
 
               <div
-                class="mt-4 p-6 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-200"
+                class="mt-4 cursor-pointer rounded-lg border-2 border-dashed p-6 transition-all duration-200"
                 :class="{
-                  'border-primary-300 bg-primary-50': isDragging,
-                  'border-gray-300 hover:border-primary-300': !isDragging
+                  'bg-primary-50 border-primary-300': isDragging,
+                  'border-gray-300 hover:border-primary-300': !isDragging,
                 }"
                 @dragenter="handleDragEnter"
                 @dragover.prevent
@@ -141,22 +141,18 @@ const closeModal = () => {
                   class="hidden"
                   @change="handleFileInputChange"
                 />
-                <div class="text-center flex flex-col items-center gap-3">
-                  <img src="/images/csv.svg" alt="csvIcon" class="w-20 h-20" />
+                <div class="flex flex-col items-center gap-3 text-center">
+                  <img src="/images/csv.svg" alt="csvIcon" class="h-20 w-20" />
                   <div v-if="!selectedFile" class="space-y-2">
-                    <div class="text-gray-500">
-                      삼성 헬스 운동 데이터 파일을 업로드하세요
-                    </div>
+                    <div class="text-gray-500">삼성 헬스 운동 데이터 파일을 업로드하세요</div>
                     <div class="text-sm text-gray-400">
                       com.samsung.shealth.exercise.*.csv 파일만 가능
                     </div>
-                    <div class="text-sm text-gray-400">
-                      최대 파일 크기: 10MB
-                    </div>
+                    <div class="text-sm text-gray-400">최대 파일 크기: 10MB</div>
                   </div>
 
                   <div v-else class="space-y-3">
-                    <div class="text-primary-600 font-medium truncate max-w-[280px] mx-auto">
+                    <div class="mx-auto max-w-[280px] truncate font-medium text-primary-600">
                       {{ selectedFile.name }}
                     </div>
                     <div class="text-sm text-gray-500">
@@ -171,19 +167,16 @@ const closeModal = () => {
               </div>
 
               <div class="mt-6 flex justify-end gap-3">
-                <BasicButton
-                  type="button"
-                  variant="outlined"
-                  color="secondary"
-                  @click="closeModal"
-                >
+                <BasicButton type="button" variant="outlined" color="secondary" @click="closeModal">
                   취소
                 </BasicButton>
                 <BasicButton
                   type="button"
                   :color="uploadStatus === 'error' ? 'warning' : 'primary'"
                   :variant="uploadStatus === 'success' ? 'ghost' : 'filled'"
-                  :disabled="!isValidFile || uploadStatus === 'uploading' || uploadStatus === 'success'"
+                  :disabled="
+                    !isValidFile || uploadStatus === 'uploading' || uploadStatus === 'success'
+                  "
                   @click="uploadFile"
                 >
                   <span v-if="uploadStatus === 'idle'">업로드</span>
