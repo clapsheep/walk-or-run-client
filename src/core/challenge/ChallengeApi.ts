@@ -22,6 +22,34 @@ export const getChallengesFetch = async (page: number = 1, size: number = 10): P
   return data
 }
 
+export const getActiveChallengesFetch = async (page: number = 1, size: number = 10): Promise<PageResponse<Challenge>> => {
+  const { data } = await axios.get(`${VITE_API_URL}/challenge/active`, {
+    params: {
+      page,
+      size,
+    },
+    headers: {
+      Authorization: getToken()
+    }
+  })
+  console.log('API Response:', data)  // 응답 데이터 로깅
+  return data
+}
+
+export const getEndedChallengeSchedulesFetch = async (page: number = 1, size: number = 10): Promise<PageResponse<Challenge>> => {
+  const { data } = await axios.get(`${VITE_API_URL}/challenge/end`, {
+    params: {
+      page,
+      size,
+    },
+    headers: {
+      Authorization: getToken()
+    }
+  })
+  console.log('API Response:', data)  // 응답 데이터 로깅
+  return data
+}
+
 export const getChallengeDetailFetch = async (challengeId: number): Promise<Challenge> => {
   const { data } = await axios.get(`${VITE_API_URL}/challenge/${challengeId}`, {
     params: {
@@ -63,12 +91,3 @@ export const getUserChallengeFetch = async (userId: number, page: number = 0): P
   return data
 }
 
-export const addChallengeFetch = async (challenge: Challenge): Promise<AxiosResponse<ApiResponse>> => {
-  const response = await axios.post(`${VITE_API_URL}/admin/challenge`, challenge, {
-    headers: {
-      Authorization: getToken()
-    }
-  })
-  console.log('API Response:', response)  // 응답 데이터 로깅
-  return response
-}

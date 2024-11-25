@@ -1,103 +1,105 @@
-import { ref } from 'vue'
-import { createChallenge, type CreateChallengeRequest } from '../services/challengeService'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useModalStore } from '@/stores/modalStore'
+import { addChallengeScheduleFetch } from '../AdminChallengeApi'
+import { validateChallengeForm } from '../utils/challengeValidation'
+import type { ChallengeErrors } from '../utils/challengeValidation'
 import { setError, setLoading } from '../utils/settingUtils'
+import { Challenge } from '../ChallengeType'
+import { addChallengeFetch } from '../AdminChallengeApi'
+import { useUserStore } from '@/stores/userStore'
 
 export const useCreateChallenge = () => {
-  const loading = ref(false)
+  const router = useRouter()
+  const modalStore = useModalStore()
+  const isLoading = ref(false)
+  const isRecurring = ref(false)
   const error = ref('')
-  const success = ref(false)
+  const errors = ref<ChallengeErrors>({})
+  const userStore = useUserStore()
 
-  const challengeData = ref<CreateChallengeRequest>({
-    challengeName: '',
-    challengeContent: '',
-    challengeStartDate: '',
-    challengeEndDate: '',
-    challengeTargetTime: 0,
-    challengeTargetCount: 0
+  const form = ref<Challenge>({
+    challengeCategoryCode: 0,
+    challengeTitle: '',
+    challengeDescription: '',
+    challengeAuthorId: '',
+    challengeTargetCnt: 0,
+    challengeCreateDate: '',
+    challengeDeleteDate: '',
+    challengeSchedulerCycle: undefined
   })
 
-  const resetForm = () => {
-    challengeData.value = {
-      challengeName: '',
-      challengeContent: '',
-      challengeStartDate: '',
-      challengeEndDate: '',
-      challengeTargetTime: 0,
-      challengeTargetCount: 0
-    }
-    error.value = ''
-    success.value = false
+  const validateForm = () => {
+    errors.value = validateChallengeForm(form.value)
+    return Object.keys(errors.value).length === 0
   }
 
-  const validateForm = (): boolean => {
-    if (!challengeData.value.challengeName.trim()) {
-      error.value = '챌린지 이름을 입력해주세요.'
-      return false
-    }
-    if (!challengeData.value.challengeContent.trim()) {
-      error.value = '챌린지 내용을 입력해주세요.'
-      return false
-    }
-    if (!challengeData.value.challengeStartDate) {
-      error.value = '시작 날짜를 선택해주세요.'
-      return false
-    }
-    if (!challengeData.value.challengeEndDate) {
-      error.value = '종료 날짜를 선택해주세요.'
-      return false
-    }
-    if (challengeData.value.challengeTargetTime <= 0) {
-      error.value = '목표 시간을 입력해주세요.'
-      return false
-    }
-    if (challengeData.value.challengeTargetCount <= 0) {
-      error.value = '목표 횟수를 입력해주세요.'
-      return false
-    }
-    return true
-  }
+  const isFormValid = computed(() => {
+    return (
+      form.value.challengeTitle &&
+      form.value.challengeDescription &&
+      (form.value.challengeTargetCnt ?? 0) > 0 &&
+      form.value.challengeCategoryCode &&
+      form.value.challengeCreateDate &&
+      form.value.challengeDeleteDate &&
+      (!isRecurring.value || (isRecurring.value && form.value.challengeSchedulerCycle)) &&
+      Object.keys(errors.value).length === 0
+    )
+  })
 
-  const handleImageUpload = (event: Event) => {
-    const input = event.target as HTMLInputElement
-    if (input.files && input.files[0]) {
-      challengeData.value.challengeImage = input.files[0]
-    }
-  }
+  const submitForm = async () => {
+    if (isLoading.value || !isFormValid.value) return
 
-  const handleSubmit = async () => {
-    const state = { loading, error }
+    if (!validateForm()) return
+
+    const state = { loading: isLoading, error }
     setLoading(state, true)
     setError(state, '')
-    success.value = false
 
     try {
-      if (!validateForm()) {
-        setLoading(state, false)
-        return
+      // API 요청을 위한 데이터 변환
+      const challengeData = {
+        challengeAuthorId: userStore.userId ?? '',
+        challengeTitle: form.value.challengeTitle,
+        challengeDescription: form.value.challengeDescription,
+        challengeCategoryCode: Number(form.value.challengeCategoryCode),
+        challengeTargetCnt: form.value.challengeTargetCnt,
+        challengeSchedulerCycle: isRecurring ? Number(form.value.challengeSchedulerCycle) : 0,
+        challengeCreateDate: form.value.challengeCreateDate,
+        challengeDeleteDate: form.value.challengeDeleteDate
       }
+      console.log(challengeData)
 
-      const response = await createChallenge(challengeData.value)
-      
-      if (response.status === 201 || response.status === 200) {
-        success.value = true
-        resetForm()
+      const response = await addChallengeFetch(challengeData)
+      console.log(response)
+
+      if (response.data.code === 200) {
+        modalStore.openModal({
+          title: '챌린지 생성 성공',
+          content: '챌린지가 성공적으로 생성되었습니다!',
+          onConfirm: () => router.push('/admin/challenges')
+        })
       } else {
-        setError(state, '챌린지 생성에 실패했습니다.')
+        error.value = response.data.message || '챌린지 생성에 실패했습니다.'
       }
     } catch (err: any) {
-      setError(state, err.message || '챌린지 생성 중 오류가 발생했습니다.')
+      error.value = '챌린지 생성 중 오류가 발생했습니다.'
+      modalStore.openModal({
+        title: '챌린지 생성 실패',
+        content: '챌린지 생성 중 오류가 발생했습니다. 다시 시도해주세요.'
+      })
     } finally {
-      setLoading(state, false)
+      isLoading.value = false
     }
   }
 
   return {
-    loading,
+    form,
+    errors,
+    isLoading,
+    isRecurring,
     error,
-    success,
-    challengeData,
-    handleSubmit,
-    handleImageUpload,
-    resetForm
+    isFormValid,
+    submitForm
   }
 }

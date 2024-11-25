@@ -5,6 +5,16 @@ import { getToken } from "../auth/services/loginService"
 
 const { VITE_API_URL } = import.meta.env
 
+export const addChallengeFetch = async (challenge: Challenge): Promise<AxiosResponse<ApiResponse>> => {
+  const response = await axios.post(`${VITE_API_URL}/admin/challenge`, challenge, {
+    headers: {
+      Authorization: getToken()
+    }
+  })
+  console.log('API Response:', response)  // 응답 데이터 로깅
+  return response
+}
+
 export const addChallengeScheduleFetch = async (challenge: Challenge): Promise<AxiosResponse<ApiResponse>> => {
   const response = await axios.post(`${VITE_API_URL}/admin/challenge/schedule`, challenge, {
     headers: {
