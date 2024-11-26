@@ -77,7 +77,7 @@ const { schedule, isLoading,error, handleSubmit,handleStopRepeatSchedule } = use
               id="startDate"
               label="반복 시작 날짜"
               name="startDate"
-              type="datetime-local"
+              type="date"
               v-model="schedule.challengeCreateDate"
               direction="col"
               required
@@ -87,7 +87,7 @@ const { schedule, isLoading,error, handleSubmit,handleStopRepeatSchedule } = use
               id="endDate"
               label="반복 종료 날짜"
               name="endDate"
-              type="datetime-local"
+              type="date"
               v-model="schedule.challengeDeleteDate"
               direction="col"
               required
