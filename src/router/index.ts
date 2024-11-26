@@ -106,7 +106,18 @@ const router = createRouter({
           path: 'challenges/schedule',
           name: 'admin-schedule',
           component: () => import('@/views/admin/ScheduleManageView.vue')
-        }
+        },
+        {
+          path: 'schedule/edit/:id',
+          name: 'admin-schedule-edit',
+          component: () => import('@/views/admin/EditScheduleView.vue')
+        },
+        {
+          path: 'schedule/edit',
+          name: 'EditSchedule',
+          component: () => import('@/views/admin/EditScheduleView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true }
+        },
       ],
       redirect: { name: 'admin-ongoing-challenges' }
     },

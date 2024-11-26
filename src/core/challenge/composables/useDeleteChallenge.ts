@@ -26,7 +26,7 @@ export const useDeleteChallenge = (
 
       if (response.data.message === 'success') {
         // 삭제 성공 시 목록 페이지로 이동
-        router.push('/admin/challenges/ongoing')
+        router.back()
       } else {
         error.value = response.data.message || '챌린지 삭제에 실패했습니다.'
       }

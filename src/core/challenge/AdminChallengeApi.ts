@@ -25,7 +25,7 @@ export const addChallengeScheduleFetch = async (challenge: Challenge): Promise<A
   return response
 }
 
-export const getChallengeSchedulesFetch = async (): Promise<AxiosResponse<Challenge[] |ApiResponse>> => {
+export const getChallengeSchedulesFetch = async (): Promise<AxiosResponse<Challenge[] | ApiResponse>> => {
   const response = await axios.get(`${VITE_API_URL}/admin/challenge/schedule`, {
     headers: {
       Authorization: getToken()
@@ -66,6 +66,7 @@ export const updateChallengeScheduleFetch = async (challenge: Challenge): Promis
 }
 
 export const deleteChallengeScheduleFetch = async (challengeId: number): Promise<AxiosResponse<ApiResponse>> => {
+  console.log(challengeId)
   const response = await axios.delete(`${VITE_API_URL}/admin/challenge/schedule/${challengeId}`, {
     headers: {
       Authorization: getToken()
@@ -87,6 +88,16 @@ export const getEndedChallengeSchedulesFetch = async (): Promise<AxiosResponse<C
 
 export const getActiveChallengeSchedulesFetch = async (): Promise<AxiosResponse<Challenge[] |ApiResponse>> => {
   const response = await axios.get(`${VITE_API_URL}/admin/challenge/schedule/active`, {
+    headers: {
+      Authorization: getToken()
+    }
+  })
+  console.log('API Response:', response)  // 응답 데이터 로깅
+  return response
+}
+
+export const getChallengeScheduleFetch = async (challengeId: number): Promise<AxiosResponse<Challenge | ApiResponse>> => {
+  const response = await axios.get(`${VITE_API_URL}/admin/challenge/schedule/${challengeId}`, {
     headers: {
       Authorization: getToken()
     }

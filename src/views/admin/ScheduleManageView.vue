@@ -1,69 +1,42 @@
-<!-- views/admin/ChallengeScheduleView.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
-import { useRouter } from 'vue-router'
+import { deleteChallengeScheduleFetch, getChallengeSchedulesFetch, updateChallengeScheduleFetch } from '@/core/challenge/AdminChallengeApi'
+import { Challenge } from '@/core/challenge/ChallengeType'
+import { useScheduleManage } from '@/core/challenge/composables/useScheduleManage'
 
-interface Schedule {
-  id: number
-  title: string
-  frequency: string
-  nextRunDate: string
-  status: 'active' | 'paused'
-}
+const {
+  loading,
+  error,
+  schedules,
+  fetchSchedules,
+  initializeSelectedCycles,
+  goToEdit
+} = useScheduleManage(
+  getChallengeSchedulesFetch,
+  updateChallengeScheduleFetch,
+  deleteChallengeScheduleFetch
+)
 
-const router = useRouter()
-const loading = ref(false)
-const error = ref('')
-const schedules = ref<Schedule[]>([])
+const openSchedules = ref<Challenge[]>([])
+const closedSchedules = ref<Challenge[]>([])
 
-const mockSchedules: Schedule[] = [
-  {
-    id: 1,
-    title: '주간 걷기 챌린지',
-    frequency: '매주 월요일',
-    nextRunDate: '2024-01-22',
-    status: 'active'
-  },
-  {
-    id: 2,
-    title: '월간 달리기 챌린지',
-    frequency: '매월 1일',
-    nextRunDate: '2024-02-01',
-    status: 'active'
+watch(schedules, (newSchedules) => {
+  if (newSchedules) {
+    openSchedules.value = newSchedules.filter(schedule => schedule.challengeIsEnded === 0)
+    closedSchedules.value = newSchedules.filter(schedule => schedule.challengeIsEnded === 1)
+    console.log('Open Schedules:', openSchedules.value)
+    console.log('Closed Schedules:', closedSchedules.value)
   }
-]
+}, { immediate: true })
 
-// 실제 API 연동 시 사용할 함수
-const fetchSchedules = async () => {
-  loading.value = true
-  error.value = ''
+console.log(getChallengeSchedulesFetch);
 
-  try {
-    // TODO: API 연동
-    schedules.value = mockSchedules
-  } catch (e) {
-    error.value = '스케줄 목록을 불러오는데 실패했습니다.'
-  } finally {
-    loading.value = false
-  }
-}
+onMounted(async () => {
+  fetchSchedules()
+  initializeSelectedCycles()
+})
 
-const toggleScheduleStatus = async (schedule: Schedule) => {
-  try {
-    // TODO: API 연동
-    schedule.status = schedule.status === 'active' ? 'paused' : 'active'
-  } catch (e) {
-    error.value = '스케줄 상태 변경에 실패했습니다.'
-  }
-}
-
-const goToScheduleDetail = (id: number) => {
-  router.push(`/admin/schedule/${id}`)
-}
-
-// Initial fetch
-fetchSchedules()
 </script>
 
 <template>
@@ -95,29 +68,26 @@ fetchSchedules()
       </div>
       <div
         v-else
-        v-for="schedule in schedules"
-        :key="schedule.id"
-        class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        v-for="schedule in openSchedules"
+        :key="schedule.challengeId"
+        class="bg-white p-6 rounded-lg shadow-sm"
       >
         <div class="flex justify-between items-center">
           <div class="space-y-2">
-            <h3 class="text-lg font-semibold text-gray-800">{{ schedule.title }}</h3>
-            <p class="text-sm text-gray-600">
-              {{ schedule.frequency }} · 다음 실행일: {{ schedule.nextRunDate }}
+            <h3 class="text-lg font-semibold text-gray-900">{{ schedule.challengeTitle }}</h3>
+            <p class="text-sm text-gray-500">{{ schedule.challengeDescription }}</p>
+            <p class="text-sm text-gray-500">
+              반복 주기: {{ schedule.challengeSchedulerCycle === 1 ? '일일' :
+                          schedule.challengeSchedulerCycle === 2 ? '일주일' : '한달' }}
             </p>
           </div>
-          <div class="space-x-2">
+          <div class="flex space-x-2">
             <BasicButton
-              :color="schedule.status === 'active' ? 'warning' : 'primary'"
-              @click="toggleScheduleStatus(schedule)"
+              color="primary"
+              size="sm"
+              @click="goToEdit(schedule.challengeId)"
             >
-              {{ schedule.status === 'active' ? '일시중지' : '재시작' }}
-            </BasicButton>
-            <BasicButton
-              color="secondary"
-              @click="goToScheduleDetail(schedule.id)"
-            >
-              수정하기
+              상세보기
             </BasicButton>
           </div>
         </div>

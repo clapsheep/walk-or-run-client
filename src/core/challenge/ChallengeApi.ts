@@ -58,7 +58,7 @@ export const getEndedChallengesFetch = async (
   return data
 }
 
-export const getChallengeDetailFetch = async (challengeId: number): Promise<Challenge> => {
+export const getChallengeDetailFetch = async (challengeId: number): Promise<AxiosResponse<Challenge>> => {
   const { data } = await axios.get(`${VITE_API_URL}/challenge/${challengeId}`, {
     headers: {
       Authorization: getToken(),
