@@ -31,7 +31,13 @@ export const useCreateChallenge = () => {
     challengeTargetCnt: 0,
     challengeCreateDate: '',
     challengeDeleteDate: '',
-    challengeSchedulerCycle: undefined
+    challengeSchedulerCycle: 0,
+    challengeId: 0,
+    challengeIsEnded: 0,
+    challengeCategoryName: '',
+    challengeParticipantCnt: 0,
+    challengeParticipants: [],
+    dday: ''
   })
 
   const validateForm = () => {
@@ -63,7 +69,7 @@ export const useCreateChallenge = () => {
 
     try {
       // API 요청을 위한 데이터 변환
-      const challengeData = {
+      const challengeData: Challenge = {
         challengeAuthorId: userStore.userId ?? '',
         challengeTitle: form.value.challengeTitle,
         challengeDescription: form.value.challengeDescription,
@@ -71,7 +77,12 @@ export const useCreateChallenge = () => {
         challengeTargetCnt: form.value.challengeTargetCnt,
         challengeSchedulerCycle: isRecurring ? Number(form.value.challengeSchedulerCycle) : 0,
         challengeCreateDate: form.value.challengeCreateDate,
-        challengeDeleteDate: form.value.challengeDeleteDate
+        challengeDeleteDate: form.value.challengeDeleteDate,
+        challengeIsEnded: 0,
+        challengeCategoryName: '',
+        challengeParticipantCnt: 0,
+        challengeParticipants: [],
+        dday: ''
       }
       console.log(challengeData)
 

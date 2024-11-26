@@ -5,15 +5,24 @@ import { ref } from "vue"
 import CommentType from "../CommentType"
 
 export const useUpdateComment = (
-  challengeId: string,
+  challengeId: number,
   comment: CommentType,
-  updateCommentFetch: (challengeId: string, comment: CommentType) => Promise<AxiosResponse<ApiResponse>>
+  updateCommentFetch: (challengeId: number, comment: CommentType) => Promise<AxiosResponse<ApiResponse>>
 ) => {
   const updateLoading = ref(false)
   const updateError = ref('')
+  const editingCommentId = ref<string>('');
   const state = { loading: updateLoading, error: updateError }
 
-  const updateComment = async (challengeId: string, comment: CommentType) => {
+  const startEditing = (commentId: string) => {
+    editingCommentId.value = commentId;
+  };
+
+  const cancelEditing = () => {
+    editingCommentId.value = '';
+  };
+
+  const updateComment = async (challengeId: number, comment: CommentType) => {
     try {
       setLoading(state, true)
       setError(state, '')
@@ -30,6 +39,9 @@ export const useUpdateComment = (
   return {
     updateLoading,
     updateError,
-    updateComment
+    updateComment,
+    editingCommentId,
+    startEditing,
+    cancelEditing
   }
 }
