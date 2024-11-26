@@ -31,7 +31,24 @@ interface Props {
 const props = defineProps<Props>()
 
 const chartData = computed(() => {
-  if (!props.cadenceData || props.cadenceData.length === 0) return null
+  // 데이터가 없을 때의 기본 데이터
+  if (!props.cadenceData || props.cadenceData.length === 0) {
+    return {
+      labels: [''],
+      datasets: [
+        {
+          label: '평균 케이던스 (steps/min)',
+          data: [],
+          borderColor: '#3B82F6',
+          backgroundColor: 'rgba(59, 130, 246, 0.5)',
+          tension: 0.4,
+          pointStyle: 'circle',
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }
+      ]
+    }
+  }
 
   // 날짜 정렬
   const sortedData = [...props.cadenceData].sort((a, b) =>
@@ -129,13 +146,9 @@ const chartOptions = {
         <ChartInfo description="일별 평균 케이던스(분당 발걸음 수) 추이를 보여줍니다. 케이던스는 러닝 효율성을 나타내는 중요한 지표로, 일반적으로 160-180 steps/min이 효율적인 러닝 케이던스로 알려져 있습니다." />
       </div>
       <Line
-        v-if="chartData"
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="absolute inset-0 flex items-center justify-center text-gray-500">
-        데이터가 없습니다
-      </div>
     </div>
   </div>
 </template>

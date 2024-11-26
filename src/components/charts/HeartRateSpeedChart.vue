@@ -131,13 +131,9 @@ const chartOptions = {
         <ChartInfo description="운동 중 심박수와 속도의 관계를 산점도로 보여줍니다. 이를 통해 운동 강도와 심박수의 상관관계를 분석할 수 있습니다." />
       </div>
       <Scatter
-        v-if="chartData"
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="absolute inset-0 flex items-center justify-center text-gray-500">
-        데이터가 없습니다
-      </div>
     </div>
   </div>
 </template>
