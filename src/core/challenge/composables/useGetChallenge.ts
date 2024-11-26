@@ -3,15 +3,15 @@ import type { Challenge } from "../ChallengeType"
 import { setLoading, setError } from '../utils/settingUtils'
 import { useParticipateChallenge } from "./useParticipateChallenge"
 import { participateChallengeFetch } from "../ChallengeApi"
+import { AxiosResponse } from "axios"
 
 export const useGetChallenge = (
-  getChallengeDetailFetch: (challengeId: number) => Promise<Challenge>,
+  getChallengeDetailFetch: (challengeId: number) => Promise<AxiosResponse<Challenge>>,
   challengeId: number
 ) => {
   const loading = ref(false)
   const error = ref('')
   const challenge = ref<Challenge | null>(null)
-  const isParticipating = ref(false)
 
   const {
     handleParticipate
@@ -20,20 +20,18 @@ export const useGetChallenge = (
   const participate = async (challengeId: number) => {
     const response = await handleParticipate(challengeId);
     if(response?.data?.message === 'success') {
-      isParticipating.value = true
     }
   }
 
-  const fetchChallengeDetail = async () => {
+  const fetchChallengeDetail = async (challengeId: number) => {
     const state = { loading, error }
     setLoading(state, true)
     setError(state, '')
 
     try {
-      const data = await getChallengeDetailFetch(challengeId)
-      challenge.value = data
-      console.log(data)
-      isParticipating.value = !!data.challengeIsParticipant || !!data.challengeIsEnded
+      const response = await getChallengeDetailFetch(challengeId)
+      challenge.value = response.data
+      console.log(response)
     } catch (err) {
       setError(state, '챌린지 정보를 불러오는데 실패했습니다.')
       console.error('Error fetching challenge detail:', err)
@@ -51,16 +49,13 @@ export const useGetChallenge = (
     )
   }
 
-  // 컴포저블이 생성될 때 자동으로 데이터를 불러옵니다
-  onMounted(fetchChallengeDetail)
-
   return {
     loading,
     error,
     challenge,
-    isParticipating,
     getParticipationRate,
     fetchChallengeDetail,
-    participate
+    participate,
+    handleParticipate
   }
 }
