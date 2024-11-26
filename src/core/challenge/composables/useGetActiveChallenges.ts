@@ -1,15 +1,11 @@
-import { PageResponse } from "@/core/common/types/PageType";
-import type { Challenge } from "../ChallengeType";
-import { ref } from "vue";
-import { setLoading, setError } from '../utils/settingUtils';
-import {
-  navigateToDetail,
-  handleError,
-  changePage
-} from "../services/challengesService";
+import { PageResponse } from '@/core/common/types/PageType'
+import type { Challenge } from '../ChallengeType'
+import { ref } from 'vue'
+import { setLoading, setError } from '../utils/settingUtils'
+import { handleError, changePage } from '../services/challengesService'
 
 export const useGetActiveChallenges = (
-  getActiveChallengesFetch: (page: number, pageSize: number) => Promise<PageResponse<Challenge>>
+  getActiveChallengesFetch: (page: number, pageSize: number) => Promise<PageResponse<Challenge>>,
 ) => {
   const loading = ref(false)
   const error = ref('')
@@ -20,8 +16,8 @@ export const useGetActiveChallenges = (
       currentPage: 0,
       pageSize: 10,
       totalElements: 0,
-      totalPages: 0
-    }
+      totalPages: 0,
+    },
   })
 
   // 진행 중인 챌린지 목록 조회
@@ -40,16 +36,11 @@ export const useGetActiveChallenges = (
     }
   }
 
-  const goToDetail = (challengeId: number) => {
-    navigateToDetail(challengeId);
-  }
-
   return {
     loading,
     error,
     challenges,
     fetchActiveChallenges,
     changePage: (fetchFn: any, page: number, size: number) => fetchActiveChallenges(page, size),
-    goToDetail
   }
 }

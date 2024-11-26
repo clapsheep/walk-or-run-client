@@ -22,6 +22,7 @@ import { logoutFetch } from '@/core/auth/AuthApi'
 import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
+
 const { logout, isLoading } = useLogout(logoutFetch)
 const isNavCollapsed = ref(false)
 const isLoggedIn = computed(() => !!userStore.userId)
@@ -157,14 +158,14 @@ const authMenus = [
       <div v-if="isLoggedIn && !isNavCollapsed" class="mt-auto">
         <div class="border-t border-neutral-200 bg-white p-4">
           <div class="flex items-center space-x-3">
-            <img
-              :src="'/images/defaultUserProfile.png'"
-              alt="Profile"
-              class="h-12 w-12 rounded-full object-cover"
-            />
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-lg font-semibold text-primary-600"
+            >
+              {{ userStore.userEmail?.charAt(0).toUpperCase() || 'U' }}
+            </div>
             <div class="flex-1 overflow-hidden">
               <p class="truncate whitespace-pre-line text-sm font-medium text-neutral-900">
-                {{ userStore.userEmail }}
+                {{ userStore.userNickname || userStore.userEmail }}
               </p>
               <p class="mt-1 text-sm text-gray-600">{{ welcomeMessage }}</p>
             </div>
@@ -175,11 +176,11 @@ const authMenus = [
       <!-- 축소된 프로필 (로그인한 사용자만) -->
       <div v-if="isLoggedIn && isNavCollapsed" class="mt-auto">
         <div class="border-t border-neutral-200 bg-white p-2">
-          <img
-            :src="'/images/defaultUserProfile.png'"
-            alt="Profile"
-            class="mx-auto h-8 w-8 rounded-full object-cover"
-          />
+          <div
+            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600"
+          >
+            {{ userStore.userEmail?.charAt(0).toUpperCase() || 'U' }}
+          </div>
         </div>
       </div>
 

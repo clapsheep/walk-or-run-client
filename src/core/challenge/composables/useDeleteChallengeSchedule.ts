@@ -8,16 +8,17 @@ import ApiResponse from '@/core/common/types/ApiResponse'
 export const useDeleteChallengeSchedule = (
   deleteChallengeScheduleFetch: (challengeId: number) => Promise<AxiosResponse<ApiResponse>>
 ) => {
-  const loading = ref(false)
-  const error = ref('')
+  const deleteLoading = ref(false)
+  const deleteError = ref('')
 
   const deleteSchedule = async (schedule: Challenge): Promise<AxiosResponse<ApiResponse>> => {
-    const state = { loading, error }
+    const state = { loading: deleteLoading, error: deleteError }
     setLoading(state, true)
     setError(state, '')
 
     try {
       if(schedule.challengeId) {
+        console.log(schedule.challengeId)
         const response =await deleteChallengeScheduleFetch(schedule.challengeId)
         return response
       } else {
@@ -33,8 +34,8 @@ export const useDeleteChallengeSchedule = (
   }
 
   return {
-    loading,
-    error,
+    deleteLoading,
+    deleteError,
     deleteSchedule
   }
 }

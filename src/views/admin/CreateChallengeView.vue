@@ -51,8 +51,9 @@ const {
               name="category"
               v-model="form.challengeCategoryCode"
               :options="categoryOptions"
-              placeholder="카테고리를 선택해주세요"
+              placeholder="챌린지 카테고리를 선택해주세요"
               direction="col"
+              required
             />
 
             <BasicInput
@@ -60,6 +61,7 @@ const {
               label="챌린지 제목"
               name="challengeTitle"
               v-model="form.challengeTitle"
+              placeholder="예) 매일 아침 30분 걷기"
               direction="col"
               required
             />
@@ -69,6 +71,7 @@ const {
               <textarea
                 v-model="form.challengeDescription"
                 required
+                placeholder="예) 하루의 시작을 활기차게! 매일 아침 30분 걷기 챌린지에 참여해보세요."
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
               ></textarea>
             </div>
@@ -79,6 +82,7 @@ const {
               name="challengeTargetCnt"
               type="number"
               v-model="form.challengeTargetCnt"
+              placeholder="예) 30 (30일 동안 매일 참여)"
               direction="col"
               required
             />
@@ -102,6 +106,7 @@ const {
                 name="startDate"
                 type="datetime-local"
                 v-model="form.challengeCreateDate"
+                placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
                 required
               />
@@ -112,6 +117,7 @@ const {
                 name="endDate"
                 type="datetime-local"
                 v-model="form.challengeDeleteDate"
+                placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
                 required
               />
@@ -124,6 +130,7 @@ const {
                 name="startDate"
                 type="datetime-local"
                 v-model="form.challengeCreateDate"
+                placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
                 required
               />
@@ -134,6 +141,7 @@ const {
                 name="endDate"
                 type="datetime-local"
                 v-model="form.challengeDeleteDate"
+                placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
                 required
               />

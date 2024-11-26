@@ -1,60 +1,43 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import BasicButton from '@/components/atoms/BasicButton.vue'
-import { useGetSchedules } from '@/core/challenge/composables/useGetSchedules'
-import { deleteChallengeScheduleFetch, getChallengeSchedulesFetch, updateChallengeScheduleFetch } from '@/core/challenge/AdminChallengeApi'
-import { useUpdateChallengeSchedule } from '@/core/challenge/composables/useUpdateChallengeSchedule'
-import { useDeleteChallengeSchedule } from '@/core/challenge/composables/useDeleteChallengeSchedule'
+import {
+  deleteChallengeScheduleFetch,
+  getChallengeSchedulesFetch,
+  updateChallengeScheduleFetch,
+} from '@/core/challenge/AdminChallengeApi'
 import { Challenge } from '@/core/challenge/ChallengeType'
+import { useScheduleManage } from '@/core/challenge/composables/useScheduleManage'
 
-const {
-  loading: fetchLoading,
-  error: fetchError,
+const { loading, error, schedules, fetchSchedules, initializeSelectedCycles, goToEdit } =
+  useScheduleManage(
+    getChallengeSchedulesFetch,
+    updateChallengeScheduleFetch,
+    deleteChallengeScheduleFetch,
+  )
+
+const openSchedules = ref<Challenge[]>([])
+const closedSchedules = ref<Challenge[]>([])
+
+watch(
   schedules,
-  fetchSchedules,
-} = useGetSchedules(getChallengeSchedulesFetch)
+  (newSchedules) => {
+    if (newSchedules) {
+      openSchedules.value = newSchedules.filter((schedule) => schedule.challengeIsEnded === 0)
+      closedSchedules.value = newSchedules.filter((schedule) => schedule.challengeIsEnded === 1)
+      console.log('Open Schedules:', openSchedules.value)
+      console.log('Closed Schedules:', closedSchedules.value)
+    }
+  },
+  { immediate: true },
+)
 
-const {
-  loading: updateLoading,
-  error: updateError,
-  updateSchedule
-} = useUpdateChallengeSchedule(updateChallengeScheduleFetch)
-
-const {
-  loading: deleteLoading,
-  error: deleteError,
-  deleteSchedule
-} = useDeleteChallengeSchedule(deleteChallengeScheduleFetch)
-
-const selectedCycles = ref<{ [key: string]: number }>({})
-
-const initializeSelectedCycles = () => {
-  schedules.value.forEach(schedule => {
-    selectedCycles.value[schedule.challengeId] = schedule.challengeSchedulerCycle ?? 0
-  })
-}
+console.log(getChallengeSchedulesFetch)
 
 onMounted(async () => {
-  await fetchSchedules()
+  fetchSchedules()
   initializeSelectedCycles()
 })
-
-const handleSubmit = async (schedule: Challenge) => {
-  const cycle = selectedCycles.value[schedule.challengeId]
-
-  if (cycle === 0) {
-    if (await deleteSchedule(schedule)) {
-      await fetchSchedules()
-    }
-  } else {
-    if (await updateSchedule(schedule, cycle)) {
-      await fetchSchedules()
-    }
-  }
-}
-
-const loading = computed(() => fetchLoading.value || updateLoading.value || deleteLoading.value)
-const error = computed(() => fetchError.value || updateError.value || deleteError.value)
 </script>
 
 <template>
@@ -62,13 +45,13 @@ const error = computed(() => fetchError.value || updateError.value || deleteErro
     <!-- 로딩 상태 -->
     <div v-if="loading" class="space-y-4">
       <div v-for="n in 2" :key="n" class="animate-pulse">
-        <div class="bg-white p-6 rounded-lg shadow-sm">
-          <div class="flex justify-between items-center">
-            <div class="space-y-3 flex-1">
-              <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+        <div class="rounded-lg bg-white p-6 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex-1 space-y-3">
+              <div class="h-4 w-1/4 rounded bg-gray-200"></div>
+              <div class="h-3 w-3/4 rounded bg-gray-200"></div>
             </div>
-            <div class="w-20 h-6 bg-gray-200 rounded-full"></div>
+            <div class="h-6 w-20 rounded-full bg-gray-200"></div>
           </div>
         </div>
       </div>
@@ -81,39 +64,33 @@ const error = computed(() => fetchError.value || updateError.value || deleteErro
 
     <!-- 스케줄 목록 -->
     <div v-else class="space-y-4">
-      <div v-if="schedules.length === 0" class="text-center py-8 text-gray-500">
+      <div v-if="schedules.length === 0" class="py-8 text-center text-gray-500">
         등록된 스케줄이 없습니다.
       </div>
       <div
         v-else
-        v-for="schedule in schedules"
+        v-for="schedule in openSchedules"
         :key="schedule.challengeId"
-        class="bg-white p-6 rounded-lg shadow-sm"
+        class="rounded-lg bg-white p-6 shadow-sm"
       >
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
           <div class="space-y-2">
-            <h3 class="text-lg font-semibold text-gray-800">{{ schedule.challengeTitle }}</h3>
-            <p class="text-sm text-gray-600">
-              {{ schedule.challengeSchedulerCycle }} · 다음 실행일: {{
-                new Date(Date.now() + 1000 * 60 * 60 * 24 * (schedule.challengeSchedulerCycle ?? 0)).toISOString().slice(0, 10)
+            <h3 class="text-lg font-semibold text-gray-900">{{ schedule.challengeTitle }}</h3>
+            <p class="text-sm text-gray-500">{{ schedule.challengeDescription }}</p>
+            <p class="text-sm text-gray-500">
+              반복 주기:
+              {{
+                schedule.challengeSchedulerCycle === 1
+                  ? '일일'
+                  : schedule.challengeSchedulerCycle === 2
+                    ? '일주일'
+                    : '한달'
               }}
             </p>
           </div>
-          <div class="flex items-center space-x-4">
-            <select
-              v-model="selectedCycles[schedule.challengeId]"
-              class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option :value="0">삭제</option>
-              <option :value="1">일일</option>
-              <option :value="2">일주일</option>
-              <option :value="3">한달</option>
-            </select>
-            <BasicButton
-              :color="selectedCycles[schedule.challengeId] === 0 ? 'danger' : 'primary'"
-              @click="handleSubmit(schedule)"
-            >
-              {{ selectedCycles[schedule.challengeId] === 0 ? '삭제' : '수정' }}
+          <div class="flex space-x-2">
+            <BasicButton color="accent" size="md" @click="goToEdit(schedule.challengeId)">
+              수정하기
             </BasicButton>
           </div>
         </div>
