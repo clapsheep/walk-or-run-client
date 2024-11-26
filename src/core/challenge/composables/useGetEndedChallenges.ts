@@ -32,7 +32,6 @@ export const useGetEndedChallenges = (
 
     try {
       const response = await changePage(getEndedChallengeSchedulesFetch, page, pageSize)
-      console.log(response)
       challenges.value = formatChallengeResponse(response)
     } catch (err: any) {
       setError(state, handleError(err))

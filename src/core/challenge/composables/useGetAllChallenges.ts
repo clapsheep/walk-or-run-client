@@ -31,7 +31,6 @@ export const useGetAllChallenges = (
 
     try {
       const response = await changePage(getChallengesFetch, page, pageSize)
-      console.log(response)
       challenges.value = response
     } catch (err: any) {
       setError(state, handleError(err))

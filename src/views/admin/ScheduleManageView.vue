@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import {
-  deleteChallengeScheduleFetch,
-  getChallengeSchedulesFetch,
-  updateChallengeScheduleFetch,
+  getChallengeSchedulesFetch
 } from '@/core/challenge/AdminChallengeApi'
 import { Challenge } from '@/core/challenge/ChallengeType'
-import { useScheduleManage } from '@/core/challenge/composables/useScheduleManage'
+import { useGetSchedules } from '@/core/challenge/composables/useGetSchedules'
 
-const { loading, error, schedules, fetchSchedules, initializeSelectedCycles, goToEdit } =
-  useScheduleManage(
-    getChallengeSchedulesFetch,
-    updateChallengeScheduleFetch,
-    deleteChallengeScheduleFetch,
-  )
+import { navigateToEditSchedule } from '@/core/challenge/services/challengesService'
+import { ref, watch } from 'vue'
+
+const {isLoading, error,schedules,fetchSchedules } = useGetSchedules(getChallengeSchedulesFetch)
+
 
 const openSchedules = ref<Challenge[]>([])
 const closedSchedules = ref<Challenge[]>([])
@@ -25,25 +22,17 @@ watch(
     if (newSchedules) {
       openSchedules.value = newSchedules.filter((schedule) => schedule.challengeIsEnded === 0)
       closedSchedules.value = newSchedules.filter((schedule) => schedule.challengeIsEnded === 1)
-      console.log('Open Schedules:', openSchedules.value)
-      console.log('Closed Schedules:', closedSchedules.value)
     }
   },
   { immediate: true },
 )
 
-console.log(getChallengeSchedulesFetch)
-
-onMounted(async () => {
-  fetchSchedules()
-  initializeSelectedCycles()
-})
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- 로딩 상태 -->
-    <div v-if="loading" class="space-y-4">
+    <div v-if="isLoading" class="space-y-4">
       <div v-for="n in 2" :key="n" class="animate-pulse">
         <div class="rounded-lg bg-white p-6 shadow-sm">
           <div class="flex items-center justify-between">
@@ -89,7 +78,7 @@ onMounted(async () => {
             </p>
           </div>
           <div class="flex space-x-2">
-            <BasicButton color="accent" size="md" @click="goToEdit(schedule.challengeId)">
+            <BasicButton color="accent" size="md" @click="navigateToEditSchedule(schedule.challengeId)">
               수정하기
             </BasicButton>
           </div>

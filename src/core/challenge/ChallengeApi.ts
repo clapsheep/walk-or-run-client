@@ -21,7 +21,6 @@ export const getChallengesFetch = async (
       Authorization: getToken(),
     },
   })
-  console.log('API Response:', data) // 응답 데이터 로깅
   return data
 }
 
@@ -38,7 +37,6 @@ export const getActiveChallengesFetch = async (
       Authorization: getToken(),
     },
   })
-  console.log('API Response:', data) // 응답 데이터 로깅
   return data
 }
 
@@ -73,7 +71,6 @@ export const getChallengeDetailFetch = async (
 export const participateChallengeFetch = async (
   challengeId: number,
 ): Promise<AxiosResponse<ApiResponse>> => {
-  console.log('Participating in challenge:', challengeId)
   const response = await axios.post(
     `${VITE_API_URL}/challenge/${challengeId}`,
     { userId: userStore.userId },
@@ -99,16 +96,12 @@ export const getUserChallengeFetch = async (
       Authorization: getToken(),
     },
   })
-  console.log(data)
-
   return data
 }
 export const editChallengeFetch = async (
   challengeId: number,
   challenge: Challenge,
 ): Promise<AxiosResponse<ApiResponse>> => {
-  console.log(getToken())
-
   const response = await axios.put(
     `${VITE_API_URL}/admin/challenge/${challengeId}`,
     challenge,

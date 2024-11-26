@@ -7,24 +7,15 @@ import {
   getChallengeScheduleFetch,
   updateChallengeScheduleFetch,
 } from '@/core/challenge/AdminChallengeApi'
-import { useScheduleManage } from '@/core/challenge/composables/useScheduleManage'
-import { onMounted } from 'vue'
+import { useEditSchedules } from '@/core/challenge/composables/useEditSchedules'
+import { navigateToAdminSchedule } from '@/core/challenge/services/challengesService'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const challengeId = Number(route.params.id)
 
-const { form, isLoading, fetchScheduleDetail, submitForm, deleteSchedule, goToList } =
-  useScheduleManage(
-    getChallengeScheduleFetch,
-    updateChallengeScheduleFetch,
-    deleteChallengeScheduleFetch,
-  )
+const { schedule, isLoading,error, handleSubmit,handleStopRepeatSchedule } = useEditSchedules(challengeId,updateChallengeScheduleFetch)
 
-onMounted(async () => {
-  console.log('Challenge ID:', challengeId)
-  await fetchScheduleDetail(challengeId)
-})
 </script>
 
 <template>
@@ -41,12 +32,12 @@ onMounted(async () => {
         <div class="rounded-lg bg-white p-6 shadow-sm">
           <h2 class="mb-6 text-2xl font-bold text-gray-800">스케줄 수정</h2>
 
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form @submit.prevent="handleSubmit()" class="space-y-6">
             <BasicInput
               id="title"
               label="챌린지 제목"
               name="challengeTitle"
-              v-model="form.challengeTitle"
+              v-model="schedule.challengeTitle"
               direction="col"
               required
             />
@@ -54,7 +45,7 @@ onMounted(async () => {
             <div class="space-y-2">
               <label class="block font-medium text-gray-700">챌린지 설명</label>
               <textarea
-                v-model="form.challengeDescription"
+                v-model="schedule.challengeDescription"
                 required
                 class="min-h-[100px] w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
               ></textarea>
@@ -65,7 +56,7 @@ onMounted(async () => {
               label="목표 인원 수"
               name="challengeTargetCnt"
               type="number"
-              v-model="form.challengeTargetCnt"
+              v-model="schedule.challengeTargetCnt"
               direction="col"
               required
             />
@@ -73,7 +64,7 @@ onMounted(async () => {
             <div class="space-y-2">
               <label class="block font-medium text-gray-700">반복 주기</label>
               <select
-                v-model="form.challengeSchedulerCycle"
+                v-model="schedule.challengeSchedulerCycle"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="1">일일</option>
@@ -87,7 +78,7 @@ onMounted(async () => {
               label="반복 시작 날짜"
               name="startDate"
               type="datetime-local"
-              v-model="form.challengeCreateDate"
+              v-model="schedule.challengeCreateDate"
               direction="col"
               required
             />
@@ -97,7 +88,7 @@ onMounted(async () => {
               label="반복 종료 날짜"
               name="endDate"
               type="datetime-local"
-              v-model="form.challengeDeleteDate"
+              v-model="schedule.challengeDeleteDate"
               direction="col"
               required
             />
@@ -118,7 +109,7 @@ onMounted(async () => {
                 size="lg"
                 class="flex-1"
                 :loading="isLoading"
-                @click="deleteSchedule(challengeId)"
+                @click="handleStopRepeatSchedule()"
               >
                 삭제하기
               </BasicButton>
@@ -127,7 +118,7 @@ onMounted(async () => {
                 color="secondary"
                 size="lg"
                 class="flex-1"
-                @click="goToList"
+                @click="navigateToAdminSchedule()"
               >
                 취소
               </BasicButton>
