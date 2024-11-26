@@ -1,8 +1,8 @@
-import type { PageResponse } from '@/core/common/types/PageType'
-import type { Challenge } from '@/core/challenge/ChallengeType'
-import axios, { AxiosResponse } from 'axios'
 import { getToken } from '@/core/auth/services/loginService'
+import type { Challenge } from '@/core/challenge/ChallengeType'
+import type { PageResponse } from '@/core/common/types/PageType'
 import { useUserStore } from '@/stores/userStore'
+import axios, { AxiosResponse } from 'axios'
 import ApiResponse from '../common/types/ApiResponse'
 
 const { VITE_API_URL } = import.meta.env
@@ -58,15 +58,16 @@ export const getEndedChallengesFetch = async (
   return data
 }
 
-export const getChallengeDetailFetch = async (challengeId: number): Promise<AxiosResponse<Challenge>> => {
-  const { data } = await axios.get(`${VITE_API_URL}/challenge/${challengeId}`, {
+export const getChallengeDetailFetch = async (
+  challengeId: number,
+): Promise<AxiosResponse<Challenge | ApiResponse>> => {
+  const response = await axios.get(`${VITE_API_URL}/challenge/${challengeId}`, {
     headers: {
       Authorization: getToken(),
     },
   })
-  console.log(data)
 
-  return data
+  return response
 }
 
 export const participateChallengeFetch = async (
@@ -101,4 +102,31 @@ export const getUserChallengeFetch = async (
   console.log(data)
 
   return data
+}
+export const editChallengeFetch = async (
+  challengeId: number,
+  challenge: Challenge,
+): Promise<AxiosResponse<ApiResponse>> => {
+  console.log(getToken())
+
+  const response = await axios.put(
+    `${VITE_API_URL}/admin/challenge/${challengeId}`,
+    challenge,
+    {
+      headers: {
+        Authorization: getToken(),
+      },
+    }
+  )
+  return response
+}
+export const closeChallengeFetch = async (
+  challengeId: number,
+): Promise<AxiosResponse<ApiResponse>> => {
+  const response = await axios.delete(`${VITE_API_URL}/admin/challenge/${challengeId}`, {
+    headers: {
+      Authorization: getToken(),
+    },
+  })
+  return response
 }

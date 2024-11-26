@@ -2,6 +2,8 @@
 <script setup lang="ts">
 import { useGetEndedChallenges } from '@/core/challenge/composables/useGetEndedChallenges'
 import BasicButton from '@/components/atoms/BasicButton.vue'
+import PageSizeSelect from '@/components/atoms/PageSizeSelect.vue'
+import Pagination from '@/components/atoms/Pagination.vue'
 import { useRouter } from 'vue-router'
 import { onMounted } from 'vue';
 import { getEndedChallengesFetch } from '@/core/challenge/ChallengeApi';
@@ -24,25 +26,11 @@ onMounted(async () => await fetchEndedChallenges())
 <template>
   <div class="space-y-6">
     <!-- 페이지 크기 선택 -->
-    <div class="flex justify-end">
-      <div class="flex items-center space-x-2">
-        <span class="text-sm text-gray-600">페이지당 항목:</span>
-        <div class="flex space-x-1">
-          <button
-            v-for="size in [10, 20, 30]"
-            :key="size"
-            class="px-3 py-1 text-sm border rounded-md"
-            :class="[
-              challenges.pageInfo.pageSize === size
-                ? 'bg-primary-500 text-white border-primary-500'
-                : 'border-gray-300 hover:bg-gray-50'
-            ]"
-            @click="changePage(getEndedChallengesFetch, 1, size)"
-          >
-            {{ size }}
-          </button>
-        </div>
-      </div>
+    <div class="flex items-center justify-end space-x-2">
+      <PageSizeSelect
+        :current-size="challenges.pageInfo.pageSize"
+        @select="(size) => changePage(getEndedChallengesFetch, 1, size)"
+      />
     </div>
 
     <!-- 로딩 상태 -->
@@ -95,26 +83,18 @@ onMounted(async () => await fetchEndedChallenges())
       </div>
 
       <!-- 페이지네이션 -->
-      <div v-if="!loading && !error && challenges.content.length > 0" class="mt-8 flex justify-center">
-        <nav class="flex items-center space-x-2">
-          <button
-            class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="challenges.pageInfo.currentPage === 1"
-            @click="changePage(getEndedChallengesFetch, challenges.pageInfo.currentPage - 1, challenges.pageInfo.pageSize)"
-          >
-            이전
-          </button>
-          <span class="text-sm text-gray-700">
-            {{ challenges.pageInfo.currentPage }} / {{ challenges.pageInfo.totalPages }}
-          </span>
-          <button
-            class="rounded-md border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="challenges.pageInfo.currentPage >= challenges.pageInfo.totalPages"
-            @click="changePage(getEndedChallengesFetch, challenges.pageInfo.currentPage + 1, challenges.pageInfo.pageSize)"
-          >
-            다음
-          </button>
-        </nav>
+      <div
+        v-if="!loading && !error && challenges.content.length > 0"
+        class="mt-8 flex justify-center"
+      >
+        <Pagination
+          :page-info="{
+            currentPage: challenges.pageInfo.currentPage,
+            totalPages: challenges.pageInfo.totalPages,
+            pageSize: challenges.pageInfo.pageSize,
+          }"
+          @page-change="(page, pageSize) => changePage(getEndedChallengesFetch, page, pageSize)"
+        />
       </div>
     </div>
   </div>

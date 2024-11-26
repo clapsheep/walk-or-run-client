@@ -1,13 +1,13 @@
-import ApiResponse from "@/core/common/types/ApiResponse";
-import { AxiosResponse } from "axios";
-import { ref } from "vue";
-import Comment from "../CommentType";
-import { setError, setLoading } from "@/core/challenge/utils/settingUtils";
+import ApiResponse from '@/core/common/types/ApiResponse'
+import { AxiosResponse } from 'axios'
+import { ref } from 'vue'
+import Comment from '../CommentType'
+import { setError, setLoading } from '@/core/challenge/utils/settingUtils'
 
 export const useAddComment = (
-  challengeId: string,
+  challengeId: number,
   comment: Comment,
-  addCommentFetch: (challengeId: string, comment: Comment) => Promise<AxiosResponse<ApiResponse>>
+  addCommentFetch: (challengeId: number, comment: Comment) => Promise<AxiosResponse<ApiResponse>>,
 ) => {
   const addLoading = ref(false)
   const addError = ref('')
@@ -29,6 +29,6 @@ export const useAddComment = (
   return {
     addLoading,
     addError,
-    createComment
+    createComment,
   }
 }
