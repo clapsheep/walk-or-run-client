@@ -1,23 +1,30 @@
-import ApiResponse from "@/core/common/types/ApiResponse";
-import User from "../UserType";
-import { ref, watch } from "vue";
-import { setError, setLoading } from "@/core/challenge/utils/settingUtils";
-import router from "@/router";
-import { useUserStore } from "@/stores/userStore";
-import { useGetUserInfo } from "./useGetUserInfo";
-import { getUserInfoFetch } from "../UserApi";
+import ApiResponse from '@/core/common/types/ApiResponse'
+import User from '../UserType'
+import { ref, watch } from 'vue'
+import { setError, setLoading } from '@/core/challenge/utils/settingUtils'
+import router from '@/router'
+import { useUserStore } from '@/stores/userStore'
+import { useGetUserInfo } from './useGetUserInfo'
+import { getUserInfoFetch } from '../UserApi'
 
 interface ChangeUserErrors {
-  userId?: string;
-  userName?: string;
-  userEmail?: string;
-  userNickname?: string;
-  userPhoneNumber?: string;
+  userId?: string
+  userName?: string
+  userEmail?: string
+  userNickname?: string
+  userPhoneNumber?: string
 }
 
+export type UserForm = {
+  userId: string
+  userName: string
+  userEmail: string
+  userNickname: string
+  userPhoneNumber: string
+}
 export const useChangeProfile = (
-  changeUserInfoFetch: (data: User) => Promise<ApiResponse>,
-  getUserInfoFetch: () => Promise<User>
+  changeUserInfoFetch: (data: UserForm) => Promise<ApiResponse>,
+  getUserInfoFetch: () => Promise<User>,
 ) => {
   const loading = ref(false)
   const error = ref('')
@@ -26,34 +33,46 @@ export const useChangeProfile = (
 
   fetchUserInfo()
 
-  const form = ref<User>({})
+  const form = ref<UserForm>({
+    userId: '',
+    userEmail: '',
+    userName: '',
+    userNickname: '',
+    userPhoneNumber: '',
+  })
   const errors = ref<ChangeUserErrors>({})
   const isEditing = ref(false)
 
   const watchUserInputs = () => {
     // 닉네임 감시
-    watch(() => form.value.userNickname, (newValue) => {
-      if (!newValue?.trim()) {
-        errors.value.userNickname = '닉네임을 입력해주세요';
-      } else {
-        errors.value.userNickname = undefined;
-      }
-    });
+    watch(
+      () => form.value.userNickname,
+      (newValue) => {
+        if (!newValue?.trim()) {
+          errors.value.userNickname = '닉네임을 입력해주세요'
+        } else {
+          errors.value.userNickname = undefined
+        }
+      },
+    )
 
     // 휴대폰 번호 감시
-    watch(() => form.value.userPhoneNumber, (newValue) => {
-      if (!newValue?.trim()) {
-        errors.value.userPhoneNumber = '휴대폰 번호를 입력해주세요';
-      } else if (!/^01\d{9}$/.test(newValue)) {
-        errors.value.userPhoneNumber = '올바른 휴대폰 번호 형식이 아닙니다';
-      } else {
-        errors.value.userPhoneNumber = undefined;
-      }
-    });
-  };
+    watch(
+      () => form.value.userPhoneNumber,
+      (newValue) => {
+        if (!newValue?.trim()) {
+          errors.value.userPhoneNumber = '휴대폰 번호를 입력해주세요'
+        } else if (!/^01\d{9}$/.test(newValue)) {
+          errors.value.userPhoneNumber = '올바른 휴대폰 번호 형식이 아닙니다'
+        } else {
+          errors.value.userPhoneNumber = undefined
+        }
+      },
+    )
+  }
 
   // 컴포저블 초기화 시 watch 설정
-  watchUserInputs();
+  watchUserInputs()
 
   const handleEdit = () => {
     form.value = {
@@ -79,7 +98,7 @@ export const useChangeProfile = (
       console.error('사용자 정보를 변경하는데 실패함:', err)
     } finally {
       setLoading(state, false)
-      router.push('/mypage/profile')
+      router.push('/account/mypage/profile')
     }
   }
 

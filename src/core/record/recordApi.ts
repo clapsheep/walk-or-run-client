@@ -12,8 +12,6 @@ const { VITE_API_URL } = import.meta.env
 export const uploadRecordFetch = async (userId: string, file: File): Promise<AxiosResponse<UploadResponse|ApiResponse>> => {
   const formData = new FormData()
   formData.append('csv', file)
-  console.log(getAuthHeader());
-  console.log(formData.get('csv'));
 
 
   const response = await axios.post(

@@ -35,60 +35,62 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-4xl px-4 py-8">
-    <div class="mb-8 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900">나의 목표</h1>
-      <BasicButton @click="handleOpenModal" color="primary"> 새로운 목표 설정하기 </BasicButton>
-
-      <GoalSettingModal :show="showModal" @close="handleCloseModal" @submit="fetchGoals" />
-    </div>
-
-    <!-- 목표 상태 필터 -->
-    <div class="mb-6 flex space-x-4">
-      <StatusTag
-        v-for="status in ['all', 'active', 'completed'] as const"
-        :key="status"
-        :status="status"
-        :active="selectedStatus === status"
-        :disabled="status !== 'all' && goals.length === 0"
-        interactive
-        size="md"
-        @click="selectedStatus = status"
-      />
-    </div>
-
-    <!-- 로딩 상태 -->
-    <div v-if="loading" class="space-y-4">
-      <GoalCardSkeleton v-for="n in 3" :key="n" padding="large" />
-    </div>
-
-    <!-- 에러 상태 -->
-    <div v-else-if="error" class="flex justify-center py-8">
-      <p class="text-red-500">{{ error }}</p>
-    </div>
-
-    <!-- 목표 목록 -->
-    <div v-else class="space-y-4">
-      <div v-if="filteredGoals.length === 0" class="rounded-lg bg-gray-50 p-8 text-center">
-        <p class="text-gray-600">
-          {{
-            selectedStatus === 'all'
-              ? '설정된 목표가 없습니다.'
-              : selectedStatus === 'active'
-                ? '진행중인 목표가 없습니다.'
-                : '완료된 목표가 없습니다.'
-          }}
-        </p>
+  <div class="mx-auto max-w-4xl px-4 py-8">
+    <div class="space-y-6">
+      <!-- 헤더 -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-800">나의 목표</h2>
+        <BasicButton @click="handleOpenModal" color="primary">새로운 목표 설정하기</BasicButton>
+        <GoalSettingModal :show="showModal" @close="handleCloseModal" @submit="fetchGoals" />
       </div>
-      <GoalCard
-        v-else
-        v-for="goal in filteredGoals"
-        :key="goal.userGoalId"
-        :goal="goal"
-        :loading="deleteLoading"
-        padding="large"
-        @delete="confirmAndDeleteGoal"
-      />
+
+      <!-- 상태 필터 -->
+      <div class="flex space-x-2">
+        <StatusTag
+          v-for="status in ['all', 'active', 'completed'] as const"
+          :key="status"
+          :status="status"
+          :active="selectedStatus === status"
+          :disabled="status !== 'all' && goals.length === 0"
+          interactive
+          size="md"
+          @click="selectedStatus = status"
+        />
+      </div>
+
+      <!-- 로딩 상태 -->
+      <div v-if="loading" class="space-y-4">
+        <GoalCardSkeleton v-for="n in 3" :key="n" padding="large" />
+      </div>
+
+      <!-- 에러 상태 -->
+      <div v-else-if="error" class="flex justify-center py-8">
+        <p class="text-red-500">{{ error }}</p>
+      </div>
+
+      <!-- 목표 목록 -->
+      <div v-else class="space-y-4">
+        <div v-if="filteredGoals.length === 0" class="rounded-lg bg-gray-50 p-8 text-center">
+          <p class="text-gray-600">
+            {{
+              selectedStatus === 'all'
+                ? '설정된 목표가 없습니다.'
+                : selectedStatus === 'active'
+                  ? '진행중인 목표가 없습니다.'
+                  : '완료된 목표가 없습니다.'
+            }}
+          </p>
+        </div>
+        <GoalCard
+          v-else
+          v-for="goal in filteredGoals"
+          :key="goal.userGoalId"
+          :goal="goal"
+          :loading="deleteLoading"
+          padding="large"
+          @delete="confirmAndDeleteGoal"
+        />
+      </div>
     </div>
   </div>
 </template>

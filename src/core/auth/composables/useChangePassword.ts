@@ -69,8 +69,6 @@ export const useChangePassword = (
 
     isLoading.value = true
     error.value = ''
-    console.log(authStore.tempEmail,
-      form.value.password);
 
     try {
       const { data } = await changePasswordFetch(

@@ -25,7 +25,6 @@ export const useGetUserChallenges = (
 
     try {
       const data = await getUserChallengeFetch(userId, pageInfo.value.pageNumber)
-      console.log("data", data)
       challenges.value = data.content
       pageInfo.value = {
         ...pageInfo.value,
