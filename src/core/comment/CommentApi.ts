@@ -6,7 +6,7 @@ import CommentType from "./CommentType"
 
 const { VITE_API_URL } = import.meta.env
 
-export const getCommentsFetch = async (challengeId: number, page: number, size: number): Promise<AxiosResponse<PageResponse<CommentType> |ApiResponse>> => {
+export const getCommentsFetch = async (challengeId: number, page = 1, size= 10): Promise<AxiosResponse<PageResponse<CommentType> |ApiResponse>> => {
   const response = await axios.get(`${VITE_API_URL}/challenge/${challengeId}/comment`, {
     headers: {
       Authorization: getToken()
