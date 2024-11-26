@@ -1,8 +1,9 @@
-export type Comment = {
+type CommentType = {
   commentId: string,
   challengeId: string,
-  commentAuthorId: string,
   commentContent: string,
+  commentAuthorId: string,
   commentCreateDate: string,
   commentAuthorName: string
 }
+export default CommentType
