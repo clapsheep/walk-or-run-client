@@ -4,15 +4,15 @@ import { AxiosResponse } from "axios";
 import { ref } from "vue";
 
 export const useDeleteComment = (
-  challengeId: string,
+  challengeId: number,
   commentId: string,
-  deleteCommentFetch: (challengeId: string, commentId: string) => Promise<AxiosResponse<ApiResponse>>
+  deleteCommentFetch: (challengeId: number, commentId: string) => Promise<AxiosResponse<ApiResponse>>
 ) => {
   const deleteLoading = ref(false)
   const deleteError = ref('')
   const state = { loading: deleteLoading, error: deleteError }
 
-  const deleteComment = async (challengeId: string, commentId: string) => {
+  const deleteComment = async (challengeId: number, commentId: string) => {
     try {
       setLoading(state, true)
       setError(state, '')

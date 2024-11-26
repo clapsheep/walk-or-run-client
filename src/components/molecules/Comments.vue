@@ -9,10 +9,15 @@ defineProps<{
   loading: boolean;
   error: string;
   userId: string;
-  challengeId: string;
-  commentAdd: (comment: CommentType, challengeId: string) => void;
-  commentDelete: (challengeId: string, commentId: string) => void;
+  challengeId: number;
+  editingCommentId: string;
+  startEditing: (commentId: string) => void;
+  cancelEditing: () => void;
+  commentAdd: (comment: CommentType, challengeId: number) => void;
+  commentDelete: (challengeId: number, commentId: string) => void;
+  commentUpdate: (challengeId: number, comment: CommentType) => void;
 }>();
+
 </script>
 
 <template>
@@ -53,18 +58,48 @@ defineProps<{
     <div v-else class="space-y-4">
       <div v-for="comment in comments" :key="comment.commentId" class="p-4 bg-gray-50 rounded-lg">
         <div class="flex justify-between items-start">
-          <div>
+          <div class="flex-grow">
             <p class="font-medium">{{ comment.commentAuthorName }}</p>
-            <p class="text-gray-600 mt-1">{{ comment.commentContent }}</p>
+            <div v-if="editingCommentId === comment.commentId">
+              <textarea
+                v-model="comment.commentContent"
+                rows="2"
+                class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mt-1"
+              ></textarea>
+              <div class="flex justify-end gap-2 mt-2">
+                <button
+                  @click="commentUpdate(challengeId, comment)"
+                  class="px-4 py-1 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  수정 완료
+                </button>
+                <button
+                  @click="cancelEditing"
+                  class="px-4 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+            <p v-else class="text-gray-600 mt-1">{{ comment.commentContent }}</p>
             <p class="text-sm text-gray-400 mt-2">{{ comment.commentCreateDate }}</p>
           </div>
-          <button
-            v-if="comment.commentAuthorId === userId"
-            @click="commentDelete(challengeId, comment.commentId)"
-            class="text-gray-400 hover:text-red-500"
-          >
-            삭제
-          </button>
+          <div v-if="comment.commentAuthorId === userId" class="flex gap-2">
+            <button
+              v-if="editingCommentId !== comment.commentId"
+              @click="startEditing(comment.commentId)"
+              class="text-gray-400 hover:text-blue-500"
+            >
+              수정
+            </button>
+            <button
+              v-if="editingCommentId !== comment.commentId"
+              @click="commentDelete(challengeId, comment.commentId)"
+              class="text-gray-400 hover:text-red-500"
+            >
+              삭제
+            </button>
+          </div>
         </div>
       </div>
     </div>

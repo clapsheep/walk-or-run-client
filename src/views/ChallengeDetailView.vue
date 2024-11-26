@@ -25,7 +25,22 @@ const { loading, error, challenge, fetchChallengeDetail, handleParticipate } = u
   challengeId,
 )
 
-const {} = useCommentManage(
+const {
+  commentLoading,
+  commentError,
+  comment,
+  comments,
+  commentCnt,
+  fetchComments,
+  commentAdd,
+  commentDelete,
+  commentUpdate,
+  editingCommentId,
+  startEditing,
+  cancelEditing,
+  page,
+  size,
+} = useCommentManage(
   challengeId,
   getCommentsFetch,
   addCommentFetch,
@@ -37,11 +52,6 @@ const isParticipating = computed(() => {
   if (!challenge.value?.challengeParticipants || !userStore.userId) {
     return false
   }
-
-  onMounted(() => {
-    fetchChallengeDetail(challengeId)
-    fetchComments()
-  })
 
   return challenge.value.challengeParticipants.some((participant) => {
     const matches = participant.userId === userStore.userId
@@ -56,7 +66,10 @@ const handleParticipateClick = async () => {
   }
 }
 
-onMounted(() => fetchChallengeDetail(challengeId))
+onMounted(() => {
+  fetchChallengeDetail(challengeId)
+  fetchComments(challengeId, page.value, size.value)
+})
 </script>
 
 <template>
@@ -202,11 +215,19 @@ onMounted(() => fetchChallengeDetail(challengeId))
 
           <!-- 응원 댓글 섹션 -->
           <Comments
+            :comment="comment"
             :comments="comments"
+            :commentCnt="commentCnt"
             :loading="commentLoading"
             :error="commentError"
-            :onSubmit="createComment"
-            :onDelete="deleteComment"
+            :userId="userStore.userId as string"
+            :challengeId="challengeId"
+            :commentAdd="commentAdd"
+            :commentDelete="commentDelete"
+            :commentUpdate="commentUpdate"
+            :editingCommentId="editingCommentId"
+            :startEditing="startEditing"
+            :cancelEditing="cancelEditing"
           />
           <!-- 관리자용 삭제 버튼 -->
         </div>
