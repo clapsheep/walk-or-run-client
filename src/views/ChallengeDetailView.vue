@@ -7,6 +7,14 @@ import { FireIcon, UserGroupIcon, CalendarIcon, TrophyIcon } from '@heroicons/vu
 import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
 import { onMounted, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
+import Comments from '@/components/molecules/Comments.vue'
+import { useCommentManage } from '@/core/comment/composables/useCommentManage'
+import {
+  addCommentFetch,
+  deleteCommentFetch,
+  getCommentsFetch,
+  updateCommentFetch,
+} from '@/core/comment/CommentApi'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -17,10 +25,23 @@ const { loading, error, challenge, fetchChallengeDetail, handleParticipate } = u
   challengeId,
 )
 
+const {} = useCommentManage(
+  challengeId,
+  getCommentsFetch,
+  addCommentFetch,
+  deleteCommentFetch,
+  updateCommentFetch,
+)
+
 const isParticipating = computed(() => {
   if (!challenge.value?.challengeParticipants || !userStore.userId) {
     return false
   }
+
+  onMounted(() => {
+    fetchChallengeDetail(challengeId)
+    fetchComments()
+  })
 
   return challenge.value.challengeParticipants.some((participant) => {
     const matches = participant.userId === userStore.userId
@@ -180,30 +201,13 @@ onMounted(() => fetchChallengeDetail(challengeId))
           </div>
 
           <!-- 응원 댓글 섹션 -->
-          <div class="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 class="mb-4 flex items-center text-xl font-semibold">
-              <FireIcon class="mr-2 h-6 w-6 text-primary-500" />
-              응원 댓글
-            </h2>
-            <!-- 댓글 입력창 -->
-            <div class="mb-4">
-              <div class="flex space-x-4">
-                <div class="flex-grow">
-                  <div class="relative rounded-lg border border-gray-300 shadow-sm">
-                    <div class="rounded-lg bg-white p-3">
-                      <p class="text-gray-400">댓글 기능 준비중입니다...</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- 댓글 목록 -->
-            <div class="space-y-4">
-              <div class="flex items-center justify-center py-8 text-gray-400">
-                <p>첫 응원 댓글을 남겨보세요!</p>
-              </div>
-            </div>
-          </div>
+          <Comments
+            :comments="comments"
+            :loading="commentLoading"
+            :error="commentError"
+            :onSubmit="createComment"
+            :onDelete="deleteComment"
+          />
           <!-- 관리자용 삭제 버튼 -->
         </div>
       </div>

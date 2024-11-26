@@ -106,6 +106,11 @@ const router = createRouter({
           name: 'admin-schedule',
           component: () => import('@/views/admin/ScheduleManageView.vue'),
         },
+        {
+          path: 'test',
+          name: 'test',
+          component: () => import('@/views/admin/TestView.vue')
+        }
       ],
       redirect: { name: 'admin-ongoing-challenges' },
     },
