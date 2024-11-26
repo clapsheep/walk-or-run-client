@@ -1,74 +1,94 @@
-import { AxiosResponse } from "axios";
-import { Challenge } from "../ChallengeType";
-import ApiResponse from "@/core/common/types/ApiResponse";
-import { useGetSchedules } from "./useGetSchedules";
-import { useUpdateChallengeSchedule } from "./useUpdateChallengeSchedule";
-import { useDeleteChallengeSchedule } from "./useDeleteChallengeSchedule";
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { Challenge } from '../ChallengeType'
+import { AxiosResponse } from 'axios'
+import ApiResponse from '@/core/common/types/ApiResponse'
 
 export const useScheduleManage = (
-  getChallengeSchedulesFetch: () => Promise<AxiosResponse<Challenge[] | ApiResponse>>,
-  updateChallengeScheduleFetch: (challenge: Challenge) => Promise<AxiosResponse<ApiResponse>>,
-  deleteChallengeScheduleFetch: (challengeId: number) => Promise<AxiosResponse<ApiResponse>>
+  getChallengeScheduleFetch: (
+    challengeId: number,
+  ) => Promise<AxiosResponse<Challenge | ApiResponse>>,
+  updateChallengeScheduleFetch: (form: Challenge) => Promise<AxiosResponse<ApiResponse>>,
+  deleteChallengeScheduleFetch: (challengeId: number) => Promise<AxiosResponse<ApiResponse>>,
 ) => {
+  const router = useRouter()
+  const isLoading = ref(false)
 
-  const selectedCycles = ref<{ [key: string]: number }>({})
-  const loading = computed(() => fetchLoading.value || updateLoading.value || deleteLoading.value)
-  const error = computed(() => fetchError.value || updateError.value || deleteError.value)
-  const router = useRouter();
+  const form = ref<Challenge>({
+    challengeId: 0,
+    challengeTitle: '',
+    challengeDescription: '',
+    challengeTargetCnt: 0,
+    challengeSchedulerCycle: 0,
+    challengeCreateDate: '',
+    challengeDeleteDate: '',
+    challengeCategoryCode: 0,
+    challengeIsEnded: 0,
+    challengeCategoryName: '',
+    challengeAuthorId: '',
+    challengeParticipantCnt: 0,
+    challengeParticipants: [],
+    dday: '',
+  })
 
-  const {
-    fetchLoading,
-    fetchError,
-    schedules,
-    fetchSchedules,
-  } = useGetSchedules(getChallengeSchedulesFetch)
+  const fetchScheduleDetail = async (challengeId: number) => {
+    try {
+      isLoading.value = true
+      const response = await getChallengeScheduleFetch(challengeId)
+      console.log('response', response)
 
-  const {
-    updateLoading,
-    updateError,
-    updateSchedule
-  } = useUpdateChallengeSchedule(updateChallengeScheduleFetch)
+      if (response.status === 200) {
+        const data = response.data as Challenge
+        // 날짜 형식 변환
+        const createDate = new Date(data.challengeCreateDate)
+        const deleteDate = new Date(data.challengeDeleteDate)
+        console.log(createDate, deleteDate)
 
-  const {
-    deleteLoading,
-    deleteError,
-    deleteSchedule
-  } = useDeleteChallengeSchedule(deleteChallengeScheduleFetch)
-
-  const initializeSelectedCycles = () => {
-    schedules.value.forEach(schedule => {
-      selectedCycles.value[schedule.challengeId] = schedule.challengeSchedulerCycle ?? 0
-    })
-  }
-
-  const handleSubmit = async (schedule: Challenge) => {
-    const cycle = selectedCycles.value[schedule.challengeId]
-
-    if (cycle === 0) {
-      if (await deleteSchedule(schedule)) {
-        await fetchSchedules()
+        form.value = {
+          ...data,
+          challengeCreateDate: createDate.toISOString().slice(0, 16),
+          challengeDeleteDate: deleteDate.toISOString().slice(0, 16),
+        }
       }
-    } else {
-      if (await updateSchedule(schedule, cycle)) {
-        await fetchSchedules()
-      }
+    } catch (error) {
+      console.error('스케줄 정보 조회 실패:', error)
+    } finally {
+      isLoading.value = false
     }
   }
 
-  const goToEdit = (challengeId: number) => {
-    router.push(`/admin/schedule/edit/${challengeId}`)
+  const submitForm = async () => {
+    try {
+      isLoading.value = true
+      await updateChallengeScheduleFetch(form.value)
+      router.push('/admin/challenges/schedule')
+    } catch (error) {
+      console.error('스케줄 수정 실패:', error)
+    } finally {
+      isLoading.value = false
+    }
   }
 
+  const deleteSchedule = async (challengeId: number) => {
+    try {
+      isLoading.value = true
+      await deleteChallengeScheduleFetch(challengeId)
+      router.push('/admin/challenges/schedule')
+    } catch (error) {
+      console.error('스케줄 삭제 실패:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const goToList = () => router.push('/admin/challenges/schedule')
+
   return {
-    loading,
-    error,
-    schedules,
-    fetchSchedules,
-    selectedCycles,
-    initializeSelectedCycles,
-    handleSubmit,
-    goToEdit
+    form,
+    isLoading,
+    fetchScheduleDetail,
+    submitForm,
+    deleteSchedule,
+    goToList,
   }
 }

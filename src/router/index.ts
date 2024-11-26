@@ -16,7 +16,7 @@ const router = createRouter({
         } else {
           next({ name: 'home' })
         }
-      }
+      },
     },
     {
       path: '/home',
@@ -27,13 +27,13 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/layouts/DashBoardLayout.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/challenge',
       name: 'challenge',
       component: () => import('@/views/ChallengeView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/challenge/:id',
@@ -63,8 +63,8 @@ const router = createRouter({
           name: 'my-password-change',
           component: () => import('@/views/account/MyPasswordChangeView.vue'),
           meta: {
-            requiresAuth: true
-          }
+            requiresAuth: true,
+          },
         },
         {
           path: 'mypage/challenges',
@@ -80,55 +80,56 @@ const router = createRouter({
           path: 'mypage/follows',
           name: 'follows',
           component: () => import('@/views/account/MyFollowView.vue'),
-        }
-      ]
+        },
+      ],
     },
     {
       path: '/admin',
-      name: 'admin',
       component: () => import('@/layouts/AdminLayout.vue'),
       meta: {
         requiresAuth: true,
-        requiresAdmin: true
+        requiresAdmin: true,
       },
       children: [
         {
           path: 'challenges/ongoing',
           name: 'admin-ongoing-challenges',
-          component: () => import('@/views/admin/OngoingChallengeView.vue')
+          component: () => import('@/views/admin/OngoingChallengeView.vue'),
         },
         {
           path: 'challenges/ended',
           name: 'admin-ended-challenges',
-          component: () => import('@/views/admin/EndedChallengeView.vue')
+          component: () => import('@/views/admin/EndedChallengeView.vue'),
         },
         {
           path: 'challenges/schedule',
           name: 'admin-schedule',
-          component: () => import('@/views/admin/ScheduleManageView.vue')
-        },
-        {
-          path: 'schedule/edit/:id',
-          name: 'admin-schedule-edit',
-          component: () => import('@/views/admin/EditScheduleView.vue')
-        },
-        {
-          path: 'schedule/edit',
-          name: 'EditSchedule',
-          component: () => import('@/views/admin/EditScheduleView.vue'),
-          meta: { requiresAuth: true, requiresAdmin: true }
+          component: () => import('@/views/admin/ScheduleManageView.vue'),
         },
       ],
-      redirect: { name: 'admin-ongoing-challenges' }
+      redirect: { name: 'admin-ongoing-challenges' },
     },
+    {
+      path: '/admin/schedule/edit/:id',
+      name: 'admin-schedule-edit',
+      component: () => import('@/views/admin/EditScheduleView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/admin/challenges/edit/:id',
+      name: 'admin-challenges-edit',
+      component: () => import('@/views/admin/EditChellengeView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+
     {
       path: '/admin/challenge/create',
       name: 'create-challenge',
       component: () => import('@/views/admin/CreateChallengeView.vue'),
       meta: {
         requiresAuth: true,
-        requiresAdmin: true
-      }
+        requiresAdmin: true,
+      },
     },
     {
       path: '/signin',
@@ -154,7 +155,13 @@ const router = createRouter({
       path: '/find-user',
       name: 'find-user',
       component: () => import('@/views/FindUserView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
+    },
+    // 404 페이지 - 모든 매칭되지 않는 라우트를 캐치
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
     },
   ],
 })
