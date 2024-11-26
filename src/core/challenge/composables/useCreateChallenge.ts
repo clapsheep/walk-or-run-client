@@ -1,7 +1,6 @@
 import { useModalStore } from '@/stores/modalStore'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Challenge } from '../ChallengeType'
 import type { ChallengeErrors, ChallengeFormType } from '../utils/challengeValidation'
 import { validateChallengeForm } from '../utils/challengeValidation'
 import { setError, setLoading } from '../utils/settingUtils'
@@ -75,20 +74,23 @@ export const useCreateChallenge = (addChallengeFetch: (challenge: ChallengeFormT
         challengeCreateDate: new Date(challengeForm.value.challengeCreateDate).toISOString().split('T')[0],
         challengeDeleteDate: new Date(challengeForm.value.challengeDeleteDate).toISOString().split('T')[0],
       }
+      console.log(challengeData);
 
       let response;
       if(isRecurring.value) {
         response = await addChallengeScheduleFetch(challengeData)
       }else{
         response = await addChallengeFetch(challengeData)
+        console.log(response);
+
       }
 
 
-      if (response.data.code === 200) {
+      if (response.status === 201) {
         modalStore.openModal({
           title: '챌린지 생성 성공',
           content: '챌린지가 성공적으로 생성되었습니다!',
-          onConfirm: () => router.push('/admin/challenges')
+          onConfirm: () => router.push('/admin/challenges/ongoing')
         })
       } else {
         error.value = response.data.message || '챌린지 생성에 실패했습니다.'

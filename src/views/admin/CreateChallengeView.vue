@@ -15,7 +15,7 @@ const {
   handleSubmit,
   isFormValid,
   categoryOptions
-} = useCreateChallenge(addChallengeScheduleFetch,addChallengeFetch)
+} = useCreateChallenge(addChallengeFetch, addChallengeScheduleFetch,)
 
 
 // 임시 카테고리 데이터
@@ -106,7 +106,7 @@ const {
                 id="startDate"
                 label="반복 시작 날짜"
                 name="startDate"
-                type="datetime-local"
+                type=""
                 v-model="challengeForm.challengeCreateDate"
                 placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
@@ -117,7 +117,7 @@ const {
                 id="endDate"
                 label="반복 종료 날짜"
                 name="endDate"
-                type="datetime-local"
+                type="date"
                 v-model="challengeForm.challengeDeleteDate"
                 placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
@@ -130,7 +130,7 @@ const {
                 id="startDate"
                 label="시작 날짜"
                 name="startDate"
-                type="datetime-local"
+                type="date"
                 v-model="challengeForm.challengeCreateDate"
                 placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
@@ -141,7 +141,7 @@ const {
                 id="endDate"
                 label="종료 날짜"
                 name="endDate"
-                type="datetime-local"
+                type="date"
                 v-model="challengeForm.challengeDeleteDate"
                 placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
