@@ -17,7 +17,7 @@ const fetchChallengeDetail = async () => {
   try {
     const challengeId = Number(route.params.id)
     const response = await getChallengeDetailFetch(challengeId)
-    challenge.value = response
+    challenge.value = response.data
   } catch (err) {
     error.value = '챌린지 정보를 불러오는데 실패했습니다.'
     console.error(err)

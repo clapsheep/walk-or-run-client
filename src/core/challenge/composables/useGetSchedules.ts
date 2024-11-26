@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { setLoading, setError } from '../utils/settingUtils'
 import { handleError } from '../services/challengesService'
 import router from '@/router'
@@ -10,12 +10,12 @@ import { updateChallengeFetch } from '../AdminChallengeApi'
 export const useGetSchedules = (
   getChallengeSchedulesFetch: () => Promise<AxiosResponse<Challenge[] | ApiResponse>>
 ) => {
-  const loading = ref(false)
-  const error = ref('')
+  const fetchLoading = ref(false)
+  const fetchError = ref('')
   const schedules = ref<Challenge[]>([])
 
   const fetchSchedules = async (): Promise<void> => {
-    const state = { loading, error }
+    const state = { loading: fetchLoading, error: fetchError }
     setLoading(state, true)
     setError(state, '')
 
@@ -23,8 +23,10 @@ export const useGetSchedules = (
       const response = await getChallengeSchedulesFetch()
       if (Array.isArray(response.data)) {
         schedules.value = response.data
+        console.log(response.data);
+
       } else {
-        error.value = response.data.message
+        fetchError.value = response.data.message
       }
     } catch (err: any) {
       setError(state, handleError(err))
@@ -39,7 +41,7 @@ export const useGetSchedules = (
   }
 
   const toggleScheduleStatus = async (schedule: Challenge) => {
-    const state = { loading, error }
+    const state = { loading: fetchLoading, error: fetchError }
     setLoading(state, true)
     setError(state, '')
 
@@ -62,8 +64,8 @@ export const useGetSchedules = (
   }
 
   return {
-    loading,
-    error,
+    fetchLoading,
+    fetchError,
     schedules,
     fetchSchedules,
     goToDetail,

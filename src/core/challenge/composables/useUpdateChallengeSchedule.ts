@@ -8,11 +8,11 @@ import ApiResponse from '@/core/common/types/ApiResponse'
 export const useUpdateChallengeSchedule = (
   updateChallengeScheduleFetch: (challenge: Challenge) => Promise<AxiosResponse<ApiResponse>>
 ) => {
-  const loading = ref(false)
-  const error = ref('')
+  const updateLoading = ref(false)
+  const updateError = ref('')
 
   const updateSchedule = async (schedule: Challenge, cycle: number): Promise<AxiosResponse<ApiResponse>> => {
-    const state = { loading, error }
+    const state = { loading: updateLoading, error: updateError }
     setLoading(state, true)
     setError(state, '')
 
@@ -34,8 +34,8 @@ export const useUpdateChallengeSchedule = (
   }
 
   return {
-    loading,
-    error,
+    updateLoading,
+    updateError,
     updateSchedule
   }
 }

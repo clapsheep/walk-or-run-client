@@ -2,131 +2,132 @@
 import Header from '@/components/atoms/Header.vue';
 import BasicInput from '@/components/atoms/BasicInput.vue';
 import BasicButton from '@/components/atoms/BasicButton.vue';
-import BasicSelect from '@/components/molecules/BasicSelect.vue';
-import CreateChallengeSkeleton from '@/components/skeletons/CreateChallengeSkeleton.vue';
-import { useCreateChallenge } from '@/core/challenge/composables/useCreateChallenge'
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getChallengeScheduleFetch, updateChallengeScheduleFetch, deleteChallengeScheduleFetch } from '@/core/challenge/AdminChallengeApi';
+import { useEditChallenge } from '@/core/challenge/composables/useEditChallenge';
 
-const router = useRouter()
+const route = useRoute();
+const challengeId = Number(route.params.id);
+
 const {
   form,
   isLoading,
-  isRecurring,
+  fetchScheduleDetail,
   submitForm,
-  isFormValid,
-  categoryOptions
-} = useCreateChallenge()
+  deleteSchedule,
+  goToList
+} = useEditChallenge(getChallengeScheduleFetch, updateChallengeScheduleFetch, deleteChallengeScheduleFetch);
 
-onMounted(() => {
-  // 항상 반복 챌린지로 설정
-  isRecurring.value = true
-  
-  // history.state에서 schedule 데이터를 가져옴
-  const schedule = window.history.state?.schedule
-  if (schedule) {
-    form.value = {
-      ...form.value,
-      challengeTitle: schedule.challengeTitle,
-      challengeDescription: schedule.challengeDescription,
-      challengeCategoryCode: schedule.challengeCategoryCode,
-      challengeTargetCnt: schedule.challengeTargetCnt,
-      challengeCreateDate: schedule.challengeCreateDate,
-      challengeDeleteDate: schedule.challengeDeleteDate,
-      challengeSchedulerCycle: schedule.challengeSchedulerCycle,
-      challengeAuthorId: schedule.challengeAuthorId
-    }
-  } else {
-    // schedule 데이터가 없으면 목록 페이지로 리다이렉트
-    router.replace({ name: 'admin-schedule' })
-  }
-})
+onMounted(async () => {
+  console.log('Challenge ID:', challengeId);
+  await fetchScheduleDetail(challengeId);
+});
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100">
-    <Header title="챌린지 수정" />
+    <Header title="스케줄 수정" />
 
     <div class="max-w-6xl mx-auto p-4">
       <template v-if="isLoading">
-        <CreateChallengeSkeleton padding="large" />
+        <div class="flex justify-center items-center h-64">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+        </div>
       </template>
       <template v-else>
         <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-2xl font-bold mb-6 text-gray-800">챌린지 수정</h2>
+          <h2 class="text-2xl font-bold mb-6 text-gray-800">스케줄 수정</h2>
 
           <form @submit.prevent="submitForm" class="space-y-6">
-            <BasicSelect
-              id="category"
-              label="카테고리"
-              name="category"
-              v-model="form.challengeCategoryCode"
-              :options="categoryOptions"
-              required
-            />
-
             <BasicInput
               id="title"
               label="챌린지 제목"
-              name="title"
+              name="challengeTitle"
               v-model="form.challengeTitle"
-              placeholder="챌린지 제목을 입력해주세요"
+              direction="col"
               required
             />
 
-            <BasicInput
-              id="description"
-              label="챌린지 설명"
-              name="description"
-              v-model="form.challengeDescription"
-              placeholder="챌린지 설명을 입력해주세요"
-              required
-            />
+            <div class="space-y-2">
+              <label class="block text-gray-700 font-medium">챌린지 설명</label>
+              <textarea
+                v-model="form.challengeDescription"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
+              ></textarea>
+            </div>
 
             <BasicInput
               id="targetCount"
-              label="목표 횟수"
-              name="targetCount"
+              label="목표 인원 수"
+              name="challengeTargetCnt"
               type="number"
               v-model="form.challengeTargetCnt"
-              placeholder="목표 횟수를 입력해주세요"
+              direction="col"
               required
             />
 
+            <div class="space-y-2">
+              <label class="block text-gray-700 font-medium">반복 주기</label>
+              <select
+                v-model="form.challengeSchedulerCycle"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="1">일일</option>
+                <option value="2">일주일</option>
+                <option value="3">한달</option>
+              </select>
+            </div>
+
             <BasicInput
               id="startDate"
-              label="시작일"
+              label="반복 시작 날짜"
               name="startDate"
-              type="date"
+              type="datetime-local"
               v-model="form.challengeCreateDate"
+              direction="col"
               required
             />
 
             <BasicInput
               id="endDate"
-              label="종료일"
+              label="반복 종료 날짜"
               name="endDate"
-              type="date"
+              type="datetime-local"
               v-model="form.challengeDeleteDate"
+              direction="col"
               required
             />
 
-            <BasicInput
-              id="cycle"
-              label="반복 주기 (일)"
-              name="cycle"
-              type="number"
-              v-model="form.challengeSchedulerCycle"
-              placeholder="반복 주기를 입력해주세요"
-              required
-            />
-
-            <div class="flex justify-end space-x-4">
+            <div class="flex space-x-4">
               <BasicButton
                 type="submit"
-                :disabled="!isFormValid"
+                color="primary"
+                size="lg"
+                class="flex-1"
+                :loading="isLoading"
               >
                 수정하기
+              </BasicButton>
+              <BasicButton
+                type="button"
+                color="warning"
+                size="lg"
+                class="flex-1"
+                :loading="isLoading"
+                @click="deleteSchedule(challengeId)"
+              >
+                삭제하기
+              </BasicButton>
+              <BasicButton
+                type="button"
+                color="secondary"
+                size="lg"
+                class="flex-1"
+                @click="goToList"
+              >
+                취소
               </BasicButton>
             </div>
           </form>
