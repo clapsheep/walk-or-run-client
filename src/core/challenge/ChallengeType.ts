@@ -1,5 +1,5 @@
-import { Ref } from "vue"
-import User from "../user/UserType"
+import { Ref } from 'vue'
+import User from '../user/UserType'
 
 export type Challenge = {
   challengeId: number
@@ -12,7 +12,6 @@ export type Challenge = {
   challengeAuthorId: string
   challengeParticipantCnt: number
   challengeTargetCnt: number
-  challengeIsParticipant: number
   challengeCategoryCode: number
   challengeSchedulerCycle: number
   challengeParticipants: User[]
