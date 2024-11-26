@@ -35,14 +35,12 @@ export const useScheduleManage = (
     try {
       isLoading.value = true
       const response = await getChallengeScheduleFetch(challengeId)
-      console.log('response', response)
 
       if (response.status === 200) {
         const data = response.data as Challenge
         // 날짜 형식 변환
         const createDate = new Date(data.challengeCreateDate)
         const deleteDate = new Date(data.challengeDeleteDate)
-        console.log(createDate, deleteDate)
 
         form.value = {
           ...data,

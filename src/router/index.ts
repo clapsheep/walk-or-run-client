@@ -53,11 +53,7 @@ const router = createRouter({
           name: 'profile',
           component: () => import('@/views/account/ProfileView.vue'),
         },
-        {
-          path: 'mypage/profile/change-password',
-          name: 'change-password',
-          component: () => import('@/views/account/MyPasswordView.vue'),
-        },
+
         {
           path: 'mypage/profile/my-password-change',
           name: 'my-password-change',
@@ -156,6 +152,11 @@ const router = createRouter({
       name: 'find-user',
       component: () => import('@/views/FindUserView.vue'),
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/change-password',
+      name: 'change-password',
+      component: () => import('@/views/ChangePasswordView.vue'),
     },
     // 404 페이지 - 모든 매칭되지 않는 라우트를 캐치
     {

@@ -11,9 +11,20 @@ export type ChallengeErrors = {
   challengeSchedulerCycle?: string
 }
 
-export const validateChallengeForm = (form: Challenge): ChallengeErrors => {
+export type ChallengeFormType = {
+  challengeCategoryCode : number
+  challengeTitle : string
+  challengeDescription : string
+  challengeAuthorId : number
+  challengeTargetCnt : number
+  challengeCreateDate : string
+  challengeDeleteDate : string
+  challengeSchedulerCycle :0 | 1| 2| 3
+}
+
+export const validateChallengeForm = (form: ChallengeFormType,isRecurring:boolean): ChallengeErrors => {
   const errors: ChallengeErrors = {}
-  const { isRecurring } = useCreateChallenge();
+
 
   if (!form.challengeTitle?.trim()) {
     errors.challengeTitle = '챌린지 제목을 입력해주세요.'
@@ -39,7 +50,7 @@ export const validateChallengeForm = (form: Challenge): ChallengeErrors => {
     errors.challengeDeleteDate = '종료 날짜를 선택해주세요.'
   }
 
-  if (isRecurring.value && !form.challengeSchedulerCycle) {
+  if (isRecurring && !form.challengeSchedulerCycle) {
     errors.challengeSchedulerCycle = '반복 주기를 선택해주세요.'
   }
 

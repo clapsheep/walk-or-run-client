@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import BasicButton from '@/components/atoms/BasicButton.vue'
 import BasicInput from '@/components/atoms/BasicInput.vue'
+import BasicSelect from '@/components/molecules/BasicSelect.vue'
 import { createUserGoalFetch } from '@/core/goal/GoalApi'
 import { useModalStore } from '@/stores/modalStore'
 import Datepicker from '@vuepic/vue-datepicker'
@@ -48,7 +49,6 @@ const { date, handleDateSelect } = useDateRange((dates) => {
   }
 })
 
-// Initialize date with current values if form has dates
 watch(
   () => [form.value.startDate, form.value.endDate],
   ([newStartDate, newEndDate]) => {
@@ -106,21 +106,16 @@ watch(
           <div class="space-y-4">
             <!-- 목표 종류 선택 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700">운동 종류</label>
-              <select
+              <BasicSelect
+                id="challengeCategoryCode"
+                label="운동 종류"
+                name="challengeCategoryCode"
                 v-model="form.challengeCategoryCode"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
-                :class="{ 'border-red-500': errors.challengeCategoryCode }"
-              >
-                <option value="">선택해주세요</option>
-                <option
-                  v-for="category in categoryOptions"
-                  :key="category.code"
-                  :value="category.code"
-                >
-                  {{ category.name }}
-                </option>
-              </select>
+                :options="Object.fromEntries(categoryOptions.map(cat => [cat.code, cat.name]))"
+                placeholder="선택해주세요"
+                :error="errors.challengeCategoryCode"
+                direction="col"
+              />
               <p v-if="errors.challengeCategoryCode" class="mt-1 text-sm text-red-600">
                 {{ errors.challengeCategoryCode }}
               </p>
@@ -128,17 +123,16 @@ watch(
 
             <!-- 단위 선택 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700">단위</label>
-              <select
+              <BasicSelect
+                id="challengeCategoryUnitCode"
+                label="단위"
+                name="challengeCategoryUnitCode"
                 v-model="form.challengeCategoryUnitCode"
-                class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
-                :class="{ 'border-red-500': errors.challengeCategoryUnitCode }"
-              >
-                <option value="">선택해주세요</option>
-                <option v-for="unit in unitOptions" :key="unit.code" :value="unit.code">
-                  {{ unit.name }}
-                </option>
-              </select>
+                :options="Object.fromEntries(unitOptions.map(unit => [unit.code, unit.name]))"
+                placeholder="선택해주세요"
+                :error="errors.challengeCategoryUnitCode"
+                direction="col"
+              />
               <p v-if="errors.challengeCategoryUnitCode" class="mt-1 text-sm text-red-600">
                 {{ errors.challengeCategoryUnitCode }}
               </p>
@@ -146,19 +140,19 @@ watch(
 
             <!-- 목표량 입력 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700">목표량</label>
               <BasicInput
-                v-model="form.targetAmount"
-                type="number"
-                label="목표량"
                 id="targetAmount"
+                label="목표량"
                 name="targetAmount"
+                type="number"
+                v-model="form.targetAmount"
                 placeholder="목표량을 입력하세요"
-                class="mt-1"
-                direction="col"
                 :error="errors.targetAmount"
-                :class="{ 'border-red-500': errors.targetAmount }"
+                direction="col"
               />
+              <p v-if="errors.targetAmount" class="mt-1 text-sm text-red-600">
+                {{ errors.targetAmount }}
+              </p>
             </div>
 
             <!-- 기간 설정 -->

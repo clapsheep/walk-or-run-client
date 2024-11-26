@@ -17,11 +17,6 @@ export const useParticipateChallenge = (
 
     try {
       const response = await participateChallengeFetch(challengeId);
-      console.log('Participation response:', response);
-      // if(response.data.message === 'success') {
-
-      //   router.go(0);
-      // }
       return response;
     } catch (err) {
       setError(state, '챌린지에 참여할 수 없습니다.')

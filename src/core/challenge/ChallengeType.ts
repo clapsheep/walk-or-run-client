@@ -2,7 +2,7 @@ import { Ref } from 'vue'
 import User from '../user/UserType'
 
 export type Challenge = {
-  challengeId?: number
+  challengeId: number
   challengeTitle: string
   challengeDescription: string
   challengeCreateDate: string

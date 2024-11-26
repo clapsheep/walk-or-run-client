@@ -36,8 +36,8 @@ export const useEditChallenge = (
         challengeTitle: data.challengeTitle,
         challengeDescription: data.challengeDescription,
         challengeTargetCnt: data.challengeTargetCnt,
-        challengeCreateDate: createDate.toISOString().slice(0, 16),
-        challengeDeleteDate: deleteDate.toISOString().slice(0, 16),
+        challengeCreateDate: new Date(createDate).toISOString().split('T')[0],
+        challengeDeleteDate: new Date(deleteDate).toISOString().split('T')[0],
       }
     }
   })
@@ -58,11 +58,10 @@ export const useEditChallenge = (
       // 날짜 형식을 서버 형식으로 변환 (YYYY-MM-DD HH:mm:ss)
       const formattedData = {
         ...form.value,
-        challengeCreateDate: form.value.challengeCreateDate.replace('T', ' ') + ':00',
-        challengeDeleteDate: form.value.challengeDeleteDate.replace('T', ' ') + ':00',
+        challengeCreateDate: form.value.challengeCreateDate + ' 00:00:00',
+        challengeDeleteDate: form.value.challengeDeleteDate + ' 23:59:59',
       }
       const response = await editChallengeFetch(challengeId, formattedData as Challenge)
-      console.log(response)
       if (response.status === 200) {
         router.push(`/admin/challenges/ongoing`)
       }

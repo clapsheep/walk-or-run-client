@@ -39,8 +39,6 @@ export const findEmailFetch = async ({userName, userPhoneNumber}: FindEmailForm)
 }
 
 export const changePasswordFetch = async (email: string, password: string): Promise<AxiosResponse<ApiResponse>> => {
-  console.log(email, password);
-
   const response = await axios.post(`${VITE_API_URL}/auth/password/change`, {
     userEmail: email,
     userPassword: password

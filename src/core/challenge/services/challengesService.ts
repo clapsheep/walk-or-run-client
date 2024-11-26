@@ -34,6 +34,12 @@ export const navigateToAdminChallenge = () => {
   router.push(`/admin/challenges/ongoing`)
 }
 
+export const navigateToEditSchedule = (challengeId: number) => {
+  router.push(`/admin/schedule/edit/${challengeId}`)
+}
+export const navigateToAdminSchedule = () => {
+  router.push(`/admin/challenges/schedule`)
+}
 // 에러 메시지 처리
 export const handleError = (error: any): string => {
   return error?.response?.data?.message || '챌린지 목록을 불러오는데 실패했습니다.'
