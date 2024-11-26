@@ -4,37 +4,44 @@ import { useGetComment } from './useGetComment'
 import { useAddComment } from './useAddComment'
 import { useDeleteComment } from './useDeleteComment'
 import { useUpdateComment } from './useUpdateComment'
-import type Comment from '../CommentType'
 import { computed, ref } from 'vue'
 import CommentType from '../CommentType'
+import { PageResponse } from '@/core/common/types/PageType'
+import { useUserStore } from '@/stores/userStore'
 
 export const useCommentManage = (
   challengeId: number,
-  getCommentsFetch: (challengeId: string) => Promise<AxiosResponse<CommentType[] | ApiResponse>>,
+  getCommentsFetch: (
+    challengeId: number,
+    page: number,
+    size: number
+  ) => Promise<AxiosResponse<PageResponse<CommentType> | ApiResponse>>,
   addCommentFetch: (
-    challengeId: string,
+    challengeId: number,
     comment: CommentType,
   ) => Promise<AxiosResponse<ApiResponse>>,
   deleteCommentFetch: (
-    challengeId: string,
+    challengeId: number,
     commentId: string,
   ) => Promise<AxiosResponse<ApiResponse>>,
   updateCommentFetch: (
-    challengeId: string,
+    challengeId: number,
     comment: CommentType,
   ) => Promise<AxiosResponse<ApiResponse>>,
 ) => {
+  const userStore = useUserStore()
+
   const comment = ref<CommentType>({
     commentId: '',
     challengeId: '',
     commentContent: '',
-    commentAuthorId: '',
+    commentAuthorId: userStore.userId as string,
     commentCreateDate: '',
     commentAuthorName: '',
   })
   const commentId = ref('')
 
-  const { getLoading, getError, comments, commentCnt, fetchComments, fetchCommentCount } =
+  const { getLoading, getError, comments, commentCnt, fetchComments, page, size } =
     useGetComment(challengeId, getCommentsFetch)
 
   const { createComment, addLoading, addError } = useAddComment(
@@ -49,44 +56,57 @@ export const useCommentManage = (
     deleteCommentFetch,
   )
 
-  const { updateLoading, updateError, updateComment } = useUpdateComment(
+  const {
+    updateLoading,
+    updateError,
+    updateComment,
+    editingCommentId,
+    startEditing,
+    cancelEditing
+  } = useUpdateComment(
     challengeId,
     comment.value,
     updateCommentFetch,
   )
 
-  const loading = computed(
+  const commentLoading = computed(
     () => getLoading.value || addLoading.value || deleteLoading.value || updateLoading.value,
   )
-  const error = computed(
+  const commentError = computed(
     () => getError.value || addError.value || deleteError.value || updateError.value,
   )
 
-  const commentAdd = (comment: Comment, challengeId: string) => {
-    createComment(comment)
-    fetchComments(challengeId)
+  const commentAdd = async (comment: CommentType, challengeId: number, page: number = 1, size: number = 10) => {
+    await createComment(comment)
+    comment.commentContent = ''
+    await fetchComments(challengeId, page, size)
   }
 
-  const commentDelete = (challengeId: string, commentId: string) => {
-    deleteComment(challengeId, commentId)
-    fetchComments(challengeId)
+  const commentDelete = async (challengeId: number, commentId: string, page: number = 1, size: number = 10) => {
+    await deleteComment(challengeId, commentId)
+    await fetchComments(challengeId, page, size)
   }
 
-  const commentUpdate = (challengeId: string, comment: CommentType) => {
-    updateComment(challengeId, comment)
-    fetchComments(challengeId)
+  const commentUpdate = async (challengeId: number, comment: CommentType, page: number = 1, size: number = 10) => {
+    await updateComment(challengeId, comment)
+    editingCommentId.value = '';
+    await fetchComments(challengeId, page, size)
   }
 
   return {
-    loading,
-    error,
+    commentLoading,
+    commentError,
     comment,
     comments,
     commentCnt,
     fetchComments,
-    fetchCommentCount,
     commentAdd,
     commentDelete,
     commentUpdate,
+    editingCommentId,
+    startEditing,
+    cancelEditing,
+    page,
+    size
   }
 }
