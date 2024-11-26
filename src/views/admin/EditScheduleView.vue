@@ -6,9 +6,9 @@ import BasicSelect from '@/components/molecules/BasicSelect.vue';
 import CreateChallengeSkeleton from '@/components/skeletons/CreateChallengeSkeleton.vue';
 import { useCreateChallenge } from '@/core/challenge/composables/useCreateChallenge'
 import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
-const router = useRouter()
+const route = useRoute()
 const {
   form,
   isLoading,
@@ -21,7 +21,7 @@ const {
 onMounted(() => {
   // 항상 반복 챌린지로 설정
   isRecurring.value = true
-  
+
   // history.state에서 schedule 데이터를 가져옴
   const schedule = window.history.state?.schedule
   if (schedule) {
@@ -36,9 +36,6 @@ onMounted(() => {
       challengeSchedulerCycle: schedule.challengeSchedulerCycle,
       challengeAuthorId: schedule.challengeAuthorId
     }
-  } else {
-    // schedule 데이터가 없으면 목록 페이지로 리다이렉트
-    router.replace({ name: 'admin-schedule' })
   }
 })
 </script>
