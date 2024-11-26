@@ -25,7 +25,6 @@ export const useEditChallenge = (
     challengeCategoryName: '',
     challengeAuthorId: '',
     challengeParticipantCnt: 0,
-    challengeIsParticipant: 0,
     challengeParticipants: [],
     dday: ''
   });

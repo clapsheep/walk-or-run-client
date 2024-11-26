@@ -1,44 +1,25 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getChallengeDetailFetch, participateChallengeFetch } from '@/core/challenge/ChallengeApi'
-import { Challenge } from '@/core/challenge/ChallengeType'
+import { useRoute } from 'vue-router'
+import { getChallengeDetailFetch } from '@/core/challenge/ChallengeApi'
 import Header from '@/components/atoms/Header.vue'
 import DdayBadge from '@/components/atoms/DdayBadge.vue'
 import { FireIcon, UserGroupIcon, CalendarIcon, TrophyIcon } from '@heroicons/vue/24/outline'
+import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
+import { onMounted } from 'vue'
 
 const route = useRoute()
-const router = useRouter()
-const challenge = ref<Challenge>()
-const loading = ref(true)
-const error = ref('')
+const challengeId = Number(route.params.id)
 
-const fetchChallengeDetail = async () => {
-  try {
-    const challengeId = Number(route.params.id)
-    const response = await getChallengeDetailFetch(challengeId)
-    challenge.value = response.data
-  } catch (err) {
-    error.value = '챌린지 정보를 불러오는데 실패했습니다.'
-    console.error(err)
-  } finally {
-    loading.value = false
-  }
-}
+const {
+  loading,
+  error,
+  challenge,
+  fetchChallengeDetail,
+  handleParticipate
+} = useGetChallenge(getChallengeDetailFetch, challengeId)
 
-const handleParticipate = async () => {
-  try {
-    const challengeId = Number(route.params.id)
-    await participateChallengeFetch(challengeId)
-    router.push('/challenge')
-  } catch (err) {
-    console.error(err)
-  }
-}
+onMounted(() =>fetchChallengeDetail(challengeId))
 
-onMounted(() => {
-  fetchChallengeDetail()
-})
 </script>
 
 <template>
@@ -86,7 +67,7 @@ onMounted(() => {
               <!-- 참여하기 버튼 -->
               <div class="mb-8">
                 <button
-                  @click="handleParticipate"
+                  @click="handleParticipate(challenge.challengeId)"
                   class="w-full inline-flex items-center justify-center px-8 py-4 bg-yellow-400 text-primary-900 font-bold rounded-xl hover:bg-yellow-300 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <FireIcon class="w-6 h-6 mr-2" />
