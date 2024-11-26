@@ -5,6 +5,8 @@ import Header from '@/components/atoms/Header.vue'
 import DdayBadge from '@/components/atoms/DdayBadge.vue'
 import { FireIcon, UserGroupIcon, CalendarIcon, TrophyIcon } from '@heroicons/vue/24/outline'
 import { useGetChallenge } from '@/core/challenge/composables/useGetChallenge'
+import { useGetComment } from '@/core/comment/composables/useGetComment'
+import Comments from '@/components/molecules/Comments.vue'
 import { onMounted } from 'vue'
 
 const route = useRoute()
@@ -18,7 +20,11 @@ const {
   handleParticipate
 } = useGetChallenge(getChallengeDetailFetch, challengeId)
 
-onMounted(() =>fetchChallengeDetail(challengeId))
+
+onMounted(() => {
+  fetchChallengeDetail(challengeId)
+  fetchComments()
+})
 
 </script>
 
@@ -143,32 +149,14 @@ onMounted(() =>fetchChallengeDetail(challengeId))
           </div>
 
           <!-- 응원 댓글 섹션 -->
-          <div class="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 class="text-xl font-semibold mb-4 flex items-center">
-              <FireIcon class="w-6 h-6 text-primary-500 mr-2" />
-              응원 댓글
-            </h2>
-            <!-- 댓글 입력창 -->
-            <div class="mb-4">
-              <div class="flex space-x-4">
-                <div class="flex-grow">
-                  <div class="relative rounded-lg border border-gray-300 shadow-sm">
-                    <div class="p-3 bg-white rounded-lg">
-                      <p class="text-gray-400">댓글 기능 준비중입니다...</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- 댓글 목록 -->
-            <div class="space-y-4">
-              <div class="flex justify-center items-center py-8 text-gray-400">
-                <p>첫 응원 댓글을 남겨보세요!</p>
-              </div>
-            </div>
-          </div>
+          <Comments
+            :comments="comments"
+            :loading="commentLoading"
+            :error="commentError"
+            :onSubmit="createComment"
+            :onDelete="deleteComment"
+          />
           <!-- 관리자용 삭제 버튼 -->
-
         </div>
       </div>
     </div>
