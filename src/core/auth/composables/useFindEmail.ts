@@ -21,7 +21,7 @@ export const useFindEmail = (
   const isLoading = ref(false)
   const error = ref('')
   const errors= ref<FindEmailForm>({})
-  const form = ref<User>({
+  const form = ref<FindEmailForm>({
     userName: '',
     userPhoneNumber: ''
   })
@@ -52,10 +52,9 @@ export const useFindEmail = (
 
     form.value = credentials
 
-    console.log(3);
     isLoading.value = true
     error.value = ''
-    console.log(4);
+
     try {
       const { data } = await findEmailFetch(credentials)
 

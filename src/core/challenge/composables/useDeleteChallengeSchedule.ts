@@ -18,7 +18,6 @@ export const useDeleteChallengeSchedule = (
 
     try {
       if(schedule.challengeId) {
-        console.log(schedule.challengeId)
         const response =await deleteChallengeScheduleFetch(schedule.challengeId)
         return response
       } else {

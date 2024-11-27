@@ -10,7 +10,6 @@ const { VITE_API_URL } = import.meta.env
 
 export const getUserInfoFetch = async (): Promise<User> => {
   const userStore = useUserStore()
-  console.log('getUserInfoFetch')
   const { data } = await axios.get(`${VITE_API_URL}/user/${userStore.userId}`, {
     headers: {
       Authorization: getToken(),
@@ -26,11 +25,13 @@ export const changeUserPasswordFetch = async (data: {
   userPasswordQuestionId: number
   userPasswordAnswer: string
 }): Promise<ApiResponse> => {
-  const { data: response } = await axios.put(`${VITE_API_URL}/user/password`, data, {
+
+  const { data: response } = await axios.post(`${VITE_API_URL}/user/${data.userId}/password/change`, data, {
     headers: {
       Authorization: getToken(),
     },
   })
+
   return response
 }
 

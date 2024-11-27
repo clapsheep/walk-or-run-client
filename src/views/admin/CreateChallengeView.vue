@@ -6,15 +6,17 @@ import BasicButton from '@/components/atoms/BasicButton.vue';
 import BasicSelect from '@/components/molecules/BasicSelect.vue';
 import CreateChallengeSkeleton from '@/components/skeletons/CreateChallengeSkeleton.vue';
 import { useCreateChallenge } from '@/core/challenge/composables/useCreateChallenge'
+import { addChallengeFetch, addChallengeScheduleFetch } from '@/core/challenge/AdminChallengeApi';
 
 const {
-  form,
+  challengeForm,
   isLoading,
   isRecurring,
-  submitForm,
+  handleSubmit,
   isFormValid,
   categoryOptions
-} = useCreateChallenge()
+} = useCreateChallenge(addChallengeFetch, addChallengeScheduleFetch,)
+
 
 // 임시 카테고리 데이터
 
@@ -32,7 +34,7 @@ const {
         <div class="bg-white rounded-lg shadow-sm p-6">
           <h2 class="text-2xl font-bold mb-6 text-gray-800">챌린지 생성</h2>
 
-          <form @submit.prevent="submitForm" class="space-y-6">
+          <form @submit.prevent="handleSubmit" class="space-y-6">
             <BasicRadio
               id="challengeType"
               name="challengeType"
@@ -49,7 +51,7 @@ const {
               id="category"
               label="카테고리"
               name="category"
-              v-model="form.challengeCategoryCode"
+              v-model="challengeForm.challengeCategoryCode"
               :options="categoryOptions"
               placeholder="챌린지 카테고리를 선택해주세요"
               direction="col"
@@ -60,7 +62,7 @@ const {
               id="title"
               label="챌린지 제목"
               name="challengeTitle"
-              v-model="form.challengeTitle"
+              v-model="challengeForm.challengeTitle"
               placeholder="예) 매일 아침 30분 걷기"
               direction="col"
               required
@@ -69,7 +71,7 @@ const {
             <div class="space-y-2">
               <label class="block text-gray-700 font-medium">챌린지 설명</label>
               <textarea
-                v-model="form.challengeDescription"
+                v-model="challengeForm.challengeDescription"
                 required
                 placeholder="예) 하루의 시작을 활기차게! 매일 아침 30분 걷기 챌린지에 참여해보세요."
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px]"
@@ -81,7 +83,7 @@ const {
               label="목표 인원 수"
               name="challengeTargetCnt"
               type="number"
-              v-model="form.challengeTargetCnt"
+              v-model="challengeForm.challengeTargetCnt"
               placeholder="예) 30 (30일 동안 매일 참여)"
               direction="col"
               required
@@ -91,7 +93,7 @@ const {
               <div class="space-y-2">
                 <label class="block text-gray-700 font-medium">반복 주기</label>
                 <select
-                  v-model="form.challengeSchedulerCycle"
+                  v-model="challengeForm.challengeSchedulerCycle"
                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="1">일일</option>
@@ -104,8 +106,8 @@ const {
                 id="startDate"
                 label="반복 시작 날짜"
                 name="startDate"
-                type="datetime-local"
-                v-model="form.challengeCreateDate"
+                type=""
+                v-model="challengeForm.challengeCreateDate"
                 placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
                 required
@@ -115,8 +117,8 @@ const {
                 id="endDate"
                 label="반복 종료 날짜"
                 name="endDate"
-                type="datetime-local"
-                v-model="form.challengeDeleteDate"
+                type="date"
+                v-model="challengeForm.challengeDeleteDate"
                 placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
                 required
@@ -128,8 +130,8 @@ const {
                 id="startDate"
                 label="시작 날짜"
                 name="startDate"
-                type="datetime-local"
-                v-model="form.challengeCreateDate"
+                type="date"
+                v-model="challengeForm.challengeCreateDate"
                 placeholder="챌린지 시작 날짜를 선택해주세요"
                 direction="col"
                 required
@@ -139,8 +141,8 @@ const {
                 id="endDate"
                 label="종료 날짜"
                 name="endDate"
-                type="datetime-local"
-                v-model="form.challengeDeleteDate"
+                type="date"
+                v-model="challengeForm.challengeDeleteDate"
                 placeholder="챌린지 종료 날짜를 선택해주세요"
                 direction="col"
                 required

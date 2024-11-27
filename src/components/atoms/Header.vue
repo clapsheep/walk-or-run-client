@@ -19,13 +19,13 @@ const goBack = () => {
 </script>
 
 <template>
-  <header class="relative flex justify-center items-center py-4 bg-white shadow-sm">
+  <header class="sticky top-0 z-50 flex items-center justify-center bg-white py-4 shadow-sm">
     <div v-if="showBackButton" class="absolute left-4">
       <button
         @click="goBack"
-        class="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
+        class="rounded-full p-2 transition-colors duration-200 hover:bg-gray-100"
       >
-        <ArrowLongLeftIcon class="w-6 h-6 text-gray-600" />
+        <ArrowLongLeftIcon class="h-6 w-6 text-gray-600" />
       </button>
     </div>
     <h1 class="text-xl font-bold text-gray-800">{{ title }}</h1>

@@ -96,9 +96,14 @@ export const useCreateUserGoals = (
 
     loading.value = true
     error.value = ''
-
     try {
-      const response = await createGoalFetch(form.value)
+      const formattedData = {
+        ...form.value,
+        startDate: form.value.startDate ? new Date(form.value.startDate).toISOString().split('T')[0] : '',
+        endDate: form.value.endDate ? new Date(form.value.endDate).toISOString().split('T')[0] : ''
+      }
+
+      const response = await createGoalFetch(formattedData)
       if (response.data.code !== 201) {
         throw new Error(response.data.message || '목표 생성에 실패했습니다.')
       }
