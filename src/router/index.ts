@@ -118,11 +118,6 @@ const router = createRouter({
           component: () => import('@/views/admin/EditScheduleView.vue'),
           meta: { requiresAuth: true, requiresAdmin: true }
         },
-        {
-          path: 'test',
-          name: 'test',
-          component: () => import('@/views/admin/TestView.vue')
-        }
       ],
       redirect: { name: 'admin-ongoing-challenges' }
     },
